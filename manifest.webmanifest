@@ -1,0 +1,20 @@
+{
+  "name": "Tàn Thành: Vạn Giới",
+  "short_name": "Tàn Thành",
+  "description": "Game hành động 2D pixel: bản đồ vô hạn, rương báu, boss ngẫu nhiên, đồng hành và cốt truyện ngẫu nhiên.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#0b0c0e",
+  "theme_color": "#1a0c08",
+  "lang": "vi",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

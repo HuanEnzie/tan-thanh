@@ -2,9 +2,15 @@
 
 Game hành động 2D pixel, góc nhìn từ trên xuống. Có 3 thế giới đang mở, bản đồ vô hạn với 12 vùng địa hình, và cốt truyện ngẫu nhiên. Chạy được trên trình duyệt máy tính lẫn điện thoại. 
 
-Có hai cách chơi:
+Có ba cách chơi:
+- **Cài như app (PWA)** từ https://huanenzie.github.io/tan-thanh/:
+  - Android / máy tính: mở bằng Chrome, bấm **📲 CÀI ĐẶT APP** trên màn hình chính của game (hoặc menu ⋮ → "Cài đặt ứng dụng").
+  - iPhone: mở bằng Safari, bấm Chia sẻ → "Thêm vào MH chính".
+  - App mở toàn màn hình, xoay ngang. Vào **Cài đặt → 📥 Tải dữ liệu để chơi offline** để chơi không cần mạng.
 - Chơi online: https://claude.ai/artifact/HNwsvSuoVAEXYxXWtcDnbp
 - Chạy trên máy: bấm đúp `CHOI_GAME.bat`, hoặc chạy `python -m http.server` rồi mở `index.html`.
+
+Để trang GitHub Pages chạy được, repo phải bật Pages: Settings → Pages → Source "Deploy from a branch" → nhánh `main`, thư mục `/ (root)`. Mỗi lần đổi code, tăng `VERSION` trong `sw.js` để máy người chơi xoá bộ đệm cũ.
 
 ## Thế giới
 

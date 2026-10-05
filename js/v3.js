@@ -399,3 +399,40 @@ Object.assign(UI, {
 })();
 // quick-bar slots are tappable (handy on phones)
 $('quick').addEventListener('click', e => { const q = e.target.closest('.qslot'); if (!q || !q.dataset.q || G.state !== 'playing') return; if (q.dataset.q === 'scroll') G.useScroll(); else if (['barricade', 'trap'].includes(q.dataset.q)) G.place(q.dataset.q); else if (['grenade', 'molotov'].includes(q.dataset.q)) throwIt(q.dataset.q); else G.useItem(q.dataset.q); });
+
+// ---------- installable app (PWA) ----------
+const PWA = {
+  deferred: null,
+  standalone() { return matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; },
+  ios() { return /iphone|ipad|ipod/i.test(navigator.userAgent); },
+  init() {
+    const b = $('btnInstall');
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); this.deferred = e; if (!this.standalone()) b.hidden = false; });
+    window.addEventListener('appinstalled', () => { b.hidden = true; this.deferred = null; UI.toast('Đã cài app Tàn Thành! Mở từ màn hình chính để chơi toàn màn hình.', 'good'); });
+    if (this.ios() && !this.standalone() && /^https?:$/.test(location.protocol)) b.hidden = false;
+    b.onclick = () => {
+      if (this.deferred) { this.deferred.prompt(); this.deferred.userChoice.finally(() => { this.deferred = null; }); return; }
+      UI.toast(this.ios() ? 'Trên iPhone: bấm nút Chia sẻ ⬆ ở Safari rồi chọn "Thêm vào MH chính".' : 'Mở menu ⋮ của Chrome rồi chọn "Cài đặt ứng dụng" / "Thêm vào màn hình chính".', 'info');
+    };
+  },
+  // called once the service worker is registered
+  ready() { $('btnOffline').hidden = false; $('btnOffline').onclick = () => this.cacheAll(); },
+  async cacheAll() {
+    const b = $('btnOffline');
+    if (this.busy) return; this.busy = true;
+    const imgs = new Set(COMMON_IMAGES.concat(ART_IMAGES));
+    for (const r of REALM_ORDER) for (const n of realmImages(r)) imgs.add(n);
+    for (const r of REALM_ORDER) for (const p of REALMS[r].port) { imgs.add(p); if (EXPR_PORTS.has(p)) for (const e of EXPRESSIONS) imgs.add(p + '_' + e); }
+    const urls = [...imgs].map(n => 'assets/img/' + n + (JPG.has(n) || /port\d(_|$)/.test(n) ? '.jpg' : '.png'));
+    const audio = new Set(SFX_LIST.concat(['amb_rain', 'amb_wind', 'music_menu', 'music_romance', 'music_victory', 'music_dungeon']));
+    for (const r of REALM_ORDER) for (const k in REALMS[r].music) audio.add(REALMS[r].music[k]);
+    for (const a of audio) urls.push('assets/audio/' + a + '.mp3');
+    let done = 0;
+    const next = async () => { while (urls.length) { const u = urls.pop(); try { await fetch(u); } catch (e) {} done++; b.textContent = `📥 ĐANG TẢI... ${done}/${total}`; } };
+    const total = urls.length;
+    await Promise.all([next(), next(), next(), next()]);
+    b.textContent = '✔ ĐÃ TẢI XONG — CHƠI ĐƯỢC OFFLINE';
+    this.busy = false;
+  },
+};
+PWA.init();
