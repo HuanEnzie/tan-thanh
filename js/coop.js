@@ -18,6 +18,7 @@ const Net = {
       document.head.appendChild(s);
     });
   },
+  modeKey() { return World.mode === 'dungeon' && World.dg ? 'd' + World.dg.floor : 'over'; },
   supported() { return typeof RTCPeerConnection !== 'undefined' && /^https?:$/.test(location.protocol); },
   genCode() { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let c = ''; for (let i = 0; i < 5; i++) c += A[Math.floor(Math.random() * A.length)]; return c; },
   link() { return location.origin + location.pathname + '#join-' + this.code; },
@@ -35,7 +36,7 @@ const Net = {
       const peer = new Peer(NET_PREFIX + this.code, { debug: 0 });
       this.peer = peer;
       peer.on('open', () => {
-        this.active = this.host = true; this.guest = false; this.pid = 0; G.remotes = [];
+        this.active = this.host = true; this.guest = false; this.pid = 0; G.remotes = []; this.startTicker();
         clearTimeout(this.openTO);
         this.msg('✔ Phòng đã mở! Gửi mã hoặc link bên dưới cho bạn bè rồi chờ họ vào.');
         UI.coopRefresh(); G.toast(`👥 Đã mở phòng ${this.code} — mời bạn bè vào chơi cùng!`, 'quest');
@@ -139,7 +140,7 @@ const Net = {
     if (s) {
       r.tx = s[0]; r.ty = s[1]; r.angle = s[2] / 100; r.spr = s[3]; r.hp = s[4]; r.maxHp = s[5]; r.lvl = s[7];
       const f = s[6]; r.dead = !!(f & 1); if (f & 2) r.sw = 0.2; if (f & 4) r.mz = 0.06;
-      r.pet = s[8]; r.away = s[9] !== World.mode + (World.dg ? World.dg.floor : '');
+      r.pet = s[8]; r.away = s[9] !== this.modeKey();
       if (Math.hypot(r.x - r.tx, r.y - r.ty) > 400) { r.x = r.tx; r.y = r.ty; }
     }
     if (d.h) for (const h of d.h) {
@@ -158,6 +159,8 @@ const Net = {
     if (d.t === 'bye') { this.lost('Chủ phòng đã đóng phòng.'); return; }
     if (d.t === 'init') { this.guestInit(d); return; }
     if (d.t === 'dn' && this.guest && G.player) {
+      if (this.stalled) { this.stalled = false; G.toast('▶ Chủ phòng đã quay lại — thế giới tiếp tục!', 'good'); }
+      this.lastSnap = performance.now();
       if (d.s) this.applySnap(d.s);
       if (d.e) for (const e of d.e) this.applyEvent(e, null);
     }
@@ -186,7 +189,7 @@ const Net = {
       G.initV4(ch.v4);
       G.clock = d.clock; G.day = d.day; G.time = 0;
       G.returnPos = d.ret;
-      this.active = this.guest = true; this.host = false;
+      this.active = this.guest = true; this.host = false; this.startTicker(); this.lastSnap = performance.now();
       G.remotes = []; this.zmap.clear(); this.amap.clear(); this.nprops.clear();
       if (d.mode === 'dungeon' && d.dg) {
         if (d.overDelta) { World.delta = new Map(); for (const [k, l, r, c] of d.overDelta) World.delta.set(k, { looted: new Set(l), removed: new Set(r), cleared: !!c }); }
@@ -388,7 +391,7 @@ const Net = {
       });
     } else if (e[1] === 'exit') {
       UI.fade(() => {
-        World.mode = 'over'; G.dgTarget = null;
+        World.mode = 'over'; World.dg = null; G.dgTarget = null;
         World.reset();
         if (G.saveOver) { World.delta = G.saveOver.delta; World.explored = G.saveOver.explored; }
         G.zombies = []; this.zmap.clear(); G.allies = G.allies.filter(a => !a.net); this.amap.clear(); this.nprops.clear();
@@ -402,6 +405,22 @@ const Net = {
   },
 
   // ---------- per-frame ----------
+  // rAF stops in hidden tabs; a worker clock keeps the room alive (desktop browsers)
+  startTicker() {
+    if (this.ticker || typeof Worker === 'undefined') return;
+    try {
+      this.ticker = new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},33);'], { type: 'text/javascript' })));
+      this.hidT = performance.now();
+      this.ticker.onmessage = () => {
+        const now = performance.now();
+        if (!document.hidden || !this.active || !G.player) { this.hidT = now; return; }
+        const dt = Math.min(0.1, (now - this.hidT) / 1000); this.hidT = now;
+        G.rdt = dt; G.frame++;
+        try { G.update(dt); } catch (e) { console.error(e); }
+        Input.endFrame();
+      };
+    } catch (e) { this.ticker = null; }
+  },
   queueHit(id, dmg, kx, ky, aff, src) {
     const k = id + '|' + src;
     let h = this.hq.get(k);
@@ -430,6 +449,10 @@ const Net = {
         G.toast('Bạn đã hồi sinh!', 'good');
       }
     }
+    if (this.guest && !this.stalled && performance.now() - (this.lastSnap || 0) > 3000) {
+      this.stalled = true;
+      G.toast('⏸ Chủ phòng đang tạm rời game (thu nhỏ trình duyệt / mở app khác) — quái và thời gian tạm dừng. Nhắn họ mở lại game nhé!', 'warn');
+    }
     // network send
     this.sendT -= dt;
     if (this.sendT > 0) return;
@@ -445,7 +468,7 @@ const Net = {
   myState() {
     const P = G.player;
     let f = P.dead ? 1 : 0; if (P.swingT > 0) f |= 2; if (P.muzzleT > 0) f |= 4;
-    return [P.x | 0, P.y | 0, Math.round(P.angle * 100), P.wdef.sprite, Math.round(P.hp), Math.round(P.maxHp), f, P.level, G.activePet, World.mode + (World.dg ? World.dg.floor : '')];
+    return [P.x | 0, P.y | 0, Math.round(P.angle * 100), P.wdef.sprite, Math.round(P.hp), Math.round(P.maxHp), f, P.level, G.activePet, this.modeKey()];
   },
   guestSend() {
     const msg = { t: 'up', s: this.myState() };

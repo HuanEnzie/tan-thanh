@@ -871,7 +871,7 @@ const G = {
     const cleared = World.dg && World.dg.cleared, story = World.dg && World.dg.story;
     Sound.play('sfx_portal', 0.7);
     UI.fade(() => {
-      World.mode = 'over'; this.dgTarget = null; this.transit = false;
+      World.mode = 'over'; World.dg = null; this.dgTarget = null; this.transit = false;
       World.reset();
       World.delta = this.saveOver.delta; World.explored = this.saveOver.explored;
       if (cleared && this.gateProp) World.markRemoved(this.gateProp);
