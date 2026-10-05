@@ -95,7 +95,8 @@ const UI = {
   refreshPick(newName) {
     const r = this.pickedRealm, L = LORE[r], g = this.pickedGender || 'm';
     const names = (HERO_NAMES[r] || HERO_NAMES.md)[g];
-    if (newName || !$('heroName').value) $('heroName').value = R.pick(names);
+    const all = Object.values(HERO_NAMES).flatMap(o => o.m.concat(o.f));
+    if (newName || !$('heroName').value || all.includes($('heroName').value)) $('heroName').value = R.pick(names);
     $('pickComps').innerHTML = L.companions.map((c, i) => {
       const rom = c.gender !== g;
       return `<div class="pc"><img src="assets/img/${REALMS[r].port[i]}.jpg" alt=""><b>${esc(c.name)}</b><span>${esc(c.role)}</span><em class="${rom ? 'rom' : 'bond'}">${rom ? '♥ Có thể thành người thương' : '★ ' + esc(c.bondTitle || 'Kết nghĩa')}</em></div>`;
@@ -138,6 +139,7 @@ const UI = {
     if (id === 'craft') this.buildCraft();
     if (id === 'inv') this.buildInv();
     if (id === 'map') this.drawBigMap();
+    if (id === 'gacha') this.buildGacha();
     this.showScreen(id);
   },
   closePanel() { if (G.state === 'menu') { G.state = 'playing'; this.showScreen(null); } },
@@ -255,7 +257,7 @@ const UI = {
     $('dPort').style.display = who === 'npc' && P ? '' : 'none';
     if (P) {
       let pt = P;
-      if (who === 'npc' && EXPR_PORTS.has(P)) { const e = line.e || guessExpr(line.text, d.romance !== false); if (e && e !== 'normal') pt = P + '_' + e; }
+      if (who === 'npc' && EXPR_PORTS.has(P)) { let e = line.e || guessExpr(line.text, d.romance !== false); if (e === 'blush' && d.romance === false) e = 'happy'; if (e && e !== 'normal') pt = P + '_' + e; }
       const src = 'assets/img/' + pt + '.jpg';
       if (!$('dPort').src.endsWith(src)) { $('dPort').src = src; $('dPort').classList.remove('pop'); void $('dPort').offsetWidth; $('dPort').classList.add('pop'); }
     }
@@ -435,6 +437,15 @@ const UI = {
       g.drawImage(m, x * SB * S, y * SB * S, SB * S + 0.5, SB * S + 0.5);
     }
     const toM = (wx, wy) => [((wx / TILE) - (psx - 12) * SB) * S, ((wy / TILE) - (psy - 12) * SB) * S];
+    if (World.mode === 'over') for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const sx = psx - 12 + x, sy = psy - 12 + y, w = World.wonderAt(sx, sy); if (w == null) continue;
+      const found = World.explored.has(World.mode + nkey(sx, sy));
+      const [mx, my] = [(x + 0.5) * SB * S, (y + 0.5) * SB * S];
+      g.font = (found ? 'bold 20px' : 'bold 22px') + ' VT323, monospace'; g.textAlign = 'center';
+      g.fillStyle = '#000'; g.fillText(found ? '★' : '?', mx + 1, my + 8);
+      g.fillStyle = found ? '#ffe6a0' : '#c8b8ff'; g.fillText(found ? '★' : '?', mx, my + 7);
+      if (found) { g.font = '13px VT323, monospace'; g.fillText(WONDERS[w].name, mx, my + 22); }
+    }
     g.font = '16px VT323, monospace'; g.textAlign = 'center';
     for (const t of World.mode === 'over' ? Story.targets() : []) {
       const [x, y] = toM(t.x, t.y);

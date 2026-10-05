@@ -34,7 +34,7 @@
 <button id="tDash"><span>LƯỚT</span></button>
 <button id="tSkill"><span>TUYỆT KỸ</span></button>
 <div id="tmenu">
-  <button data-a="pause">II</button><button data-a="fs">⛶</button><button data-a="map">Bản đồ</button><button data-a="craft">Chế tạo</button><button data-a="inv">Túi</button>
+  <button data-a="pause">II</button><button data-a="fs">⛶</button><button data-a="map">Bản đồ</button><button data-a="craft">Chế tạo</button><button data-a="inv">Túi</button><button data-a="gacha" class="gbtn">🎴</button>
   <button data-k="KeyL" class="ico"><img src="assets/img/i_flashlight.png" alt="Đèn"></button><button data-k="KeyB" class="ico"><img src="assets/img/i_planks.png" alt="Rào"><i></i></button><button data-k="KeyT" class="ico"><img src="assets/img/i_scrap.png" alt="Bẫy"><i></i></button><button data-k="KeyU" class="ico"><img src="assets/img/ui_5.png" alt="Truyền tống"></button>
 </div>
 <div id="fsHint" hidden></div>
@@ -52,7 +52,7 @@
   </div>
   <div id="topright">
     <canvas id="minimap" width="200" height="200"></canvas>
-    <div id="mmlabel">[M] Bản đồ • [C] Chế tạo • [Tab] Túi đồ • [U] Truyền tống</div>
+    <div id="mmlabel">[M] Bản đồ • [C] Chế tạo • [Tab] Túi đồ • [Y] Triệu hồi</div>
   </div>
   <div id="bossbar" class="hidden"><div id="bossname"></div><div class="bar"><div id="bossfill"></div></div></div>
   <div id="feed"></div>
@@ -164,6 +164,7 @@
           <tr><td>G • B • T • L</td><td>Ném • Rào chắn • Bẫy • Đèn</td></tr>
           <tr><td>C / Tab / M</td><td>Chế tạo / Túi đồ / Bản đồ</td></tr>
           <tr><td>U</td><td>Cuộn truyền tống: về nơi trú ẩn / thoát hầm ngục</td></tr>
+          <tr><td>Y</td><td>Tế Đàn triệu hồi (gacha): thú cưng, trang bị, báu vật</td></tr>
         </table>
         <h3>Điện thoại</h3>
         <p class="muted">Cần trái di chuyển, cần phải ngắm. Giữ nút đỏ để tấn công (tự ngắm kẻ gần nhất). LƯỚT để né, TUYỆT KỸ khi vòng năng lượng đầy.</p>
@@ -183,6 +184,11 @@
           <li>Trong hầm ngục, mũi tên vàng chỉ đường tới Chủ Hầm Ngục rồi tới lối ra.</li>
           <li>Đồng hành khác giới có thể thành người thương; cùng giới sẽ kết nghĩa huynh đệ / tỷ muội.</li>
           <li>💾 Lưu / tải file .json trong menu để giữ tiến độ trên máy.</li>
+          <li>🎴 <b>Tế Đàn triệu hồi</b> (phím Y): dùng vé để nhận thú cưng, trang bị Huyền Thoại, rương Kim Cương. Vé có từ vùng đất mới, kỳ quan, boss, rương quý, yêu tinh trộm vàng, mảnh sao băng.</li>
+          <li>★ <b>Kỳ quan</b>: mỗi vùng đất ẩn một kỳ quan. Dấu ? trên bản đồ lớn là tin đồn — hãy đến tận nơi.</li>
+          <li>💰 <b>Yêu tinh trộm vàng</b> thỉnh thoảng xuất hiện và bỏ chạy. Hạ nó trước khi nó chui vào cổng!</li>
+          <li>⚠ Có những chiếc rương... biết cắn. Để ý rương nào hơi rung rinh.</li>
+          <li>🌙 Đêm có thể có <b>Mưa sao băng</b> (nhặt mảnh sao) hoặc <b>Huyết nguyệt</b> (quái đông, tiền x2).</li>
         </ul>
       </div>
     </div>
@@ -223,7 +229,7 @@
   <div class="panel wide">
     <button class="close" onclick="UI.closePanel()">✕</button>
     <h2>TÚI ĐỒ <small>[Tab] đóng</small></h2>
-    <div class="tabs"><button data-tab="gear">Trang bị</button><button data-tab="items">Vật phẩm</button><button data-tab="comp">Đồng hành ♥</button><button data-tab="stats">Nhân vật</button></div>
+    <div class="tabs"><button data-tab="gear">Trang bị</button><button data-tab="items">Vật phẩm</button><button data-tab="comp">Đồng hành ♥</button><button data-tab="pets">Thú cưng</button><button data-tab="codex">Sổ tay</button><button data-tab="stats">Nhân vật</button></div>
     <div id="invBody"></div>
   </div>
 </div>
@@ -235,6 +241,20 @@
     <div class="tabs"><button data-stab="buy">Mua</button><button data-stab="sell">Bán</button></div>
     <div id="shopBody"></div>
   </div>
+</div>
+
+<div id="gacha" class="screen hidden">
+  <div class="panel wide gpanel">
+    <button class="close" onclick="UI.closePanel()">✕</button>
+    <div class="ghead"><h2 id="gName"></h2><div class="gcur" id="gTickets"></div><div class="gcur" id="gStars"></div></div>
+    <div class="gbanner">
+      <img src="assets/img/ev_altar.png" alt="" class="galtar">
+      <div class="gbtext"><b>Thú cưng 5★ đang xuất hiện</b><div id="gFeat"></div><p id="gPity"></p>
+        <p class="muted">Tỉ lệ: 5★ 1.6% (tăng dần từ lượt 45, chắc chắn ở lượt 60) • 4★ 13% (chắc chắn mỗi 10 lượt). Phần thưởng: thú cưng, trang bị Huyền Thoại, rương Kim Cương, tinh thể sinh mệnh…</p></div>
+    </div>
+    <div class="menu row wrap gbtns"><button id="gPull1">TRIỆU HỒI x1</button><button id="gPull10" class="gold">TRIỆU HỒI x10</button><button id="gTrade">ĐỔI 10 MẢNH SAO → 1 VÉ</button><button id="gBuy"></button></div>
+  </div>
+  <div id="gAnim" class="ganim" hidden><div class="gsky"></div><div class="gstreak"></div><div class="gflash"></div><div id="gCards"></div><button id="gCont" hidden>TIẾP TỤC ▶</button></div>
 </div>
 
 <div id="saveio" class="screen hidden">
@@ -297,6 +317,7 @@
 <script src="js/play.js"></script>
 <script src="js/touch.js"></script>
 <script src="js/v3.js"></script>
+<script src="js/v4.js"></script>
 <script>
   try { G.lowGfx = !!localStorage.getItem('tt_low'); } catch (e) {}
   resize();

@@ -96,6 +96,7 @@ Object.assign(G, {
   },
   earn(n) { this.player.gold += n; Sound.play('sfx_coin', 0.45, 1.3); UI.dirty = true; },
   openChest(p) {
+    if (p.data && p.data.keep) World.unkeep(p.data.keep);
     const tier = clamp(p.data && p.data.tier || 0, 0, 3), C = CHESTS[tier];
     const P = this.player;
     p.img = 'chest_' + tier + 'o';
@@ -115,19 +116,24 @@ Object.assign(G, {
     const bonus = (p.data && p.data.bonus || 0) + luck;
     const drops = [];
     const gold = [[6, 16], [22, 45], [60, 110], [170, 320]][tier];
-    drops.push(() => Items.drop(p.x, p.y, 'gold', Math.round(R.int(gold[0], gold[1]) * (1 + lvl * 0.08))));
+    drops.push(q => Items.drop(q.x, q.y, 'gold', Math.round(R.int(gold[0], gold[1]) * (1 + lvl * 0.08))));
     const nGear = [Math.random() < 0.4 ? 1 : 0, 1 + (Math.random() < 0.35 ? 1 : 0), 2, 3][tier];
     const gb = [0.3, 1, 2, 3.5][tier], minR = [0, 1, 2, 3][tier];
-    for (let i = 0; i < nGear; i++) { const mr = tier === 3 && i === 0 && Math.random() < 0.4 ? 4 : minR; drops.push(() => Items.dropGear(p.x, p.y, Loot.randomGear(lvl, gb + bonus, mr))); }
+    for (let i = 0; i < nGear; i++) { const mr = tier === 3 && i === 0 && Math.random() < 0.4 ? 4 : minR; drops.push(q => Items.dropGear(q.x, q.y, Loot.randomGear(lvl, gb + bonus, mr))); }
     const cons = [
       [['food', 1], ['water', 1], ['bandage', 1], ['ammo_pistol', 12], ['planks', 2], ['flower', 1]],
       [['medkit', 1], ['ammo_shell', 8], ['ammo_rifle', 20], ['grenade', 1], ['pills', 1], ['energy', 1]],
       [['medkit', 2], ['grenade', 2], ['ammo_rifle', 35], ['scroll', 1], ['pills', 2]],
       [['medkit', 3], ['heart', 1], ['mystery', 1], ['scroll', 1], ['grenade', 3]],
     ][tier];
-    for (let i = 0; i < [2, 2, 2, 3][tier]; i++) { const c = R.pick(cons); drops.push(() => Items.drop(p.x, p.y, c[0], c[1])); }
-    if (tier >= 2 && Math.random() < 0.25) drops.push(() => Items.drop(p.x, p.y, 'heart', 1));
-    drops.forEach((f, i) => setTimeout(() => { if (this.player === P && !P.dead) { f(); Particles.burst(p.x, p.y - 4, 5, C.col, 120); } }, 160 + i * 150));
+    for (let i = 0; i < [2, 2, 2, 3][tier]; i++) { const c = R.pick(cons); drops.push(q => Items.drop(q.x, q.y, c[0], c[1])); }
+    if (tier >= 2 && Math.random() < 0.25) drops.push(q => Items.drop(q.x, q.y, 'heart', 1));
+    const token = World.mode + (World.dg ? World.dg.floor : '');
+    drops.forEach((f, i) => setTimeout(() => {
+      if (this.player !== P || P.dead) return;
+      if (token !== World.mode + (World.dg ? World.dg.floor : '')) { p = { x: P.x, y: P.y, data: p.data }; }
+      f(p); Particles.burst(p.x, p.y - 4, 5, C.col, 120);
+    }, 160 + i * 150));
   },
   useItem(id) {
     const P = this.player;
@@ -135,8 +141,8 @@ Object.assign(G, {
     if (id === 'scroll') return this.useScroll();
     if (id === 'heart') { this.take(id); P.maxHp += 10; P.hp = Math.min(P.maxHp, P.hp + 10); FX.pillar(P.x, P.y, '#ff3b5a', 1, 30); Sound.play('sfx_heal', 0.6); this.toast(`+10 máu tối đa (${Math.round(P.maxHp)})`, 'good'); return; }
     if (id === 'mystery') { this.take(id); Items.dropGear(P.x, P.y, Loot.randomGear(P.level, 1.3)); FX.ring(P.x, P.y, 6, 60, '#c08bff', 0.4, 5); Sound.play('sfx_coin', 0.5); return; }
-    if (['medkit', 'bandage', 'pills'].includes(id)) useHeal();
-    if (['food', 'water', 'choco', 'energy'].includes(id)) useFood();
+    if (['medkit', 'bandage', 'pills'].includes(id)) useHeal(id);
+    if (['food', 'water', 'choco', 'energy'].includes(id)) useFood(id);
   },
   useScroll() {
     const P = this.player;
@@ -173,6 +179,7 @@ Object.assign(G, {
     this.biome = b;
     const B = BIOMES[b];
     this.biomeAmb = B.amb;
+    this.biomeFound(b);
     if (!first) { UI.banner(B.name.toUpperCase(), B.desc, '#cfe8ff'); Sound.play('sfx_bell', 0.3, 1.3); }
   },
 });
@@ -233,7 +240,9 @@ function drawChestAura(p) {
   ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
   // shake while being opened
   const A = G.action;
-  if (A && A.prop === p) { p.rot = Math.sin(G.time * 40) * 0.08 * (A.t / A.dur); } else p.rot = 0;
+  if (A && A.prop === p) { p.rot = Math.sin(G.time * 40) * 0.08 * (A.t / A.dur); }
+  else if (p.data && p.data.mimic && Math.sin(G.time * 0.9 + p.x * 0.01) > 0.94) p.rot = Math.sin(G.time * 35) * 0.06; // a mimic twitches now and then
+  else p.rot = 0;
 }
 
 // ---------- shop UI ----------
@@ -280,6 +289,12 @@ Object.assign(UI, {
     } else {
       const cheap = P.stash.filter(it => it.rarity <= 1);
       h += `<div class="menu row"><button id="sellCheap" ${cheap.length ? '' : 'class="dim"'}>BÁN HẾT ĐỒ THƯỜNG & TỐT (${cheap.length}) — ${cheap.reduce((s, it) => s + Loot.price(it), 0)}</button></div>`;
+      const worn = [...SLOT_ORDER.map(s => P.equip[s]), ...ARMOR_SLOTS.map(s => P.armor[s]), ...P.relics].filter(Boolean);
+      if (worn.length) {
+        h += '<h3>Đang trang bị <small>— bấm BÁN hai lần để xác nhận</small></h3><div class="srows">';
+        for (const it of worn) { const r = RARITY[it.rarity]; h += `<div class="srow worn" style="--rc:${r.color}"><img src="${IMG[Loot.iconOf(it)].src}" alt=""><div class="sinfo"><b style="color:${r.color}">${esc(it.name)}</b><small>ĐANG DÙNG • ${r.name} • Cấp ${it.ilvl}</small></div>${coin(Loot.price(it))}<button data-sellw="${it.uid}">BÁN</button></div>`; }
+        h += '</div>';
+      }
       h += `<h3>Trang bị trong túi (${P.stash.length}/30)</h3><div class="srows">`;
       P.stash.forEach(it => {
         const r = RARITY[it.rarity];
@@ -307,7 +322,7 @@ Object.assign(UI, {
       if (!G.pay(+b.dataset.p)) return;
       const t = +b.dataset.chest;
       const x = P.x + Math.cos(P.angle) * 40, y = P.y + Math.sin(P.angle) * 40;
-      World.addProp('chest_' + t, x, y, { container: 'chest', kind: 'chest', r: 12, data: { tier: t, bonus: 0.3 } });
+      World.keepChest(x, y, t, 0.3);
       FX.pillar(x, y, CHESTS[t].col, 0.8, 20);
       this.shopSay('buy'); this.closePanel();
       G.toast(`${CHESTS[t].name} đã đặt trước mặt bạn — nhấn [E] để mở!`, 'good');
@@ -320,6 +335,16 @@ Object.assign(UI, {
     box.querySelectorAll('[data-sellg]').forEach(b => b.onclick = () => {
       const it = P.stash.find(x => x.uid === +b.dataset.sellg); if (!it) return;
       P.stash.splice(P.stash.indexOf(it), 1); G.earn(Loot.price(it)); this.shopSay('sell'); this.buildShop();
+    });
+    box.querySelectorAll('[data-sellw]').forEach(b => b.onclick = () => {
+      if (!b.dataset.armed) { b.dataset.armed = 1; b.textContent = 'CHẮC CHƯA?'; b.classList.add('warn'); setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = 'BÁN'; b.classList.remove('warn'); } }, 2500); return; }
+      const uid = +b.dataset.sellw;
+      let it = null;
+      for (const s of SLOT_ORDER) if (P.equip[s] && P.equip[s].uid === uid) { it = P.equip[s]; P.equip[s] = null; P.wcache = {}; if (P.weapon === s) P.weapon = 'melee'; if (s !== 'melee') { P.inv[AMMO_OF[s]] = (P.inv[AMMO_OF[s]] || 0) + (P.mags[s] || 0); P.mags[s] = 0; } }
+      for (const s of ARMOR_SLOTS) if (P.armor[s] && P.armor[s].uid === uid) { it = P.armor[s]; P.armor[s] = null; P.applyGear(); }
+      P.relics.forEach((r, i) => { if (r && r.uid === uid) { it = r; P.relics[i] = null; G.applyRelics(); } });
+      if (!it) return;
+      G.earn(Loot.price(it)); this.shopSay('sell'); this.buildShop();
     });
     const sellItem = (id, n) => {
       n = Math.min(n, P.inv[id] || 0); if (!n) return;
@@ -393,7 +418,7 @@ Object.assign(UI, {
   $('sioPaste').onclick = () => UI.importSave($('sioText').value);
   document.querySelectorAll('#shop [data-stab]').forEach(t => t.onclick = () => { UI.shopTab = t.dataset.stab; UI.buildShop(); });
   // gender picker on the world screen
-  const setG = g => { UI.pickedGender = g; $('gM').classList.toggle('on', g === 'm'); $('gF').classList.toggle('on', g === 'f'); if (UI.pickedRealm) UI.refreshPick(true); };
+  const setG = g => { UI.pickedGender = g; $('gM').classList.toggle('on', g === 'm'); $('gF').classList.toggle('on', g === 'f'); if (UI.pickedRealm) UI.refreshPick(false); };
   $('gM').onclick = () => setG('m'); $('gF').onclick = () => setG('f');
   UI.pickedGender = 'm';
 })();
@@ -424,14 +449,14 @@ const PWA = {
     for (const r of REALM_ORDER) for (const n of realmImages(r)) imgs.add(n);
     for (const r of REALM_ORDER) for (const p of REALMS[r].port) { imgs.add(p); if (EXPR_PORTS.has(p)) for (const e of EXPRESSIONS) imgs.add(p + '_' + e); }
     const urls = [...imgs].map(n => 'assets/img/' + n + (JPG.has(n) || /port\d(_|$)/.test(n) ? '.jpg' : '.png'));
-    const audio = new Set(SFX_LIST.concat(['amb_rain', 'amb_wind', 'music_menu', 'music_romance', 'music_victory', 'music_dungeon']));
+    const audio = new Set(SFX_LIST.concat(['sfx_heartbeat', 'amb_rain', 'amb_wind', 'music_menu', 'music_romance', 'music_victory', 'music_dungeon']));
     for (const r of REALM_ORDER) for (const k in REALMS[r].music) audio.add(REALMS[r].music[k]);
     for (const a of audio) urls.push('assets/audio/' + a + '.mp3');
-    let done = 0;
-    const next = async () => { while (urls.length) { const u = urls.pop(); try { await fetch(u); } catch (e) {} done++; b.textContent = `📥 ĐANG TẢI... ${done}/${total}`; } };
+    let done = 0, bad = 0;
+    const next = async () => { while (urls.length) { const u = urls.pop(); try { const r = await fetch(u); if (!r.ok) bad++; } catch (e) { bad++; } done++; b.textContent = `📥 ĐANG TẢI... ${done}/${total}`; } };
     const total = urls.length;
     await Promise.all([next(), next(), next(), next()]);
-    b.textContent = '✔ ĐÃ TẢI XONG — CHƠI ĐƯỢC OFFLINE';
+    b.textContent = bad ? `⚠ THIẾU ${bad} FILE — BẤM ĐỂ THỬ LẠI` : '✔ ĐÃ TẢI XONG — CHƠI ĐƯỢC OFFLINE';
     this.busy = false;
   },
 };

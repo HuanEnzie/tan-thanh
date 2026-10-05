@@ -51,6 +51,22 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 - **Lưu và tải file .json**: trong menu, chọn 💾 LƯU / TẢI FILE để xuất tiến độ ra file, sao chép mã, hoặc nạp lại từ file hay mã đã dán.
 - **Cửa nhà dễ thấy**: cửa vẽ trên mái, có ánh đèn hắt ra và mũi tên chỉ vào.
 
+## Bản v4: khám phá & gacha
+
+- **Tế Đàn Vận Mệnh (gacha)**: triệu hồi x1/x10, có bảo hiểm (5★ chắc chắn ở lượt 60, 4★ mỗi 10 lượt), hiệu ứng sao băng đổi màu theo độ hiếm và thẻ lật. Lần x10 đầu tiên chắc chắn có thú cưng. Vé lấy từ vùng đất mới, kỳ quan, boss, rương quý, yêu tinh, mảnh sao băng (10 mảnh = 1 vé) hoặc mua bằng tiền.
+- **8 thú cưng** có kỹ năng riêng, lên tới bậc 5 khi trùng: Hỏa Hồ Ly, Băng Long Con, Mèo Thần Tài, Sứa Ánh Sáng, Lôi Điểu, Tiểu Thạch Nhân, U Linh Đèn Lồng, Tinh Linh Pha Lê.
+- **12 kỳ quan**, mỗi vùng đất một kỳ quan, có lời kể và phần thưởng. Trên bản đồ lớn, dấu ? là tin đồn, ★ là nơi đã đến.
+- **Sự kiện thế giới**:
+  - Yêu tinh trộm vàng bỏ chạy và rơi vàng (lấy ý tưởng từ Diablo).
+  - Rương ăn thịt (Dark Souls).
+  - Mưa sao băng và huyết nguyệt (Terraria).
+- **Sổ tay lữ khách**: theo dõi vùng đất, kỳ quan, thú cưng, boss đã hạ (Hollow Knight).
+- **Bản đồ có cấu trúc**:
+  - Mỗi ô nhớ vùng của mình.
+  - Cây mọc thành lùm, xen khoảng trống.
+  - Nghĩa địa có bia mộ xếp hàng, rừng nấm có vòng nấm tiên.
+  - Pha lê mọc thành cụm, lau sậy và băng mọc ven bờ.
+
 ## Điều khiển
 
 **Máy tính**:

@@ -91,7 +91,7 @@ const World = {
     if (sb) return sb;
     sb = {
       sx, sy, key: k, tx0: sx * SB, ty0: sy * SB,
-      tiles: new Uint8Array(SB * SB), bld: new Int16Array(SB * SB).fill(-1), occ: new Uint8Array(SB * SB), block: new Uint8Array(SB * SB), mark: new Uint8Array(SB * SB),
+      tiles: new Uint8Array(SB * SB), bio: new Uint8Array(SB * SB), bld: new Int16Array(SB * SB).fill(-1), occ: new Uint8Array(SB * SB), block: new Uint8Array(SB * SB), mark: new Uint8Array(SB * SB),
       props: [], buildings: [], spawns: [], zone: 0, lights: [],
     };
     const prevGen = this._gen, prevLast = this._last;
@@ -107,7 +107,7 @@ const World = {
     sb.props.forEach((p, idx) => {
       p.id = k + ':' + idx;
       if (d && d.removed && d.removed.has(idx)) { p.dead = true; return; }
-      if (d && d.looted && d.looted.has(idx)) { p.looted = true; if (p.container === 'chest') p.img = 'chest_' + p.data.tier + 'o'; }
+      if (d && d.looted && d.looted.has(idx)) { p.looted = true; if (p.container === 'chest') { p.img = 'chest_' + p.data.tier + 'o'; const im = IMG[p.img]; if (im) { p.w = im.width / 2; p.h = im.height / 2; } } }
       this.gridAdd(p);
       this.markBlock(p, 1, sb);
       if (p.light) this.lights.push(p);
@@ -176,6 +176,26 @@ const World = {
     if (m < 0.37) return t < 0.5 ? 'autumn' : 'sakura';
     return m > 0.53 ? 'forest' : 'plains';
   },
+  // biome name of a tile (works while generating too)
+  bioAt(tx, ty) { const sb = this.sbOf(tx, ty); return sb && sb.bio ? BIOME_IDS[sb.bio[(ty - sb.ty0) * SB + (tx - sb.tx0)]] || 'plains' : 'plains'; },
+  // a landmark sits in about 1 of 20 wild blocks, computable without generating the block
+  wonderAt(sx, sy) {
+    if (this.mode !== 'over' || Math.hypot(sx, sy) < 4 || this.zoneOf(sx, sy) !== 0) return null;
+    if (h3(sx, sy, 77) > 0.03) return null;
+    if (typeof Story !== 'undefined' && Story.poiAt(sx, sy)) return null;
+    const b = this.biomeAt(sx + 0.5, sy + 0.5);
+    const i = WONDERS.findIndex(w => w.biome === b);
+    return i >= 0 ? i : null;
+  },
+  genWonder(bk, w, sb) {
+    const cx = Math.floor((bk.x0 + bk.x1) / 2), cy = Math.floor((bk.y0 + bk.y1) / 2);
+    sb.poi = { kind: 'wonder', w };
+    this.reserve(cx - 9, cy - 9, cx + 9, cy + 10);
+    this.addProp(WONDERS[w].img, cx * TILE + 16, cy * TILE, { r: 78, kind: 'wonder', data: { w }, light: 220, lightCol: 'white' });
+    this.chest(cx, cy + 6, this.rollChest(2));
+    this.spawnGuards(cx * TILE, (cy + 6) * TILE, 5, { r: 240, elite: 0.35 });
+    for (let k = 0; k < 8; k++) { const a = k / 8 * TAU; this.tryTree(Math.round(cx + Math.cos(a) * 11), Math.round(cy + Math.sin(a) * 11), false); }
+  },
   biomeOfPos(x, y) { const sb = this.sbs.get(nkey(Math.floor(x / SBPX), Math.floor(y / SBPX))); return sb && sb.biome || 'plains'; },
   levelAt(x, y) {
     if (this.mode === 'dungeon') return this.dg.level;
@@ -195,7 +215,8 @@ const World = {
       const gx = tx0 + x, gy = ty0 + y;
       const n = fbm(gx / 16, gy / 16, 3);
       const j = (fbm(gx / 9 + 77, gy / 9 + 77, 2) - 0.5) * 0.6;
-      const b = BIOMES[this.biomeAt(gx / SB + j, gy / SB - j)];
+      const bn = this.biomeAt(gx / SB + j, gy / SB - j), b = BIOMES[bn];
+      sb.bio[y * SB + x] = BIOME_IDS.indexOf(bn);
       sb.tiles[y * SB + x] = n > 0.66 ? (b.alt ?? (b.ground ?? T.DIRT)) : (b.ground ?? T.GRASS);
     }
     // lakes in the wild (frozen in the snow, lava in the volcano, oasis in the desert)
@@ -232,6 +253,7 @@ const World = {
     const forced = (typeof Story !== 'undefined') ? Story.poiAt(sx, sy) : null;
     if (sx === 0 && sy === 0) { this.genStart(bk); }
     else if (forced) this.genPOI(bk, forced, sb);
+    else if (this.wonderAt(sx, sy) != null) this.genWonder(bk, this.wonderAt(sx, sy), sb);
     else {
       const r = SR.f();
       const gateP = R.gatesCommon ? 0.09 : 0.045;
@@ -279,6 +301,7 @@ const World = {
     this.startHouse = b;
     this.addProp('fx_4', cx * TILE + 16, (cy + 6) * TILE, { solid: false, light: 150, kind: 'campfire', lightCol: 'fire' });
     this._gen.spawns.push({ kind: 'merchant', x: (cx + 4) * TILE, y: (cy + 6) * TILE + 8 });
+    this.addProp('ev_altar', (cx - 7) * TILE, (cy + 5) * TILE, { r: 22, kind: 'altar', light: 140, lightCol: 'magenta' });
     this.chest(cx - 4, cy + 7, 0);
     for (let k = 0; k < 6; k++) this.tryTree(SR.int(bk.x0, bk.x1), SR.int(bk.y0, bk.y1), true);
   },
@@ -371,14 +394,16 @@ const World = {
   },
   // tier: 0 wood, 1 silver, 2 gold, 3 diamond (rolled up a little at random)
   rollChest(base) { let t = base; if (SR.chance(0.25)) t++; if (SR.chance(0.06)) t++; return clamp(t, 0, 3); },
-  chest(tx, ty, tier) { return this.container('chest_' + tier, tx, ty, 'chest', { kind: 'chest', r: 12, data: { tier } }); },
+  chest(tx, ty, tier) { return this.container('chest_' + tier, tx, ty, 'chest', { kind: 'chest', r: 12, data: { tier, mimic: tier >= 1 && SR.chance(0.08) } }); },
   container(img, tx, ty, kind, o = {}) {
     return this.addProp(img, tx * TILE + 16, ty * TILE + 16, Object.assign({ container: kind }, o));
   },
   tryTree(tx, ty, city, list) {
     if (!this.free(tx, ty, 1)) return;
-    const B = this._gen && BIOMES[this._gen.biome];
-    const t = SR.pick(list || (B && B.trees && B.trees.length ? B.trees : RL.props.trees));
+    const B = BIOMES[this.bioAt(tx, ty)];
+    const pool = list || (B && B.trees ? B.trees : RL.props.trees);
+    if (!pool.length) return;
+    const t = SR.pick(pool);
     this.addProp(t, tx * TILE + 16, ty * TILE + 16, { canopy: true, r: 9, layer: 3, rot: SR.range(0, TAU) });
   },
 
@@ -582,22 +607,85 @@ const World = {
       this.reserve(bk.x0, bk.y0, bk.x1, bk.y1);
       return;
     }
-    const B = BIOMES[this._gen.biome] || BIOMES.plains;
     if (SR.chance(0.14)) for (let k = 0; k < 30; k++) { const x = SR.int(bk.x0 + 2, bk.x1 - 2), y = SR.int(bk.y0 + 2, bk.y1 - 2); if (this.isGround(this.get(x, y)) && this.free(x, y, 1)) { this.chest(x, y, this.rollChest(0)); break; } }
+    // which biomes share this block, and how much of it
+    const share = {};
+    for (let y = bk.y0; y <= bk.y1; y++) for (let x = bk.x0; x <= bk.x1; x++) { const b = this.bioAt(x, y); share[b] = (share[b] || 0) + 1; }
+    const area = (bk.x1 - bk.x0 + 1) * (bk.y1 - bk.y0 + 1);
+    for (const b in share) if (share[b] / area > 0.12) this.decorate(bk, b, share[b] / area);
+    // trees grow in clumps with clearings between them
     for (let y = bk.y0; y <= bk.y1; y++) for (let x = bk.x0; x <= bk.x1; x++) {
-      if (this.occAt(x, y)) continue;
-      const t = this.get(x, y);
-      if (!this.isGround(t)) continue;
-      const n = fbm(x / 13 + 50, y / 13 + 50, 3);
-      if (B.deco && SR.chance(0.012)) {
-        const img = SR.pick(B.deco), lk = B.loot && B.loot[img];
-        if (this.free(x, y)) this.addProp(img, x * TILE + 16, y * TILE + 16, { r: img === 'b_reeds' || img === 'b_glowshroom' ? 0 : 11, solid: img !== 'b_reeds' && img !== 'b_glowshroom', container: lk || null, light: img === 'b_glowshroom' || img === 'b_crystal' || img === 'b_lavarock' ? 70 : 0, lightCol: img === 'b_lavarock' ? 'fire' : img === 'b_glowshroom' ? 'cyan' : img === 'b_crystal' ? 'magenta' : null });
+      if (this.occAt(x, y) || !this.isGround(this.get(x, y))) continue;
+      const B = BIOMES[this.bioAt(x, y)];
+      const n = fbm(x / 9 + 50, y / 9 + 50, 3);
+      if (n > 0.55 && SR.chance((0.1 + (n - 0.55) * 1.4) * B.treeD)) {
+        this.tryTree(x, y, false);
+        // undergrowth around the edge of a clump
+        if (SR.chance(0.25)) { const ax = x + SR.pick([-2, 2]), ay = y + SR.int(-1, 1); if (this.free(ax, ay) && this.isGround(this.get(ax, ay))) this.addProp(SR.pick([RL.props.bush, RL.props.weeds]), ax * TILE + 16, ay * TILE + 16, { solid: false, rot: SR.range(0, TAU) }); }
       }
-      else if (n > 0.5 && SR.chance((0.08 + (n - 0.5) * 0.6) * B.treeD)) this.tryTree(x, y, false);
-      else if (SR.chance(0.006)) this.addProp(SR.pick(RL.props.rocks), x * TILE + 16, y * TILE + 16, { r: 12, rot: SR.range(0, TAU) });
-      else if (SR.chance(0.012)) this.addProp(SR.pick([RL.props.bush, RL.props.weeds, RL.props.weeds]), x * TILE + 16, y * TILE + 16, { solid: false, rot: SR.range(0, TAU) });
-      else if (st === 'sect' && SR.chance(0.004)) this.container(SR.pick(['tt_p_0', 'tt_p_1']), x, y, 'herb', { solid: false });
-      else if (st === 'cyber' && SR.chance(0.003)) this.addProp(RL.props.barrel, x * TILE + 16, y * TILE + 16, { r: 9, explosive: true });
+      else if (st === 'sect' && n < 0.4 && SR.chance(0.003)) this.container(SR.pick(['tt_p_0', 'tt_p_1']), x, y, 'herb', { solid: false });
+      else if (st === 'cyber' && SR.chance(0.002)) this.addProp(RL.props.barrel, x * TILE + 16, y * TILE + 16, { r: 9, explosive: true });
+    }
+    // a few rock piles instead of lone pebbles everywhere
+    for (let k = 0; k < SR.int(0, 2); k++) {
+      const cx = SR.int(bk.x0 + 2, bk.x1 - 2), cy = SR.int(bk.y0 + 2, bk.y1 - 2);
+      for (let i = 0; i < SR.int(2, 4); i++) { const x = cx + SR.int(-1, 1), y = cy + SR.int(-1, 1); if (this.free(x, y) && this.isGround(this.get(x, y))) this.addProp(SR.pick(RL.props.rocks), x * TILE + 16, y * TILE + 16, { r: 11, rot: SR.range(0, TAU) }); }
+    }
+  },
+  // place one decorative prop if the tile belongs to the biome and is free
+  deco(img, tx, ty, biome, B) {
+    if (!this.free(tx, ty) || !this.isGround(this.get(tx, ty)) || this.bioAt(tx, ty) !== biome) return null;
+    const soft = img === 'b_reeds' || img === 'b_glowshroom';
+    const lk = B.loot && B.loot[img];
+    return this.addProp(img, tx * TILE + 16, ty * TILE + 16, { r: soft ? 0 : 11, solid: !soft, container: lk || null, rot: img === 'b_tomb' ? 0 : SR.range(-0.25, 0.25),
+      light: img === 'b_glowshroom' || img === 'b_crystal' || img === 'b_lavarock' ? 70 : 0, lightCol: img === 'b_lavarock' ? 'fire' : img === 'b_glowshroom' ? 'cyan' : img === 'b_crystal' ? 'magenta' : null });
+  },
+  // tiles next to water / ice / lava
+  shoreTiles(bk, biome) {
+    const out = [];
+    for (let y = bk.y0; y <= bk.y1; y++) for (let x = bk.x0; x <= bk.x1; x++) {
+      if (this.bioAt(x, y) !== biome || !this.isGround(this.get(x, y))) continue;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const t = this.get(x + dx, y + dy); if (t === T.WATER || t === T.ICE || t === T.LAVA) { out.push([x, y]); break; } }
+    }
+    return out;
+  },
+  // structured layouts per biome: graveyards in rows, fairy rings, crystal clusters, shorelines
+  decorate(bk, biome, f) {
+    const B = BIOMES[biome];
+    const rx = () => SR.int(bk.x0 + 3, bk.x1 - 3), ry = () => SR.int(bk.y0 + 3, bk.y1 - 3);
+    const cluster = (img, n, r) => { const cx = rx(), cy = ry(); let c = 0; for (let i = 0; i < n * 3 && c < n; i++) { const a = SR.range(0, TAU), d = SR.range(0, r); if (this.deco(img, Math.round(cx + Math.cos(a) * d), Math.round(cy + Math.sin(a) * d), biome, B)) c++; } return [cx, cy]; };
+    const shore = (img, chance) => { for (const [x, y] of this.shoreTiles(bk, biome)) if (SR.chance(chance)) this.deco(img, x, y, biome, B); };
+    switch (biome) {
+      case 'grave': {
+        // fenced plots with tombstones in neat rows
+        for (let k = 0; k < (f > 0.5 ? 2 : 1); k++) {
+          const w = SR.int(5, 8), h = SR.int(4, 6), x0 = SR.int(bk.x0 + 1, Math.max(bk.x0 + 1, bk.x1 - w - 1)), y0 = SR.int(bk.y0 + 1, Math.max(bk.y0 + 1, bk.y1 - h - 1));
+          if (this.bioAt(x0 + (w >> 1), y0 + (h >> 1)) !== biome) continue;
+          for (let y = y0; y <= y0 + h; y += 2) for (let x = x0; x <= x0 + w; x += 2) if (SR.chance(0.8)) this.deco('b_tomb', x, y, biome, B);
+          if (SR.chance(0.5)) this.chest(x0 + w + 1 <= bk.x1 ? x0 + w + 1 : x0 - 1, y0 + h, this.rollChest(0));
+          for (const [x, y] of [[x0 - 1, y0 - 1], [x0 + w + 1, y0 - 1]]) this.tryTree(x, y, false, ['tree_dead']);
+        }
+        break;
+      }
+      case 'mushroom': {
+        // fairy rings of glowing mushrooms around a giant cap
+        for (let k = 0; k < (f > 0.5 ? 2 : 1); k++) {
+          const cx = rx(), cy = ry(), r = SR.range(2.6, 3.6);
+          if (this.bioAt(cx, cy) !== biome) continue;
+          this.tryTree(cx, cy, false, ['b_mushroom']);
+          const n = 9;
+          for (let i = 0; i < n; i++) { const a = i / n * TAU; this.deco('b_glowshroom', Math.round(cx + Math.cos(a) * r), Math.round(cy + Math.sin(a) * r), biome, B); }
+        }
+        cluster('b_glowshroom', 4, 2);
+        break;
+      }
+      case 'crystal': for (let k = 0; k < Math.round(1 + f * 3); k++) cluster('b_crystal', SR.int(3, 6), 2.2); cluster('rocks', 3, 2); break;
+      case 'swamp': shore('b_reeds', 0.35); cluster('b_reeds', 5, 3); break;
+      case 'snow': shore('b_ice', 0.12); cluster('b_ice', 3, 2); break;
+      case 'volcano': shore('b_lavarock', 0.2); for (let k = 0; k < 2; k++) cluster('b_lavarock', 3, 2); break;
+      case 'desert': for (let k = 0; k < Math.round(1 + f * 2); k++) cluster('b_cactus', SR.int(2, 3), 2); if (SR.chance(0.6)) cluster('b_skull', 1, 1); break;
+      case 'sakura': for (let k = 0; k < 2; k++) cluster('b_bamboo', SR.int(4, 7), 2); break;
+      case 'jungle': for (let k = 0; k < 3; k++) cluster('bush', SR.int(3, 5), 2); break;
     }
   },
 
@@ -990,6 +1078,7 @@ const World = {
     }
     for (const b of sb.buildings) for (const [x, y] of b.doors || []) dot(x - sb.tx0, y - sb.ty0, 1, [255, 214, 90]);
     if (sb.poi && sb.poi.kind === 'ruins') dot(14, 14, 4, [190, 90, 255]);
+    if (sb.poi && sb.poi.kind === 'wonder') dot(13, 13, 6, [255, 230, 160]);
     const k = this.mode + sb.key;
     this.minis.set(k, im); this.miniCv.delete(k);
     if (this.minis.size > 5000) this.minis.delete(this.minis.keys().next().value);

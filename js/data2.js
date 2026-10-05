@@ -55,6 +55,7 @@ function itm(id) {
   const d = o ? Object.assign({}, base, o) : Object.assign({}, base);
   if (d.kind === 'ammo') d.name = RL.ammoNames[['ammo_pistol', 'ammo_shell', 'ammo_rifle'].indexOf(id)];
   if (id === 'gold') { d.name = cur().name; d.icon = cur().icon; }
+  if (id === 'ticket') { const t = TICKET[rk(RL.id)]; d.name = t.name; d.icon = t.icon; }
   return d;
 }
 
@@ -119,16 +120,17 @@ const BIOMES = {
   plains:   { name: 'Đồng Cỏ', desc: 'Gió lùa qua những đồng cỏ hoang', ground: null, trees: null, treeD: 1, amb: null },
   forest:   { name: 'Rừng Già', desc: 'Tán cây che kín bầu trời', ground: null, alt: T.LEAVES, trees: null, treeD: 2.6, amb: null },
   snow:     { name: 'Băng Nguyên', desc: 'Lạnh thấu xương — nước đóng thành băng', ground: T.SNOW, water: T.ICE, trees: ['b_snowpine', 'b_snowpine', 'tree_dead'], treeD: 1.2, deco: ['b_ice', 'rocks'], amb: 'snow', tint: 'rgba(170,200,255,0.06)' },
-  desert:   { name: 'Sa Mạc', desc: 'Cát bỏng và xương trắng', ground: T.DESERT, alt: T.SAND, trees: ['b_cactus'], treeD: 0.5, deco: ['b_skull', 'rocks'], oasis: 'b_palm', amb: 'sand', tint: 'rgba(255,180,90,0.07)' },
+  desert:   { name: 'Sa Mạc', desc: 'Cát bỏng và xương trắng', ground: T.DESERT, alt: T.SAND, trees: ['tree_dead'], treeD: 0.15, deco: ['b_skull', 'rocks'], oasis: 'b_palm', amb: 'sand', tint: 'rgba(255,180,90,0.07)' },
   jungle:   { name: 'Rừng Nhiệt Đới', desc: 'Oi nồng, rậm rạp, đầy tiếng côn trùng', ground: T.JUNGLE, trees: ['b_fern', 'b_palm', 'b_fern'], treeD: 2.4, deco: ['bush'], amb: null },
   swamp:    { name: 'Đầm Lầy', desc: 'Bùn sâu, sương độc', ground: T.SWAMP, trees: ['b_swamptree', 'tree_dead'], treeD: 1.1, deco: ['b_reeds', 'b_reeds'], lakes: 0.42, amb: 'fog', tint: 'rgba(60,90,40,0.10)' },
   autumn:   { name: 'Rừng Thu', desc: 'Lá đỏ rơi như mưa', ground: T.LEAVES, trees: ['b_maple', 'tree_autumn', 'b_maple'], treeD: 1.6, amb: 'leaves' },
-  sakura:   { name: 'Rừng Anh Đào', desc: 'Hoa rơi lả tả trên lối nhỏ', ground: T.SAKURA, trees: ['b_sakura', 'b_sakura', 'b_bamboo'], treeD: 1.4, amb: 'petals' },
+  sakura:   { name: 'Rừng Anh Đào', desc: 'Hoa rơi lả tả trên lối nhỏ', ground: T.SAKURA, trees: ['b_sakura'], treeD: 1.1, amb: 'petals' },
   mushroom: { name: 'Rừng Nấm Khổng Lồ', desc: 'Bào tử phát sáng lơ lửng', ground: T.MYCEL, trees: ['b_mushroom'], treeD: 1.3, deco: ['b_glowshroom', 'b_glowshroom'], loot: { b_glowshroom: 'herb' }, amb: 'spores', tint: 'rgba(150,80,200,0.08)' },
   crystal:  { name: 'Thung Lũng Pha Lê', desc: 'Pha lê chứa đầy năng lượng — và kho báu', ground: T.CRYS, trees: [], treeD: 0, deco: ['b_crystal', 'b_crystal', 'rocks'], loot: { b_crystal: 'crystal' }, amb: 'motes', tint: 'rgba(80,120,255,0.08)' },
   volcano:  { name: 'Hỏa Sơn', desc: 'Dung nham sôi sục dưới chân', ground: T.ASH, water: T.LAVA, trees: ['tree_dead'], treeD: 0.4, deco: ['b_lavarock', 'b_lavarock'], lakes: 0.5, amb: 'embers', tint: 'rgba(255,80,20,0.08)' },
   grave:    { name: 'Nghĩa Địa Cổ', desc: 'Người chết không yên giấc', ground: T.GRAVE, trees: ['tree_dead', 'b_swamptree'], treeD: 0.7, deco: ['b_tomb', 'b_tomb', 'b_tomb'], loot: { b_tomb: 'grave' }, amb: 'fog', tint: 'rgba(40,50,70,0.14)', dark: 0.25 },
 };
+const BIOME_IDS = Object.keys(BIOMES);
 const BIOME_IMAGES = ['b_snowpine', 'b_ice', 'b_cactus', 'b_skull', 'b_palm', 'b_mushroom', 'b_glowshroom', 'b_crystal', 'b_lavarock', 'b_swamptree', 'b_reeds', 'b_tomb', 'b_sakura', 'b_bamboo', 'b_maple', 'b_fern'];
 
 // ---------- random bosses ----------
@@ -191,3 +193,40 @@ function guessExpr(text, romance) {
   if (/haha|hì|hehe|cảm ơn|vui|tuyệt|tốt lắm|đẹp quá|thật à|♥|ngon/.test(t)) return 'happy';
   return 'normal';
 }
+
+// ===== v4: pets, wonders, gacha, world events =====
+const PETS = [
+  { name: 'Hỏa Hồ Ly', star: 4, desc: 'Phun cầu lửa vào kẻ địch gần nhất', col: '#ff7a1a' },
+  { name: 'Băng Long Con', star: 5, desc: 'Phun hơi băng hình nón, làm chậm và đóng băng', col: '#7fdcff' },
+  { name: 'Mèo Thần Tài', star: 5, desc: '+30% tiền nhặt được, hút đồ từ xa, +15% may mắn', col: '#ffd23a' },
+  { name: 'Sứa Ánh Sáng', star: 4, desc: 'Liên tục chữa thương cho bạn', col: '#ff9ad8' },
+  { name: 'Lôi Điểu', star: 5, desc: 'Gọi sét đánh tới 3 kẻ địch', col: '#fff36b' },
+  { name: 'Tiểu Thạch Nhân', star: 4, desc: 'Định kỳ tạo khiên đá bảo vệ bạn', col: '#9fd18a' },
+  { name: 'U Linh Đèn Lồng', star: 4, desc: 'Soi sáng màn đêm, làm chậm kẻ địch quanh bạn', col: '#b8d8ff' },
+  { name: 'Tinh Linh Pha Lê', star: 5, desc: '+12% chí mạng, hồi năng lượng tuyệt kỹ', col: '#d8a8ff' },
+];
+const TICKET = {
+  md: { name: 'Phiếu Tiếp Tế', icon: 'tk_md' },
+  tt: { name: 'Thiên Cơ Phù', icon: 'tk_tt' },
+  sl: { name: 'Vé Triệu Hồi Hệ Thống', icon: 'tk_sl' },
+};
+Object.assign(ITEMS, {
+  ticket: { name: 'Vé triệu hồi', icon: 'tk_md', kind: 'mat', desc: 'Dùng ở Tế Đàn Vận Mệnh (nút 🎴) để triệu hồi thú cưng, trang bị và báu vật.' },
+  star:   { name: 'Mảnh Sao Băng', icon: 'ev_star', kind: 'mat', desc: 'Rơi trong mưa sao băng. 10 mảnh đổi 1 vé triệu hồi ở Tế Đàn.' },
+});
+const GACHA_NAME = { md: 'Tế Đàn Vận Mệnh', tt: 'Thiên Cơ Đài', sl: 'Cổng Triệu Hồi Hệ Thống' };
+// one landmark per biome: found by exploring, shown as "?" rumours on the map
+const WONDERS = [
+  { biome: 'snow', img: 'w_0', name: 'Mộ Rồng Băng', lore: 'Bộ xương một con rồng cổ nằm vùi trong băng. Gió thổi qua hốc mắt nó như tiếng thở dài ngàn năm.' },
+  { biome: 'desert', img: 'w_1', name: 'Kim Tự Tháp Cát Vàng', lore: 'Một kim tự tháp mọc lên giữa biển cát. Nhân sư canh cổng vẫn đang chờ câu trả lời cho câu đố của nó.' },
+  { biome: 'forest', img: 'w_2', name: 'Cây Thế Giới', lore: 'Rễ cây phát sáng chạy sâu xuống lòng đất. Người ta nói mọi sinh linh đều từ đây mà ra.' },
+  { biome: 'crystal', img: 'w_3', name: 'Tháp Pha Lê Tím', lore: 'Ngọn tháp pha lê ngân nga một giai điệu chỉ người sắp chết mới nghe thấy.' },
+  { biome: 'volcano', img: 'w_4', name: 'Tế Đàn Hắc Diệu', lore: 'Đá hắc diệu khắc chữ cổ, dung nham chảy theo đúng nét chữ. Ai đó vẫn đang thắp lửa ở đây.' },
+  { biome: 'sakura', img: 'w_5', name: 'Cổng Hoa Anh Đào', lore: 'Cánh cổng đỏ đứng giữa mưa hoa. Bước qua nó, mọi âm thanh như ngừng lại.' },
+  { biome: 'mushroom', img: 'w_6', name: 'Nhà Nấm Cổ Tích', lore: 'Ánh đèn vẫn sáng trong căn nhà nấm. Trên bàn còn ấm một tách trà... của ai?' },
+  { biome: 'swamp', img: 'w_7', name: 'Đền Chìm', lore: 'Ngôi đền chìm dần xuống bùn. Những bậc thang dẫn xuống nước, như mời ai đó bước vào.' },
+  { biome: 'jungle', img: 'w_8', name: 'Đầu Đá Khổng Lồ', lore: 'Gương mặt đá nhắm mắt giữa rừng già. Người dân tin rằng khi nó mở mắt, thế giới sẽ đổi chủ.' },
+  { biome: 'grave', img: 'w_9', name: 'Lăng Mộ U Linh', lore: 'Lửa ma xanh cháy suốt đêm trong lăng. Những bức tượng gargoyle quay mặt theo bước chân bạn.' },
+  { biome: 'autumn', img: 'w_10', name: 'Chùa Lá Đỏ', lore: 'Ngôi chùa cổ giữa rừng phong. Chuông chùa tự ngân lên mỗi khi có người lạ đến.' },
+  { biome: 'plains', img: 'w_11', name: 'Vòng Đá Cổ', lore: 'Vòng đá cổ phát sáng chữ rune xanh. Đứng giữa vòng, bạn nghe thấy tiếng thì thầm từ một thế giới khác.' },
+];

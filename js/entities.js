@@ -21,7 +21,7 @@ const Items = {
       if (it.age > 300 || (it.age > 20 && Math.abs(it.x - P.x) + Math.abs(it.y - P.y) > 2600)) { this.list.splice(i, 1); continue; }
       if (P.car || P.dead) continue;
       const d = dist(it.x, it.y, P.x, P.y);
-      const mag = it.gear ? 40 : 80;
+      const mag = (it.gear ? 40 : 80) * (G.magnetMul || 1);
       if (it.age > 0.5 && d < mag) { it.x += (P.x - it.x) * Math.min(1, dt * 8); it.y += (P.y - it.y) * Math.min(1, dt * 8); }
       if (it.age > 0.5 && d < 18) {
         if (it.gear) G.pickGear(it.gear); else G.give(it.id, it.n, true);

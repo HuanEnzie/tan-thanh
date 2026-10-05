@@ -30,6 +30,7 @@ const G = {
 
   // ---------- setup ----------
   newGame(realm, seed, hero, gender) {
+    this.heartBuys = 0; this.lastTitle = null; this.biome = this.biomeAmb = null; this.dgTarget = null; this.transit = false;
     RL = REALMS[realm];
     seed = seed || (Math.random() * 1e9) | 0;
     this.seed = seed; this.realm = realm;
@@ -50,6 +51,7 @@ const G = {
     this.clock = 8; this.day = 1; this.time = 0;
     this.stats = { kills: 0, looted: 0, gates: 0, rescued: 0, maxCombo: 0, start: Date.now() };
     this.achieved = {};
+    this.initV4(); P.inv.ticket = 10;
     this.camera.x = s.x; this.camera.y = s.y;
   },
   resetRuntime() {
@@ -79,8 +81,8 @@ const G = {
     const data = {
       v: 2, realm: RL.id, seed: this.seed, clock: this.clock, day: this.day, time: this.time, uid: UID,
       p: { x: pos.x, y: pos.y, hp: P.hp, maxHp: P.maxHp, hunger: P.hunger, thirst: P.thirst, equip: P.equip, relics: P.relics, stash: P.stash, armor: P.armor, gold: P.gold, gearHp: P.gearHp, weapon: P.weapon, mags: P.mags, inv: P.inv, battery: P.battery, xp: P.xp, level: P.level, perks: P.perks, maxStam: P.maxStam, energy: P.energy },
-      story: Story.serialize(), comps: this.companions.map(c => ({ aff: c.aff, stage: c.stage, joined: c.joined, lover: c.lover, sworn: c.sworn, scenePending: c.scenePending })),
-      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0,
+      story: Story.serialize(), comps: this.companions.map(c => ({ aff: c.aff, stage: c.stage, joined: c.joined, lover: c.lover, sworn: c.sworn, scenePending: c.scenePending, reviveDay: c.reviveDay })),
+      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0, v4: this.v4Save(),
     };
     try { localStorage.setItem('tt_save_v2', JSON.stringify(data)); } catch (e) {}
     return data;
@@ -102,8 +104,10 @@ const G = {
     this.player = new Player(d.p.x, d.p.y);
     Object.assign(this.player, d.p);
     if (!this.player.armor) this.player.armor = { head: null, body: null, legs: null, feet: null };
-    this.player.gold = this.player.gold || 0; this.player.applyGear();
+    this.player.gold = this.player.gold || 0; this.player.applyGear(); this.applyRelics();
     this.heartBuys = d.heartBuys || 0;
+    this.initV4(d.v4);
+    if (!d.v4) { this.player.inv.ticket = (this.player.inv.ticket || 0) + 10; this.v4Gift = true; }
     UID = Math.max(UID, d.uid || 1);
     this.resetRuntime();
     this.clock = d.clock; this.day = d.day; this.time = d.time;
@@ -189,7 +193,7 @@ const G = {
     const it = itm(id);
     if (!it) return;
     if (id === 'key' && !RL.cars) { id = 'gold'; n = 10; }
-    if (id === 'gold') { P.gold += n; Floaters.add(P.x, P.y - 22, `+${n} ${cur().name}`, cur().col, 9); Sound.play('sfx_coin', 0.3, 1.3); UI.dirty = true; return; }
+    if (id === 'gold') { n = Math.max(1, Math.round(n * this.goldMul())); P.gold += n; Floaters.add(P.x, P.y - 22, `+${n} ${cur().name}`, cur().col, 9); Sound.play('sfx_coin', 0.3, 1.3); UI.dirty = true; return; }
     P.inv[id] = (P.inv[id] || 0) + n;
     Floaters.add(P.x, P.y - 22, `+${n} ${it.name}`, it.kind === 'ammo' ? '#ffd76a' : '#b8f28a', 9);
     Sound.play('sfx_pickup', 0.3, 1.2);
@@ -269,7 +273,7 @@ const G = {
     const P = this.player;
     let crit = false;
     if (src === 'gun' || src === 'melee' || src === 'skill') {
-      const cc = (P.perks.crit || 0) * 0.1 + (wp && wp.crit || 0) + (P.relic('critdmg') ? 0.05 : 0) + 0.05;
+      const cc = (P.perks.crit || 0) * 0.1 + (wp && wp.crit || 0) + (P.relic('critdmg') ? 0.05 : 0) + 0.05 + (P.pab && P.pab.crit || 0);
       if (Math.random() < cc) { dmg *= 2 + P.relic('critdmg') / 100; crit = true; }
     }
     const zar = (z.t.armor || 0) + (z.armorB || 0);
@@ -356,7 +360,7 @@ const G = {
       this.shake(16); this.hitstop = 0.25; this.slowmo = 1.2;
       for (let i = 0; i < 3; i++) setTimeout(() => this.explodeFx(z.x + R.range(-40, 40), z.y + R.range(-40, 40), 60), i * 200);
       Items.drop(z.x, z.y, 'medkit', 2);
-      if (z.mini) World.addProp('chest_' + (Math.random() < 0.3 ? 3 : 2), z.x, z.y + 40, { container: 'chest', kind: 'chest', r: 12, data: { tier: Math.random() < 0.3 ? 3 : 2 } });
+      if (z.mini) World.keepChest(z.x, z.y + 40, Math.random() < 0.3 ? 3 : 2, 0.5);
       this.toast(`${z.name} đã gục ngã!`, 'quest');
       if (this.boss === z) { this.boss = null; UI.boss(null); }
       if (z.story) Story.onBoss(true);
@@ -394,7 +398,7 @@ const G = {
     const feather = P.relics.findIndex(r => r && r.type === 'revive');
     const lover = this.companions.find(c => (c.lover || c.sworn) && c.ally && !c.ally.downed && (c.reviveDay || 0) !== this.day);
     if (feather >= 0 || lover) {
-      if (feather >= 0) { P.relics[feather] = null; this.toast('Lông Phượng Hoàng bùng cháy — bạn hồi sinh!', 'quest'); }
+      if (feather >= 0) { P.relics[feather] = null; this.applyRelics(); this.toast('Lông Phượng Hoàng bùng cháy — bạn hồi sinh!', 'quest'); }
       else { lover.reviveDay = this.day; this.toast(lover.lover ? `${lover.data.name} ôm lấy bạn: "Đừng bỏ lại tôi!" — bạn hồi sinh!` : `${lover.data.name} kéo bạn dậy: "Đã kết nghĩa thì không được chết trước!" — bạn hồi sinh!`, 'love'); }
       P.hp = P.maxHp * 0.6; P.hurtT = 2; this.explode(P.x, P.y, 160, 200 + P.level * 10, true, true);
       FX.pillar(P.x, P.y, '#ffd65a', 1.5, 60); Sound.play('sfx_skill', 0.8);
@@ -547,7 +551,8 @@ const G = {
     const sb = World.sbOf(Math.floor(P.x / TILE), Math.floor(P.y / TILE));
     const zone = sb ? sb.zone : 0;
     let target = [12, 22, 30][zone] * (this.night ? 1.6 : 1) * (1 + (this.day - 1) * 0.08);
-    target = Math.min(target, this.lowGfx ? 60 : 90);
+    if (this.bloodMoon) target *= 1.8;
+    target = Math.min(target, this.lowGfx ? 70 : this.bloodMoon ? 130 : 90);
     this.spawnT = 0.5;
     const count = this.zombies.reduce((n, z) => n + (!z.guard ? 1 : 0), 0);
     if (count >= target) return;
@@ -559,7 +564,7 @@ const G = {
       if (!World.walkable(tx, ty)) continue;
       const b = World.bldAt(x, y); if (b && b === World.bldAt(P.x, P.y)) continue;
       const s2 = World.sbOf(tx, ty);
-      this.spawnEnemy(this.pickArche(s2 ? s2.zone : 0), x, y, { state: 'wander', elite: Math.random() < 0.03 + this.day * 0.004 });
+      this.spawnEnemy(this.pickArche(s2 ? s2.zone : 0), x, y, { state: this.bloodMoon ? 'chase' : 'wander', elite: Math.random() < 0.03 + this.day * 0.004 + (this.bloodMoon ? 0.1 : 0) });
       if (this.night && Math.random() < 0.3) for (let k = 0; k < 2; k++) this.spawnEnemy(R.chance(0.6) ? 'walker' : 'runner', x + R.range(-30, 30), y + R.range(-30, 30), {});
       break;
     }
@@ -652,16 +657,16 @@ const G = {
   findInteract() {
     const P = this.player;
     if (P.car) return { label: 'Xuống xe', kind: 'exitcar' };
-    let best = null, bd = 52;
+    let best = null, bd = 60;
     for (const a of this.allies) {
       const d = dist(P.x, P.y, a.x, a.y);
-      if (d > (a.kind === 'merchant' ? 60 : 50)) continue;
+      if (d > (a.kind === 'merchant' ? 60 : 50) || (best && d > bd && !(a.kind === 'comp' && a.downed))) continue;
       if (a.kind === 'comp') { best = { ally: a, kind: a.downed ? 'revive' : 'talk', label: a.downed ? `Cứu ${a.comp.name}` : (a.comp.ref.scenePending ? `♥ Trò chuyện với ${a.comp.name}` : `${a.comp.name} ♥${Math.round(a.comp.ref.aff)}`) }; bd = d; }
       else if (a.kind === 'civ' && !a.rescued) { best = { ally: a, kind: 'civ', label: 'Giải cứu người dân' }; bd = d; }
       else if (a.kind === 'merchant') { best = { ally: a, kind: 'shop', label: `Giao dịch với ${a.name}` }; bd = d; }
     }
     if (best && best.kind !== 'shop') return best;
-    if (best) bd = Math.min(bd, 30);
+    bd = best ? Math.min(bd, 30) : 52;
     for (const p of World.propsNear(P.x, P.y, 90)) {
       if (p.dead) continue;
       let d = 1e9;
@@ -672,6 +677,8 @@ const G = {
       else if (p.kind === 'stairs') { best = { prop: p, kind: 'stairs', label: `Xuống tầng ${World.dg.floor + 1}` }; bd = d; }
       else if (p.kind === 'cage') { best = { prop: p, kind: 'cage', label: `Phá lồng giải cứu ${Story.names.companion}` }; bd = d; }
       else if (p.kind === 'campfire') { best = { prop: p, kind: 'rest', label: 'Nghỉ ngơi bên lửa trại' }; bd = d; }
+      else if (p.kind === 'altar') { best = { prop: p, kind: 'altar', label: GACHA_NAME[rk(RL.id)] + ' — triệu hồi' }; bd = d; }
+      else if (p.kind === 'wonder') { best = { prop: p, kind: 'wonder', label: 'Chiêm ngưỡng ' + WONDERS[p.data.w].name }; bd = d; }
       else if (p.drivable) { best = { prop: p, kind: 'car', label: this.has('key') ? `Lái xe (xăng ${Math.round(p.fuel)}%)` : 'Lái xe (cần Bộ câu điện)' }; bd = d; }
       else if (p.container === 'chest' && !p.looted) { best = { prop: p, kind: 'loot', label: 'Mở ' + CHESTS[p.data.tier].name }; bd = d; }
       else if (p.container && !p.looted) { best = { prop: p, kind: 'loot', label: (p.container === 'crystal' ? 'Khai thác' : p.container === 'grave' ? 'Đào mộ' : 'Lục soát') + (p.container === 'artifact' ? ': ' + Story.names.artifact : p.container === 'vault' || p.container === 'dchest' ? ' rương báu' : '') }; bd = d; }
@@ -688,6 +695,8 @@ const G = {
         return this.enterCar(it.prop);
       case 'loot': return this.startAction({ kind: 'loot', prop: it.prop, label: it.label, dur: it.prop.container === 'chest' ? CHESTS[it.prop.data.tier].time : ['vault', 'artifact', 'dchest', 'boss'].includes(it.prop.container) ? 1.4 : 0.8 });
       case 'shop': return UI.openShop(it.ally);
+      case 'altar': return UI.openGacha();
+      case 'wonder': { const w = WONDERS[it.prop.data.w]; this.discoverWonder(it.prop); return UI.dialog({ title: w.name, lines: [{ who: 'sys', text: w.lore }] }); }
       case 'gate': return this.enterGate(it.prop);
       case 'exit': return this.exitDungeon(false);
       case 'stairs': return this.descend();
@@ -768,7 +777,7 @@ const G = {
     const gear = (bonus, n = 1) => { for (let i = 0; i < n; i++) Items.dropGear(p.x, p.y, Loot.randomGear(lvl, bonus + luck)); };
     const kind = p.container;
     if (kind === 'chest') { this.openChest(p); return; }
-    if (kind === 'crystal') { give('gold', R.int(15, 35) + lvl * 2); give(Math.random() < 0.5 ? 'battery' : 'ammo_rifle', Math.random() < 0.5 ? 1 : R.int(10, 20)); if (Math.random() < 0.12) gear(0.8); Particles.burst(p.x, p.y, 16, '#b07bff', 160); Sound.play('sfx_freeze', 0.5, 1.4); return; }
+    if (kind === 'crystal') { give('gold', R.int(15, 35) + lvl * 2); if (Math.random() < 0.5) give('battery', 1); else give('ammo_rifle', R.int(10, 20)); if (Math.random() < 0.12) gear(0.8); Particles.burst(p.x, p.y, 16, '#b07bff', 160); Sound.play('sfx_freeze', 0.5, 1.4); return; }
     if (kind === 'grave') {
       if (Math.random() < 0.4) { const z = this.spawnEnemy(R.pick(['walker', 'armored', 'runner']), p.x + R.range(-20, 20), p.y + 26, { state: 'chase', rise: true, elite: Math.random() < 0.2 }); Sound.at(this.groanSfx(), z.x, z.y, 0.8); this.toast('Có thứ gì đó trồi lên từ mộ!', 'warn'); }
       give('gold', R.int(8, 25)); if (Math.random() < 0.18) gear(0.6); else give(R.pick(['bandage', 'pills', 'flower', 'scrap']), 1); return;
@@ -798,20 +807,22 @@ const G = {
   // ---------- gates & dungeons ----------
   enterGate(p) {
     const P = this.player;
+    if (this.transit) return; this.transit = true;
     this.returnPos = { x: p.x, y: p.y + 70 };
     this.gateProp = p;
     const rank = p.data.rank;
     Sound.play('sfx_portal', 0.8);
     UI.fade(() => {
       this.dgTarget = null;
+      this.transit = false;
       const dg = { rank, floor: 1, floors: RANK_FLOORS[rank], level: Math.max(RANK_LVL[rank], World.levelAt(p.x, p.y)), seed: p.data.seed, story: p.data.story };
       this.saveOver = { delta: World.delta, explored: World.explored, minis: World.minis };
       World.enterDungeon(dg);
       this.zombies = []; this.cars = []; Items.list = []; this.hazards = []; Bullets.list = []; Throws.fires = []; Throws.acids = []; Throws.traps = [];
       World.update(16 * TILE, 16 * TILE);
       P.x = World.startPos.x; P.y = World.startPos.y; P.car = null;
+      this.allies = this.allies.filter(a => a.kind !== 'civ' && a.kind !== 'merchant');
       for (const a of this.allies) { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
-      this.allies = this.allies.filter(a => a.kind !== 'civ');
       this.camera.x = P.x; this.camera.y = P.y;
       this.flowT = 0;
       UI.banner(`CỔNG HẠNG ${rank}`, `${RL.dungeon.name} • Tầng 1/${dg.floors} • Cấp quái ~${dg.level}`, RANK_COLOR[rank]);
@@ -820,15 +831,18 @@ const G = {
   },
   descend() {
     const P = this.player;
+    if (this.transit) return; this.transit = true;
     Sound.play('sfx_portal', 0.6, 0.8);
     UI.fade(() => {
+      this.transit = false;
       const dg = World.dg; this.dgTarget = null;
       dg.floor++; dg.level += 2;
       World.enterDungeon(dg);
+      Throws.fires = []; Throws.acids = []; Throws.traps = []; Throws.list = [];
       this.zombies = []; Items.list = []; this.hazards = []; Bullets.list = [];
       World.update(16 * TILE, 16 * TILE);
       P.x = World.startPos.x; P.y = World.startPos.y;
-      for (const a of this.allies) { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
+      for (const a of this.allies) if (a.kind !== 'merchant') { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
       this.camera.x = P.x; this.camera.y = P.y; this.flowT = 0;
       UI.banner(`TẦNG ${dg.floor}/${dg.floors}`, RL.dungeon.name, RANK_COLOR[dg.rank]);
     });
@@ -853,10 +867,11 @@ const G = {
   },
   exitDungeon() {
     const P = this.player;
+    if (this.transit) return; this.transit = true;
     const cleared = World.dg && World.dg.cleared, story = World.dg && World.dg.story;
     Sound.play('sfx_portal', 0.7);
     UI.fade(() => {
-      World.mode = 'over'; this.dgTarget = null;
+      World.mode = 'over'; this.dgTarget = null; this.transit = false;
       World.reset();
       World.delta = this.saveOver.delta; World.explored = this.saveOver.explored;
       if (cleared && this.gateProp) World.markRemoved(this.gateProp);
@@ -864,7 +879,7 @@ const G = {
       P.x = this.returnPos.x; P.y = this.returnPos.y;
       World.update(P.x, P.y);
       if (cleared && this.gateProp) { const g = World.propsNear(P.x, P.y - 70, 40).find(p => p.kind === 'gate'); if (g) World.removeProp(g); }
-      for (const a of this.allies) { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
+      for (const a of this.allies) if (a.kind !== 'merchant') { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
       this.camera.x = P.x; this.camera.y = P.y; this.flowT = 0;
       if (cleared) Story.onGate(story);
       this.save();

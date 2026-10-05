@@ -1,11 +1,11 @@
 // Service worker: lets the installed app start offline.
 // Code (html/js/css) is network-first so updates arrive as soon as you are online;
 // images and audio are cache-first and get cached the first time the game uses them.
-const VERSION = 'tt-v4';
+const VERSION = 'tt-v5';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css', 'css/v2.css',
   'js/util.js', 'js/data.js', 'js/realms.js', 'js/lore.js', 'js/lore_bond.js', 'js/assets.js', 'js/world.js', 'js/data2.js',
-  'js/fx.js', 'js/loot.js', 'js/entities.js', 'js/game.js', 'js/story.js', 'js/ui.js', 'js/play.js', 'js/touch.js', 'js/v3.js',
+  'js/fx.js', 'js/loot.js', 'js/entities.js', 'js/game.js', 'js/story.js', 'js/ui.js', 'js/play.js', 'js/touch.js', 'js/v3.js', 'js/v4.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon-32.png',
 ];
 
@@ -21,7 +21,7 @@ const isCode = url => /\.(html|js|css|webmanifest)$/.test(url.pathname) || url.p
 async function networkFirst(req) {
   const cache = await caches.open(VERSION);
   try {
-    const res = await fetch(req);
+    const res = await fetch(req, { cache: 'no-cache' }); // revalidate, never trust a stale HTTP cache for code
     if (res.ok) cache.put(req, res.clone());
     return res;
   } catch (err) {
@@ -57,7 +57,7 @@ async function ranged(req) {
 async function fonts(req) {
   const cache = await caches.open('tt-fonts');
   const hit = await cache.match(req);
-  const net = fetch(req).then(res => { if (res.ok || res.type === 'opaque') cache.put(req, res.clone()); return res; }).catch(() => hit);
+  const net = fetch(req).then(res => { if (res.ok || res.type === 'opaque') cache.put(req, res.clone()); return res; }).catch(() => hit || Response.error());
   return hit || net;
 }
 

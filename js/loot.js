@@ -15,7 +15,6 @@ const Loot = {
       if (mtype >= 0) it.mtype = mtype;
     }
     const pool = Object.keys(AFFIXES).filter(k => slot === 'melee' ? !AFFIXES[k].ranged : !AFFIXES[k].melee);
-    if (slot === 'melee' && RL.weapons.melee.wave && !it.affixes.includes('wave') && rarity >= 2) it.affixes.push('wave');
     while (it.affixes.length < RARITY[rarity].affixes) {
       const a = R.pick(pool); if (!it.affixes.includes(a)) it.affixes.push(a);
     }

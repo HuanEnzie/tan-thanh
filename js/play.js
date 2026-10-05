@@ -268,12 +268,13 @@ function meleeAttack(w, shove) {
   if (hits) { Sound.play(RL.id === 'md' ? 'sfx_hit' : 'sfx_blade_hit', 0.55, R.range(0.9, 1.15)); G.shake(2.5 + hits * 0.5); G.hitstop = 0.04; }
 }
 
-function useHeal() {
+function useHeal(want) {
   const P = G.player;
   if (P.hp >= P.maxHp) { G.toast('Máu đang đầy.', 'info'); return; }
   const miss = P.maxHp - P.hp;
-  let id = null;
-  if (miss >= 45 && G.has('medkit')) id = 'medkit';
+  let id = want && G.has(want) ? want : null;
+  if (id) {}
+  else if (miss >= 45 && G.has('medkit')) id = 'medkit';
   else if (G.has('bandage')) id = 'bandage';
   else if (G.has('medkit')) id = 'medkit';
   else if (G.has('pills')) id = 'pills';
@@ -286,11 +287,11 @@ function useHeal() {
   FX.ring(P.x, P.y, 8, 40, '#6dff7a', 0.4, 3);
   Sound.play('sfx_heal', 0.6);
 }
-function useFood() {
+function useFood(want) {
   const P = G.player;
   const drink = P.thirst <= P.hunger;
   const order = drink ? ['water', 'energy', 'food', 'choco'] : ['food', 'choco', 'water', 'energy'];
-  const id = order.find(i => G.has(i));
+  const id = want && G.has(want) ? want : order.find(i => G.has(i));
   if (!id) { G.toast('Không có đồ ăn/uống!', 'warn'); return; }
   G.take(id);
   if (id === 'water') P.thirst = Math.min(100, P.thirst + 50);
@@ -340,6 +341,7 @@ G.update = function (dt) {
   this.allies = this.allies.filter(a => !a.dead && !((a.kind === 'civ' || a.kind === 'merchant') && World.mode === 'over' && dist(a.x, a.y, P.x, P.y) > 3600));
   this.updateHazards(dt);
   if (this.frame % 20 === 0) this.biomeTick();
+  this.v4Tick(dt);
   if (this.boss && (this.boss.dead || dist(this.boss.x, this.boss.y, P.x, P.y) > 900)) UI.boss(null); else if (this.boss) UI.boss(this.boss);
   this.spawnTick(dt);
   Bullets.update(dt);
@@ -424,8 +426,10 @@ G.render = function () {
   for (const a of this.allies) a.draw(ctx);
   FX.draw(ctx);
   P.draw(ctx);
+  drawPet(ctx);
   Bullets.draw(ctx);
   Particles.draw(ctx);
+  drawMeteors(ctx);
   for (const p of canopies) {
     const under = dist(p.x, p.y, P.x, P.y) < p.w * 0.45;
     p.alpha = lerp(p.alpha, under ? 0.35 : 1, Math.min(1, this.rdt * 6));
@@ -449,6 +453,7 @@ G.render = function () {
   drawLighting(camX, camY);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   drawBiomeTint();
+  drawEventTint();
   if (this.timeSlow > 0) { ctx.fillStyle = 'rgba(40,220,255,0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
   Ambient.update(this.rdt, canvas.width, canvas.height);
   Ambient.draw(ctx);

@@ -166,6 +166,8 @@ function realmImages(r) {
   for (const b of BOSSES[k]) add(b.img);
   add(BIOME_IMAGES); add(Object.values(BIOME_TEX));
   for (let i = 0; i < 4; i++) { add('chest_' + i); add('chest_' + i + 'o'); }
-  for (let i = 0; i < 8; i++) add('ui_' + i);
+  for (let i = 0; i < 8; i++) { add('ui_' + i); add('pet_' + i); }
+  for (let i = 0; i < 12; i++) add('w_' + i);
+  add(['ev_goblin', 'ev_mimic', 'ev_star', 'ev_altar', 'ev_egg', 'tk_' + k]);
   return [...s];
 }

@@ -34,10 +34,10 @@ const Story = {
     for (const p of this.pois) if (p.sx === sx && p.sy === sy && !p.done) return p;
     return null;
   },
-  curAct() { return this.finished ? null : this.tpl.acts[this.act]; },
+  curAct() { return this.finished ? null : (this.tpl.acts[this.act] || null); },
   goal() {
-    if (this.finished) return 'Tự do khám phá — chinh phục các Cổng và tìm bảo vật';
     const a = this.curAct();
+    if (!a) return 'Tự do khám phá — chinh phục các Cổng và tìm bảo vật';
     let g = this.fmt(a.goal);
     if (a.type === 'collect') g += ` (${this.count}/3)`;
     return g;
@@ -94,8 +94,8 @@ const Story = {
   finish() {
     this.finished = true;
     G.achieve('story');
-    const lover = G.companions.find(c => c.lover) || G.companions.filter(c => c.joined).sort((a, b) => b.aff - a.aff)[0];
-    const romance = lover && lover.aff >= 100;
+    const lover = G.companions.find(c => c.lover) || G.companions.filter(c => c.joined && c.romance).sort((a, b) => b.aff - a.aff)[0];
+    const romance = !!lover && (lover.lover || lover.aff >= 100);
     const names = Object.assign({}, this.names);
     if (romance) this.names.companion = lover.data.name;
     const lines = (romance ? this.tpl.endings.romance : this.tpl.endings.normal).map(t => ({ who: 'sys', text: this.fmt(t) }));
@@ -104,7 +104,7 @@ const Story = {
     UI.dialog({ lines, title: romance ? 'KẾT THÚC: TRÁI TIM TÌM THẤY NHAU' : 'KẾT THÚC', cinematic: true, portrait: romance ? lover.data.portrait : null, onDone: () => UI.victory(romance, lover) });
   },
   serialize() { return { gender: this.gender, realm: this.realm, tplIdx: this.tplIdx, compIdx: this.compIdx, names: this.names, act: this.act, count: this.count, finished: this.finished, pois: this.pois }; },
-  load(d) { this.gender = 'm'; Object.assign(this, d); },
+  load(d) { this.gender = 'm'; Object.assign(this, d); if (!this.finished && this.act >= this.tpl.acts.length) this.finished = true; },
 };
 
 // ---------- companion helpers on G ----------
