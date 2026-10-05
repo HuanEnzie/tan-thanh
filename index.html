@@ -34,7 +34,7 @@
 <button id="tDash"><span>LƯỚT</span></button>
 <button id="tSkill"><span>TUYỆT KỸ</span></button>
 <div id="tmenu">
-  <button data-a="pause">II</button><button data-a="fs">⛶</button><button data-a="map">Bản đồ</button><button data-a="craft">Chế tạo</button><button data-a="inv">Túi</button><button data-a="gacha" class="gbtn">🎴</button>
+  <button data-a="pause">II</button><button data-a="fs">⛶</button><button data-a="map">Bản đồ</button><button data-a="craft">Chế tạo</button><button data-a="inv">Túi</button><button data-a="gacha" class="gbtn">🎴</button><button data-a="chat">💬</button>
   <button data-k="KeyL" class="ico"><img src="assets/img/i_flashlight.png" alt="Đèn"></button><button data-k="KeyB" class="ico"><img src="assets/img/i_planks.png" alt="Rào"><i></i></button><button data-k="KeyT" class="ico"><img src="assets/img/i_scrap.png" alt="Bẫy"><i></i></button><button data-k="KeyU" class="ico"><img src="assets/img/ui_5.png" alt="Truyền tống"></button>
 </div>
 <div id="fsHint" hidden></div>
@@ -56,6 +56,7 @@
   </div>
   <div id="bossbar" class="hidden"><div id="bossname"></div><div class="bar"><div id="bossfill"></div></div></div>
   <div id="feed"></div>
+  <div id="partyHud" hidden></div>
   <div id="combo"></div>
   <div id="skillflash"></div>
   <div id="banner"></div>
@@ -105,6 +106,7 @@
       <div id="saveInfo"></div>
       <button id="btnNew">☣ CHƠI MỚI</button>
       <button id="btnHelp">? HƯỚNG DẪN</button>
+      <button id="btnCoopT">👥 CHƠI CÙNG BẠN BÈ</button>
       <button id="btnInstall" hidden>📲 CÀI ĐẶT APP</button>
       <button id="btnSaveIOT">💾 LƯU / TẢI FILE</button>
       <button id="btnSettings">♪ CÀI ĐẶT</button>
@@ -140,6 +142,7 @@
       <button id="btnResume">▶ CHƠI TIẾP</button>
       <button id="btnPauseHelp">? HƯỚNG DẪN</button>
       <button id="btnPauseSettings">♪ CÀI ĐẶT</button>
+      <button id="btnCoopP">👥 MỜI BẠN CHƠI CÙNG</button>
       <button id="btnSaveIO">💾 LƯU / TẢI FILE</button>
       <button id="btnPauseFs">⛶ TOÀN MÀN HÌNH</button>
       <button id="btnQuit">⌂ LƯU &amp; VỀ MENU</button>
@@ -165,6 +168,7 @@
           <tr><td>C / Tab / M</td><td>Chế tạo / Túi đồ / Bản đồ</td></tr>
           <tr><td>U</td><td>Cuộn truyền tống: về nơi trú ẩn / thoát hầm ngục</td></tr>
           <tr><td>Y</td><td>Tế Đàn triệu hồi (gacha): thú cưng, trang bị, báu vật</td></tr>
+          <tr><td>Enter</td><td>Nhắn tin cho đồng đội (khi chơi cùng bạn bè)</td></tr>
         </table>
         <h3>Điện thoại</h3>
         <p class="muted">Cần trái di chuyển, cần phải ngắm. Giữ nút đỏ để tấn công (tự ngắm kẻ gần nhất). LƯỚT để né, TUYỆT KỸ khi vòng năng lượng đầy.</p>
@@ -257,6 +261,30 @@
   <div id="gAnim" class="ganim" hidden><div class="gsky"></div><div class="gstreak"></div><div class="gflash"></div><div id="gCards"></div><button id="gCont" hidden>TIẾP TỤC ▶</button></div>
 </div>
 
+<div id="coop" class="screen hidden">
+  <div class="panel wide coopp">
+    <button class="close" onclick="UI.back()">✕</button>
+    <h2>👥 CHƠI CÙNG BẠN BÈ</h2>
+    <div id="coopHost">
+      <p class="muted">Bạn là chủ phòng: bạn bè vào thế giới của bạn, cùng đánh quái, vào Cổng và hạ boss. Kinh nghiệm chia đều, đồ rơi là của riêng từng người. Tối đa 4 người.</p>
+      <div class="menu row wrap"><button id="cOpen">📡 MỞ PHÒNG</button><button id="cCopy" hidden>⧉ SAO CHÉP LỜI MỜI</button><button id="cClose" hidden>✖ ĐÓNG PHÒNG</button></div>
+      <div class="ccode" id="cCode">-----</div>
+      <input id="cLink" readonly>
+    </div>
+    <div id="coopJoin">
+      <p class="muted">Nhập mã phòng bạn bè gửi, hoặc mở link mời. Nhân vật co-op của bạn được lưu riêng theo từng thế giới (lần đầu sẽ mượn nhân vật trong bản lưu nếu cùng thế giới).</p>
+      <div class="cform"><label>Tên hiển thị <input id="cName" maxlength="20" autocomplete="off"></label><label>Mã phòng <input id="cJoinCode" maxlength="6" placeholder="VD: K7M2Q" autocomplete="off"></label></div>
+      <div class="menu row"><button id="cJoin">▶ VÀO PHÒNG</button></div>
+    </div>
+    <div id="coopGuest" hidden><div class="menu row"><button id="cLeave">⏏ RỜI PHÒNG</button></div></div>
+    <div id="cPlayers" class="cplayers"></div>
+    <p id="cMsg" class="cmsg"></p>
+    <p class="muted small">Co-op nối trực tiếp giữa các máy (WebRTC): chạy trên bản GitHub Pages hoặc app đã cài, không chạy trong khung xem artifact. Một số mạng công ty / 4G có thể chặn kết nối trực tiếp. Nhấn Enter hoặc nút 💬 để nhắn tin.</p>
+  </div>
+</div>
+
+<div id="chatBox" hidden><div id="chatPresets"></div><div class="crow"><input id="chatIn" maxlength="60" placeholder="Nhắn cho đồng đội..." autocomplete="off"><button id="chatSend">GỬI</button></div></div>
+
 <div id="saveio" class="screen hidden">
   <div class="panel wide">
     <button class="close" onclick="UI.back()">✕</button>
@@ -318,6 +346,7 @@
 <script src="js/touch.js"></script>
 <script src="js/v3.js"></script>
 <script src="js/v4.js"></script>
+<script src="js/coop.js"></script>
 <script>
   try { G.lowGfx = !!localStorage.getItem('tt_low'); } catch (e) {}
   resize();

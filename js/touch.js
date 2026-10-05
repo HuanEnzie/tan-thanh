@@ -23,7 +23,7 @@ const Touch = {
       b.addEventListener('touchstart', e => {
         e.preventDefault(); e.stopPropagation();
         const a = b.dataset.a;
-        if (a === 'pause') UI.pause(); else if (a === 'fs') this.fullscreen(); else UI.openPanel(a);
+        if (a === 'pause') UI.pause(); else if (a === 'chat') UI.chatOpen(); else if (a === 'fs') this.fullscreen(); else UI.openPanel(a);
       }, opt);
     });
     // attack button: hold to shoot / swing, auto-aims at the nearest zombie

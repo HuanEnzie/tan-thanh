@@ -184,7 +184,7 @@ const G = {
     const P = this.player;
     if (t === P) this.hurtPlayer(dmg, src);
     else if (t === P.car) this.damageCar(P.car, dmg * 0.6);
-    else if (t.hurt) t.hurt(dmg);
+    else if (t.hurt) t.hurt(dmg, src);
   },
 
   // ---------- inventory & gear ----------
@@ -288,7 +288,7 @@ const G = {
       if (crit) Particles.sparks(z.x, z.y, a + Math.PI, 6, ['#fff6b0', '#ffffff']);
       if (Math.random() < 0.12) World.addDecal(R.pick(['blood1', 'blood2', 'blood3', 'blood4']), z.x + R.range(-8, 8), z.y + R.range(-8, 8), R.range(0, TAU), R.range(0.3, 0.55), 0.85);
       // gain skill energy
-      P.energy = Math.min(100, P.energy + dmg * 0.05 * (1 + P.relic('energy') / 100 + (P.perks.skill || 0) * 0.3) / Math.max(1, z.lvl * 0.25));
+      if (src !== 'net') P.energy = Math.min(100, P.energy + dmg * 0.05 * (1 + P.relic('energy') / 100 + (P.perks.skill || 0) * 0.3) / Math.max(1, z.lvl * 0.25));
     }
     // weapon affix procs
     const aff = wp && (wp.aff || wp.affixes);
@@ -547,7 +547,7 @@ const G = {
     if (World.mode === 'dungeon') return;
     this.spawnT -= dt;
     if (this.spawnT > 0) return;
-    const P = this.player;
+    const P = this.spawnCenter ? this.spawnCenter() : this.player;
     const sb = World.sbOf(Math.floor(P.x / TILE), Math.floor(P.y / TILE));
     const zone = sb ? sb.zone : 0;
     let target = [12, 22, 30][zone] * (this.night ? 1.6 : 1) * (1 + (this.day - 1) * 0.08);

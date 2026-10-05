@@ -323,22 +323,24 @@ G.update = function (dt) {
   this.processPending();
   this.zgrid.clear();
   for (const z of this.zombies) if (!z.dead) this.zgrid.insert(z);
-  updatePlayer(dt);
-  this.interactTarget = this.findInteract();
-  if (Input.hit('KeyE')) this.interact(this.interactTarget);
-  this.actionTick(dt);
+  if (this.state === 'playing') {
+    updatePlayer(dt);
+    this.interactTarget = this.findInteract();
+    if (Input.hit('KeyE')) this.interact(this.interactTarget);
+    this.actionTick(dt);
+  }
   this.flowT -= dt;
   if (this.flowT <= 0) { this.flowT = 0.3; this.computeFlow(); }
   for (const z of this.zombies) z.update(dt);
   for (let i = this.zombies.length - 1; i >= 0; i--) {
     const z = this.zombies[i];
     if (z.dead) { if (z.dying > 0.45) this.zombies.splice(i, 1); continue; }
-    const d = dist(z.x, z.y, P.x, P.y);
+    const d = this.nearestPlayerDist ? this.nearestPlayerDist(z.x, z.y) : dist(z.x, z.y, P.x, P.y);
     if (World.mode === 'over' && ((d > 1500 && !z.guard) || (d > 2400 && !z.story))) { if (z === this.boss) { this.boss = null; UI.boss(null); } this.zombies.splice(i, 1); }
   }
   for (const a of this.allies) a.update(dt);
   // drop civilians / merchants left far behind (they respawn with their area)
-  this.allies = this.allies.filter(a => !a.dead && !((a.kind === 'civ' || a.kind === 'merchant') && World.mode === 'over' && dist(a.x, a.y, P.x, P.y) > 3600));
+  this.allies = this.allies.filter(a => !a.dead && !((a.kind === 'civ' || a.kind === 'merchant') && World.mode === 'over' && (this.nearestPlayerDist ? this.nearestPlayerDist(a.x, a.y) : dist(a.x, a.y, P.x, P.y)) > 3600));
   this.updateHazards(dt);
   if (this.frame % 20 === 0) this.biomeTick();
   this.v4Tick(dt);
@@ -427,6 +429,7 @@ G.render = function () {
   FX.draw(ctx);
   P.draw(ctx);
   drawPet(ctx);
+  if (typeof drawRemotes === 'function') { drawRemotes(ctx); drawSelfSay(ctx); }
   Bullets.draw(ctx);
   Particles.draw(ctx);
   drawMeteors(ctx);
@@ -675,7 +678,7 @@ function loop(now) {
   last = now;
   G.rdt = dt;
   G.frame++;
-  if (G.state === 'playing') G.update(dt);
+  if (G.state === 'playing' || (typeof Net !== 'undefined' && Net.active && G.player && ['paused', 'menu', 'dialog', 'levelup'].includes(G.state))) G.update(dt);
   if (G.player && ['playing', 'paused', 'menu', 'levelup', 'dead', 'dialog'].includes(G.state)) {
     if (G.state === 'dead' || G.state === 'dialog') { Particles.update(dt); FX.update(dt); }
     G.render();

@@ -51,6 +51,34 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 - **Lưu và tải file .json**: trong menu, chọn 💾 LƯU / TẢI FILE để xuất tiến độ ra file, sao chép mã, hoặc nạp lại từ file hay mã đã dán.
 - **Cửa nhà dễ thấy**: cửa vẽ trên mái, có ánh đèn hắt ra và mũi tên chỉ vào.
 
+## Chơi cùng bạn bè (co-op 2–4 người)
+
+**Chủ phòng:**
+1. Vào game.
+2. Mở menu tạm dừng → **👥 MỜI BẠN CHƠI CÙNG** → **MỞ PHÒNG**.
+3. Gửi mã 5 ký tự hoặc link mời (nút **SAO CHÉP LỜI MỜI**) qua Zalo / Messenger.
+
+**Người được mời:**
+1. Mở link mời, hoặc vào màn hình chính → **👥 CHƠI CÙNG BẠN BÈ**.
+2. Nhập mã → **VÀO PHÒNG**.
+
+**Cách hoạt động:**
+- Kết nối trực tiếp giữa các máy (WebRTC qua PeerJS), không cần máy chủ riêng.
+- Máy chủ phòng điều khiển thế giới: quái, boss, ngày đêm, hầm ngục.
+- Mỗi người điều khiển nhân vật của mình nên không bị trễ khi di chuyển.
+- Kinh nghiệm chia đều cho người ở gần. Đồ rơi và rương là phần riêng của từng người.
+- Bất kỳ ai bước vào Cổng hay lối ra cũng đưa cả đội đi cùng.
+- Gục ngã thì sau 10 giây hồi sinh cạnh đồng đội.
+- Nhắn tin bằng Enter hoặc nút 💬.
+
+**Nhân vật của khách:**
+- Lưu riêng theo từng thế giới (`tt_coop_<thế giới>`), không ảnh hưởng bản lưu chơi một mình.
+- Lần đầu sẽ mượn nhân vật trong bản lưu nếu cùng thế giới.
+
+**Giới hạn:**
+- Chỉ chạy trên bản GitHub Pages hoặc app đã cài, vì artifact chặn WebRTC.
+- Một số mạng công ty hay 4G chặn kết nối trực tiếp.
+
 ## Bản v4: khám phá & gacha
 
 - **Tế Đàn Vận Mệnh (gacha)**: triệu hồi x1/x10, có bảo hiểm (5★ chắc chắn ở lượt 60, 4★ mỗi 10 lượt), hiệu ứng sao băng đổi màu theo độ hiếm và thẻ lật. Lần x10 đầu tiên chắc chắn có thú cưng. Vé lấy từ vùng đất mới, kỳ quan, boss, rương quý, yêu tinh, mảnh sao băng (10 mảnh = 1 vé) hoặc mua bằng tiền.

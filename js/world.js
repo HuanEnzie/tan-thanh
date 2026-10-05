@@ -135,7 +135,7 @@ const World = {
       if (!this.sbs.has(nkey(x, y))) { this.ensure(x, y); return; }
     }
     if (G.frame % 30 === 0) {
-      for (const [k, sb] of this.sbs) if (Math.abs(sb.sx - sx) > 3 || Math.abs(sb.sy - sy) > 3) this.unload(sb);
+      for (const [k, sb] of this.sbs) if ((Math.abs(sb.sx - sx) > 3 || Math.abs(sb.sy - sy) > 3) && !(this.focus || []).some(f => Math.abs(sb.sx - f[0]) <= 2 && Math.abs(sb.sy - f[1]) <= 2)) this.unload(sb);
     }
   },
   unload(sb) {

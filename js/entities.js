@@ -64,7 +64,7 @@ const Bullets = {
       x, y, px: x, py: y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, sp, dmg, life: o.life || w.range || 0.9,
       pierce: (w.pierce || 0) + (o.pierceBonus || 0), knock: w.knock || 50, hit: new Set(), ang, proj: o.proj || w.proj || 'bullet',
       col: o.col || w.color || '#ffe08a', aff: w.affixes || [], homing: o.homing ?? w.homing, bounce: (w.affixes || []).includes('bounce') ? 1 : 0,
-      hostile: !!o.hostile, ally: !!o.ally, crit: w.crit || 0, spin: 0, size: o.size || 1, src: o.src || 'gun',
+      hostile: !!o.hostile, ally: !!o.ally, crit: w.crit || 0, spin: 0, size: o.size || 1, src: o.src || 'gun', ghost: !!o.ghost,
     });
   },
   update(dt) {
@@ -99,6 +99,7 @@ const Bullets = {
           if (b.proj !== 'wave') Particles.sparks(b.x, b.y, b.ang, 5, b.proj === 'bullet' ? null : [b.col, '#ffffff']);
           dead = true; break;
         }
+        if (b.ghost) continue;
         if (b.hostile) {
           for (const t of G.targets()) {
             if (dist(b.x, b.y, t.x, t.y) < (t.r || 11) + 4 * b.size) {
@@ -253,7 +254,7 @@ const Throws = {
       const f = this.fires[i];
       f.life -= dt;
       if (Math.random() < 0.9) for (let k = 0; k < 2; k++) { const a = R.range(0, TAU), r = Math.sqrt(Math.random()) * f.r; Particles.fire(f.x + Math.cos(a) * r, f.y + Math.sin(a) * r, 1); }
-      if (!f.hostile) for (const z of G.zgrid.query(f.x, f.y, f.r + 20)) if (!z.dead && dist(z.x, z.y, f.x, f.y) < f.r) { G.hitEnemy(z, 40 * boom * lvlMul * dt, 0, 0, 'fire'); z.burn = 2.5; }
+      if (!f.hostile && !f.ghost) for (const z of G.zgrid.query(f.x, f.y, f.r + 20)) if (!z.dead && dist(z.x, z.y, f.x, f.y) < f.r) { G.hitEnemy(z, 40 * boom * lvlMul * dt, 0, 0, 'fire'); z.burn = 2.5; }
       const P = G.player;
       if (!P.car && !f.friendly && dist(P.x, P.y, f.x, f.y) < f.r) G.hurtPlayer(12 * dt, null, true);
       if (f.life <= 0) this.fires.splice(i, 1);
@@ -368,9 +369,11 @@ class Enemy {
     const P = G.player;
     if (this.thinkT <= 0) {
       this.thinkT = 0.2 + Math.random() * 0.15;
-      if (P.dead) { this.state = 'wander'; this.tgt = null; }
+      const rem = G.remotes || [];
+      if (P.dead && !rem.some(r => !r.dead && !r.away)) { this.state = 'wander'; this.tgt = null; }
       else {
-        let best = G.player.car || P, bd = dist(this.x, this.y, best.x, best.y);
+        let best = P.dead ? null : (G.player.car || P), bd = best ? dist(this.x, this.y, best.x, best.y) : 1e9;
+        for (const r of rem) { if (r.dead || r.away) continue; const dd = dist(this.x, this.y, r.x, r.y); if (dd < bd - 30) { bd = dd; best = r; } }
         for (const a of G.allies) { if (a.downed || a.dead || a.kind === 'merchant' || (a.kind === 'civ' && a.rescued)) continue; const dd = dist(this.x, this.y, a.x, a.y); if (dd < bd - 30) { bd = dd; best = a; } }
         this.tgt = best;
         const sight = G.sightRange() * (this.elite ? 1.3 : 1);
@@ -388,7 +391,7 @@ class Enemy {
     if (this.groanT <= 0) { this.groanT = R.range(7, 18); if (d < 550) Sound.at(G.groanSfx(), this.x, this.y, 0.35, this.boss ? 0.6 : this.arche === 'brute' ? 0.75 : R.range(0.85, 1.15)); }
 
     let mx = 0, my = 0, speed = this.spd * (G.night ? 1.15 : 1) * (this.slow > 0 ? 0.5 : 1) * (G.timeSlow > 0 ? 0.3 : 1);
-    if (this.state === 'chase' && !P.dead) {
+    if (this.state === 'chase' && !tgt.dead) {
       let dir = null;
       const tgtP = this.tgt === P || this.tgt === P.car;
       if (d < 600 && (d < 90 || World.bldAt(tgt.x, tgt.y) === World.bldAt(this.x, this.y)) && World.los(this.x, this.y, tgt.x, tgt.y)) dir = [dx / d, dy / d];
