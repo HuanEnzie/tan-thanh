@@ -1,6 +1,6 @@
 // ===== Random storyline, companions, romance =====
 const Story = {
-  init(realm, seed, hero) {
+  init(realm, seed, hero, gender) {
     const L = LORE[realm];
     const rnd = mulberry32(seed ^ 0x5f3759df);
     const pick = a => a[Math.floor(rnd() * a.length)];
@@ -11,7 +11,7 @@ const Story = {
       hero, villain: pick(L.names.villains), artifact: pick(L.names.artifacts), place: pick(L.names.places), faction: pick(L.names.factions),
       companion: L.companions[this.compIdx].name, friend: L.companions[1 - this.compIdx].name,
     };
-    this.act = 0; this.count = 0; this.finished = false;
+    this.act = 0; this.count = 0; this.finished = false; this.gender = gender || 'm';
     // place story locations around the start, in superblock units
     const ang0 = rnd() * TAU;
     const at = (d, a) => ({ sx: Math.round(Math.cos(a) * d), sy: Math.round(Math.sin(a) * d) });
@@ -103,8 +103,8 @@ const Story = {
     if (romance) Sound.setMusic('music_romance'); else Sound.setMusic('music_victory');
     UI.dialog({ lines, title: romance ? 'KẾT THÚC: TRÁI TIM TÌM THẤY NHAU' : 'KẾT THÚC', cinematic: true, portrait: romance ? lover.data.portrait : null, onDone: () => UI.victory(romance, lover) });
   },
-  serialize() { return { realm: this.realm, tplIdx: this.tplIdx, compIdx: this.compIdx, names: this.names, act: this.act, count: this.count, finished: this.finished, pois: this.pois }; },
-  load(d) { Object.assign(this, d); },
+  serialize() { return { gender: this.gender, realm: this.realm, tplIdx: this.tplIdx, compIdx: this.compIdx, names: this.names, act: this.act, count: this.count, finished: this.finished, pois: this.pois }; },
+  load(d) { this.gender = 'm'; Object.assign(this, d); },
 };
 
 // ---------- companion helpers on G ----------
@@ -115,6 +115,14 @@ Object.assign(G, {
       idx: i, aff: 0, stage: 0, joined: false, lover: false, scenePending: false, talkT: 0,
       data: Object.assign({}, d, { name: d.name, portrait: RL.port[i] || d.portrait, sprite: RL.npc[RL.compSprite[i]] }),
     }));
+    this.companions.forEach(c => this.setupBond(c));
+  },
+  // same gender as the hero -> sworn-sibling friendship instead of romance
+  setupBond(c) {
+    const d = LORE[RL.id].companions[c.idx];
+    c.romance = d.gender !== (Story.gender || 'm');
+    if (!c.romance && d.bond) { c.data.stages = d.bond; c.data.stagesExpr = null; c.data.stagesReplyExpr = null; }
+    else { c.data.stages = d.stages; c.data.stagesExpr = d.stagesExpr; c.data.stagesReplyExpr = d.stagesReplyExpr; }
   },
   recruit(c, x, y) {
     c.joined = true;
@@ -123,19 +131,19 @@ Object.assign(G, {
     this.allies.push(a);
     this.addAff(c, 5);
     Sound.play('sfx_heart', 0.6);
-    UI.dialog({ lines: c.data.meet.map(l => ({ who: l.who, text: Story.fmt(l.text) })), name: c.data.name, portrait: c.data.portrait, onDone: () => this.toast(`${c.data.name} đã gia nhập đội! Đến gần và nhấn [E] để trò chuyện.`, 'good') });
+    UI.dialog({ lines: c.data.meet.map((l, i) => ({ who: l.who, text: Story.fmt(l.text), e: c.data.meetExpr && c.data.meetExpr[i] })), name: c.data.name, portrait: c.data.portrait, romance: c.romance, onDone: () => this.toast(`${c.data.name} đã gia nhập đội! Đến gần và nhấn [E] để trò chuyện.`, 'good') });
   },
   addAff(c, n) {
-    if (!c || c.aff >= 100 && c.lover) return;
+    if (!c || c.aff >= 100 && (c.lover || c.sworn)) return;
     const before = c.aff;
     c.aff = clamp(c.aff + n * (1 + (this.player.perks.charm || 0)), 0, 100);
     const next = (c.stage + 1) * 20;
     if (c.stage < 5 && c.aff >= next && !c.scenePending) {
       c.scenePending = true;
-      this.toast(`♥ ${c.data.name} muốn nói chuyện riêng với bạn... (đến gần, nhấn E)`, 'love');
+      this.toast(`${c.romance ? '♥' : '★'} ${c.data.name} muốn nói chuyện riêng với bạn... (đến gần, nhấn E)`, 'love');
       Sound.play('sfx_heart', 0.5);
     }
-    if (Math.floor(before / 10) !== Math.floor(c.aff / 10) && n > 0 && c.ally) Floaters.add(c.ally.x, c.ally.y - 30, '♥', '#ff8ab8', 14, true);
+    if (Math.floor(before / 10) !== Math.floor(c.aff / 10) && n > 0 && c.ally) Floaters.add(c.ally.x, c.ally.y - 30, c.romance ? '♥' : '★', c.romance ? '#ff8ab8' : '#ffd23a', 14, true);
     UI.dirty = true;
   },
   romanceReady(comp) { return comp && comp.ref && comp.ref.scenePending; },
@@ -145,14 +153,18 @@ Object.assign(G, {
     const prev = Sound.currentMusic;
     Sound.setMusic('music_romance');
     UI.dialog({
-      title: '♥ ' + Story.fmt(sc.title), name: c.data.name, portrait: c.data.portrait,
-      lines: sc.lines.map(l => ({ who: l.who, text: Story.fmt(l.text) })),
-      choices: sc.choices.map(ch => ({ text: Story.fmt(ch.text), reply: Story.fmt(ch.reply), aff: ch.aff })),
+      title: (c.romance ? '♥ ' : '★ ') + Story.fmt(sc.title), name: c.data.name, portrait: c.data.portrait, romance: c.romance,
+      lines: sc.lines.map((l, i) => ({ who: l.who, text: Story.fmt(l.text), e: l.e || (c.data.stagesExpr && c.data.stagesExpr[c.stage] && c.data.stagesExpr[c.stage][i]) })),
+      choices: sc.choices.map((ch, i) => ({ text: Story.fmt(ch.text), reply: Story.fmt(ch.reply), aff: ch.aff, e: ch.e || (c.data.stagesReplyExpr && c.data.stagesReplyExpr[c.stage] && c.data.stagesReplyExpr[c.stage][i]) })),
       onChoice: ch => { c.aff = clamp(c.aff + Math.min(0, ch.aff), 0, 100); if (ch.aff > 0) c.bonus = (c.bonus || 0) + ch.aff; },
       onDone: () => {
         c.stage++; c.scenePending = false;
         if (c.bonus) { this.addAff(c, c.bonus); c.bonus = 0; }
-        if (c.stage >= 5) {
+        if (c.stage >= 5 && !c.romance) {
+          c.sworn = true; c.aff = 100;
+          this.toast('★ ' + String(c.data.bondDone || '{name} và {hero} đã kết nghĩa. (Tri kỷ sẽ hồi sinh bạn 1 lần mỗi ngày)').replace('{name}', c.data.name).replace('{hero}', Story.names.hero), 'love');
+          if (c.ally) for (let i = 0; i < 20; i++) Particles.add({ x: c.ally.x, y: c.ally.y, vx: R.range(-60, 60), vy: R.range(-120, -30), life: 1.5, max: 1.5, size: 4, col: '#ffd23a', drag: 1, glow: true });
+        } else if (c.stage >= 5) {
           c.lover = true; c.aff = 100;
           this.achieve('love');
           this.toast(`♥ ${c.data.name} và ${Story.names.hero} đã thuộc về nhau. (Người thương sẽ hồi sinh bạn 1 lần mỗi ngày)`, 'love');
@@ -168,20 +180,21 @@ Object.assign(G, {
     const opts = [];
     opts.push({ text: 'Trò chuyện', act: () => {
       const line = R.pick(c.data.banter);
-      UI.dialog({ name: c.data.name, portrait: c.data.portrait, lines: [{ who: 'npc', text: Story.fmt(line) }] });
+      UI.dialog({ name: c.data.name, portrait: c.data.portrait, romance: c.romance, lines: [{ who: 'npc', text: Story.fmt(line) }] });
       if (this.time - c.talkT > 60) { c.talkT = this.time; this.addAff(c, 2); }
     } });
     const gifts = ['flower', 'choco', 'food', 'water', 'energy', 'bandage', 'medkit', 'pills', 'battery'].filter(id => this.has(id));
+    const heart = c.romance ? '♥' : '★', hollow = c.romance ? '♡' : '☆';
     for (const id of gifts.slice(0, 4)) {
       const liked = (c.data.likes || []).includes(id);
-      opts.push({ text: `Tặng ${ITEMS[id].name}${liked ? ' ♥' : ''}`, act: () => {
+      opts.push({ text: `Tặng ${itm(id).name}${liked ? ' ' + heart : ''}`, act: () => {
         this.take(id);
         this.addAff(c, liked ? 10 : 3);
-        UI.dialog({ name: c.data.name, portrait: c.data.portrait, lines: [{ who: 'npc', text: Story.fmt(R.pick(c.data.gift)) }] });
+        UI.dialog({ name: c.data.name, portrait: c.data.portrait, lines: [{ who: 'npc', text: Story.fmt(R.pick(c.data.gift)), e: c.romance && liked ? 'blush' : 'happy' }] });
         Sound.play('sfx_heart', 0.5);
       } });
     }
     opts.push({ text: 'Đi thôi', act: () => {} });
-    UI.menuDialog({ name: c.data.name, portrait: c.data.portrait, text: `Độ thân mật: ${Math.round(c.aff)}/100 ${'♥'.repeat(c.stage)}${'♡'.repeat(5 - c.stage)}`, options: opts });
+    UI.menuDialog({ name: c.data.name, portrait: c.data.portrait, text: `${c.romance ? 'Độ thân mật' : 'Tình nghĩa ' + (c.data.bondTitle ? '(' + c.data.bondTitle + ')' : '')}: ${Math.round(c.aff)}/100 ${heart.repeat(c.stage)}${hollow.repeat(5 - c.stage)}`, options: opts });
   },
 });

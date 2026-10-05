@@ -108,13 +108,13 @@ const REALMS = {
     weapons: {
       r1: { name: 'Hoả phù', icon: 'tt_w_0', proj: 'talisman', color: '#ffd65a', sfx: 'sfx_magic', ammo: 'Phù chú' },
       r2: { name: 'Hồ lô linh hoả', icon: 'tt_w_1', proj: 'orb', color: '#5affc8', sfx: 'sfx_magic2', ammo: 'Linh hoả' },
-      r3: { name: 'Pháp trượng', icon: 'tt_w_2', proj: 'orb', color: '#6bb6ff', sfx: 'sfx_magic', ammo: 'Linh thạch', homing: true },
+      r3: { name: 'Pháp trượng', icon: 'tt_w_2', proj: 'orb', color: '#6bb6ff', sfx: 'sfx_magic', ammo: 'Linh Khí Châu', homing: true },
       melee: { name: 'Phi kiếm', icon: 'tt_w_3', sfx: 'sfx_sword2', trail: '#7dffd8', wave: true },
     },
     legend: { r1: ['Thiên Lôi Phù', 'Cửu Thiên Huyền Phù'], r2: ['Tử Kim Hồ Lô', 'Càn Khôn Hồ'], r3: ['Hỗn Độn Trượng', 'Tinh Hà Trượng'], melee: ['Tru Tiên Kiếm', 'Thanh Liên Kiếm'] },
     skill: { id: 'swords', name: 'Vạn Kiếm Quy Tông', desc: 'Triệu hồi mưa phi kiếm truy sát kẻ địch', color: '#7dffd8' },
     music: { explore: 'music_tt_explore', night: 'music_tt_explore', combat: 'music_tt_combat', dungeon: 'music_dungeon' },
-    ambient: 'motes', cars: false, nightTint: [2, 8, 22], radio: 'TRUYỀN ÂM', ammoNames: ['Phù chú', 'Linh hoả', 'Linh thạch'],
+    ambient: 'motes', cars: false, nightTint: [2, 8, 22], radio: 'TRUYỀN ÂM', ammoNames: ['Phù chú', 'Linh hoả', 'Linh Khí Châu'],
     style: 'sect',
   },
   sl: {
@@ -144,7 +144,8 @@ const REALMS = {
     style: 'modern', gatesCommon: true,
   },
 };
-const REALM_ORDER = ['md', 'cy', 'ct', 'tt', 'sl'];
+// Neon 2099 (cy) and Cổ Trang (ct) are switched off for now; their data stays for later.
+const REALM_ORDER = ['md', 'tt', 'sl'];
 let RL = REALMS.md; // current realm
 
 // image names each realm needs (beyond the shared set)
@@ -158,8 +159,13 @@ function realmImages(r) {
   add(R.roofs); add(R.wall); add(R.dungeon.floor); add(R.dungeon.wall); add(R.dungeon.torch); add(R.dungeon.decor);
   for (const k in R.props) add(R.props[k]);
   for (const k in R.weapons) add(R.weapons[k].icon);
-  for (let i = 0; i < 7; i++) add(r + '_ef_' + i);
-  for (let i = 0; i < 4; i++) add(r + '_nf_' + i);
-  add(r + '_hb');
+  const k = rk(r);
+  for (let i = 0; i < 4; i++) { add(k + '_ar_' + i); add(k + '_b_' + i); }
+  for (let i = 0; i < 8; i++) add(k + '_m_' + i);
+  if (r === 'tt') for (let i = 0; i < 16; i++) add('tt_i_' + i);
+  for (const b of BOSSES[k]) add(b.img);
+  add(BIOME_IMAGES); add(Object.values(BIOME_TEX));
+  for (let i = 0; i < 4; i++) { add('chest_' + i); add('chest_' + i + 'o'); }
+  for (let i = 0; i < 8; i++) add('ui_' + i);
   return [...s];
 }

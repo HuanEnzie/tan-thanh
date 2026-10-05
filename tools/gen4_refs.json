@@ -1,0 +1,118 @@
+{
+ "md_port1_happy": [
+  "md_port1"
+ ],
+ "md_port1_sad": [
+  "md_port1"
+ ],
+ "md_port1_angry": [
+  "md_port1"
+ ],
+ "md_port1_blush": [
+  "md_port1"
+ ],
+ "md_port1_surprised": [
+  "md_port1"
+ ],
+ "md_port2_happy": [
+  "md_port2"
+ ],
+ "md_port2_sad": [
+  "md_port2"
+ ],
+ "md_port2_angry": [
+  "md_port2"
+ ],
+ "md_port2_blush": [
+  "md_port2"
+ ],
+ "md_port2_surprised": [
+  "md_port2"
+ ],
+ "tt_port1_happy": [
+  "tt_port1"
+ ],
+ "tt_port1_sad": [
+  "tt_port1"
+ ],
+ "tt_port1_angry": [
+  "tt_port1"
+ ],
+ "tt_port1_blush": [
+  "tt_port1"
+ ],
+ "tt_port1_surprised": [
+  "tt_port1"
+ ],
+ "tt_port2_happy": [
+  "tt_port2"
+ ],
+ "tt_port2_sad": [
+  "tt_port2"
+ ],
+ "tt_port2_angry": [
+  "tt_port2"
+ ],
+ "tt_port2_blush": [
+  "tt_port2"
+ ],
+ "tt_port2_surprised": [
+  "tt_port2"
+ ],
+ "sl_port1_happy": [
+  "sl_port1"
+ ],
+ "sl_port1_sad": [
+  "sl_port1"
+ ],
+ "sl_port1_angry": [
+  "sl_port1"
+ ],
+ "sl_port1_blush": [
+  "sl_port1"
+ ],
+ "sl_port1_surprised": [
+  "sl_port1"
+ ],
+ "sl_port2_happy": [
+  "sl_port2"
+ ],
+ "sl_port2_sad": [
+  "sl_port2"
+ ],
+ "sl_port2_angry": [
+  "sl_port2"
+ ],
+ "sl_port2_blush": [
+  "sl_port2"
+ ],
+ "sl_port2_surprised": [
+  "sl_port2"
+ ],
+ "chests": [],
+ "md_armor": [],
+ "tt_armor": [],
+ "sl_armor": [],
+ "md_melee": [],
+ "tt_melee": [],
+ "sl_melee": [],
+ "tt_items": [],
+ "shop_icons": [],
+ "tex_snow": [],
+ "tex_swamp": [],
+ "tex_ash": [],
+ "tex_mycel": [],
+ "tex_crystal": [],
+ "tex_sakura": [],
+ "tex_desert": [],
+ "tex_jungle": [],
+ "tex_ice": [],
+ "tex_lava": [],
+ "tex_grave": [],
+ "tex_leaves": [],
+ "biome_a": [],
+ "biome_b": [],
+ "md_bosses": [],
+ "tt_bosses": [],
+ "sl_bosses": []
+}

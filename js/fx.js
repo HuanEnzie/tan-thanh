@@ -153,25 +153,35 @@ const Floaters = {
 const Ambient = {
   list: [],
   update(dt, W, H) {
-    const kind = World.mode === 'dungeon' ? 'dust' : RL.ambient;
+    const kind = World.mode === 'dungeon' ? 'dust' : (G.biomeAmb || RL.ambient);
     const want = kind === 'rain' ? 0 : G.lowGfx ? 25 : 55;
     while (this.list.length < want) this.list.push({ x: Math.random() * W, y: Math.random() * H, s: R.range(0.5, 1.5), p: R.range(0, TAU) });
     if (this.list.length > want) this.list.length = want;
     for (const a of this.list) {
       a.p += dt;
-      if (kind === 'petals') { a.x += (30 + Math.sin(a.p) * 20) * a.s * dt * G.dpr; a.y += 40 * a.s * dt * G.dpr; }
+      if (kind === 'petals' || kind === 'leaves') { a.x += (30 + Math.sin(a.p) * 20) * a.s * dt * G.dpr; a.y += 40 * a.s * dt * G.dpr; }
+      else if (kind === 'snow') { a.x += Math.sin(a.p) * 18 * dt * G.dpr; a.y += 34 * a.s * dt * G.dpr; }
+      else if (kind === 'sand') { a.x += 160 * a.s * dt * G.dpr; a.y += Math.sin(a.p * 2) * 10 * dt * G.dpr; }
+      else if (kind === 'fog') { a.x += 8 * a.s * dt * G.dpr; }
+      else if (kind === 'embers' || kind === 'spores') { a.x += Math.sin(a.p) * 14 * dt * G.dpr; a.y -= (kind === 'embers' ? 40 : 12) * a.s * dt * G.dpr; }
       else if (kind === 'motes' || kind === 'mana') { a.x += Math.sin(a.p * 0.7) * 10 * dt * G.dpr; a.y -= 14 * a.s * dt * G.dpr; }
       else { a.x += (15 + Math.sin(a.p) * 10) * dt * G.dpr; a.y += 12 * a.s * dt * G.dpr; }
       if (a.y > H + 10) a.y = -10; if (a.y < -10) a.y = H + 10; if (a.x > W + 10) a.x = -10; if (a.x < -10) a.x = W + 10;
     }
   },
   draw(ctx) {
-    const kind = World.mode === 'dungeon' ? 'dust' : RL.ambient;
+    const kind = World.mode === 'dungeon' ? 'dust' : (G.biomeAmb || RL.ambient);
     const d = G.dpr;
     for (const a of this.list) {
       if (kind === 'petals') { ctx.fillStyle = 'rgba(255,170,200,0.75)'; ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(a.p); ctx.fillRect(-3 * d, -1.5 * d, 6 * d, 3 * d); ctx.restore(); }
       else if (kind === 'motes') { ctx.fillStyle = `rgba(170,255,220,${0.35 + Math.sin(a.p * 3) * 0.25})`; ctx.fillRect(a.x, a.y, 2 * d * a.s, 2 * d * a.s); }
       else if (kind === 'mana') { ctx.fillStyle = `rgba(120,150,255,${0.35 + Math.sin(a.p * 3) * 0.25})`; ctx.fillRect(a.x, a.y, 2 * d * a.s, 2 * d * a.s); }
+      else if (kind === 'leaves') { ctx.fillStyle = a.s > 1 ? 'rgba(220,90,30,0.8)' : 'rgba(240,160,40,0.75)'; ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(a.p * 2); ctx.fillRect(-3 * d, -2 * d, 6 * d, 4 * d); ctx.restore(); }
+      else if (kind === 'snow') { ctx.fillStyle = 'rgba(245,250,255,0.85)'; ctx.fillRect(a.x, a.y, 2.5 * d * a.s, 2.5 * d * a.s); }
+      else if (kind === 'sand') { ctx.fillStyle = 'rgba(230,170,90,0.35)'; ctx.fillRect(a.x, a.y, 14 * d * a.s, 1.2 * d); }
+      else if (kind === 'fog') { ctx.fillStyle = 'rgba(190,210,190,0.05)'; ctx.beginPath(); ctx.arc(a.x, a.y, 70 * d * a.s, 0, TAU); ctx.fill(); }
+      else if (kind === 'embers') { ctx.fillStyle = `rgba(255,${120 + Math.floor(Math.sin(a.p * 4) * 60)},40,0.8)`; ctx.fillRect(a.x, a.y, 2 * d, 2 * d); }
+      else if (kind === 'spores') { ctx.fillStyle = a.s > 1 ? `rgba(120,255,240,${0.4 + Math.sin(a.p * 3) * 0.3})` : `rgba(220,140,255,${0.4 + Math.sin(a.p * 3) * 0.3})`; ctx.fillRect(a.x, a.y, 2.5 * d, 2.5 * d); }
       else if (kind === 'dust') { ctx.fillStyle = 'rgba(200,190,170,0.25)'; ctx.fillRect(a.x, a.y, 1.5 * d, 1.5 * d); }
       else { ctx.fillStyle = 'rgba(200,190,180,0.3)'; ctx.fillRect(a.x, a.y, 2 * d * a.s, 2 * d * a.s); }
     }

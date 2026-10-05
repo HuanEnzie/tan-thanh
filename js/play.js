@@ -30,7 +30,6 @@ function resize() {
   G.dpr = dpr;
   G.zoom = clamp(touch ? Math.min(VW / 620, VH / 350) : Math.min(VW / 880, VH / 500), 0.8, 3) * dpr;
   lightC.width = Math.ceil(canvas.width / 3); lightC.height = Math.ceil(canvas.height / 3);
-  if (typeof R3D !== 'undefined') R3D.resize();
 }
 window.addEventListener('resize', resize);
 
@@ -57,7 +56,6 @@ function updatePlayer(dt) {
   relicTick(dt);
 
   let m = screenToWorld(Input.mouse.x, Input.mouse.y);
-  if (G.gfx === '3d' && G.cam3d === 'top' && R3D.ok && R3D.camera) { const gp = R3D.groundPoint(Input.mouse.x, Input.mouse.y); if (gp) m = gp; }
   Input.mouse.wx = m.x; Input.mouse.wy = m.y;
 
   if (P.car) {
@@ -71,20 +69,7 @@ function updatePlayer(dt) {
   }
 
   let ax = 0, ay = 0;
-  if (G.cam3d !== 'top' && R3D.ok) {
-    // camera-relative controls for third / first person (both 2D-billboard and 3D-model graphics)
-    if (Input.down('ArrowLeft')) G.yaw -= dt * 2.6;
-    if (Input.down('ArrowRight')) G.yaw += dt * 2.6;
-    let f = 0, st = 0;
-    if (Input.down('KeyW') || Input.down('ArrowUp')) f += 1;
-    if (Input.down('KeyS') || Input.down('ArrowDown')) f -= 1;
-    if (Input.down('KeyA')) st -= 1;
-    if (Input.down('KeyD')) st += 1;
-    const c = Math.cos(G.yaw), sn = Math.sin(G.yaw);
-    ax = c * f - sn * st; ay = sn * f + c * st;
-    P.angle = aimAssist(G.yaw, G.cam3d === 'fp' ? 0.2 : 0.32);
-    Input.mouse.wx = P.x + Math.cos(P.angle) * 260; Input.mouse.wy = P.y + Math.sin(P.angle) * 260;
-  } else {
+  {
     P.angle = Math.atan2(m.y - P.y, m.x - P.x);
     if (Input.down('KeyW') || Input.down('ArrowUp')) ay -= 1;
     if (Input.down('KeyS') || Input.down('ArrowDown')) ay += 1;
@@ -189,49 +174,8 @@ function updatePlayer(dt) {
   if (Input.hit('KeyG')) throwIt(G.has('grenade') ? 'grenade' : 'molotov');
   if (Input.hit('KeyB')) G.place('barricade');
   if (Input.hit('KeyT')) G.place('trap');
+  if (Input.hit('KeyU')) G.useScroll();
 }
-
-function aimAssist(yaw, cone) {
-  const P = G.player;
-  let best = null, bs = 1e9;
-  for (const z of G.zgrid.query(P.x, P.y, 640)) {
-    if (z.dead || z.rise > 0) continue;
-    const a = Math.atan2(z.y - P.y, z.x - P.x), d = dist(P.x, P.y, z.x, z.y);
-    const df = Math.abs(angDiff(yaw, a));
-    if (df > cone || d > 640) continue;
-    const score = df * 300 + d;
-    if (score < bs && World.los(P.x, P.y, z.x, z.y)) { bs = score; best = a; }
-  }
-  return best == null ? yaw : best;
-}
-G.setView = function (v) {
-  if (v !== 'top' && !R3D.ok) v = 'top';
-  this.cam3d = v;
-  document.body.classList.toggle('v3d', v !== 'top' || this.gfx === '3d');
-  try { localStorage.setItem('tt_view', v); } catch (e) {}
-  const label = { top: 'TỪ TRÊN', tp: 'GÓC 3', fp: 'GÓC 1' }[v];
-  const b = document.getElementById('btnView'); if (b) b.textContent = '👁 GÓC NHÌN: ' + label;
-  if (this.player && v !== 'top') this.yaw = this.player.angle;
-  resize();
-};
-G.setGfx = function (g) {
-  if (g === '3d' && !R3D.ok) { this.toast('Trình duyệt này không hỗ trợ 3D (WebGL).', 'warn'); g = '2d'; }
-  this.gfx = g;
-  try { localStorage.setItem('tt_gfx', g); } catch (e) {}
-  document.body.classList.toggle('v3d', g === '3d' || this.cam3d !== 'top');
-  const b = document.getElementById('btnGfx'); if (b) b.textContent = '🎮 ĐỒ HOẠ: ' + (g === '3d' ? '3D' : '2D PIXEL');
-  const t = document.getElementById('tGfx'); if (t) t.textContent = g === '3d' ? '3D' : '2D';
-  if (R3D.ok) { R3D.reset(); }
-  resize();
-};
-G.toggleGfx = function () { this.setGfx(this.gfx === '3d' ? '2d' : '3d'); this.toast(this.gfx === '3d' ? 'Đồ hoạ 3D — nhấn V để đổi góc nhìn' : 'Đồ hoạ 2D pixel', 'info'); Sound.play('sfx_click', 0.5); };
-G.cycleView = function () {
-  if (!R3D.ok) { this.toast('Trình duyệt này không hỗ trợ 3D (WebGL) hoặc chưa tải được thư viện 3D.', 'warn'); return; }
-  const next = { top: 'tp', tp: 'fp', fp: 'top' }[this.cam3d] || 'top';
-  this.setView(next);
-  this.toast({ top: this.gfx === '3d' ? 'Góc nhìn: TỪ TRÊN (3D)' : 'Góc nhìn: TỪ TRÊN XUỐNG', tp: 'Góc nhìn: GÓC 3 — rê chuột hoặc cần phải để xoay', fp: 'Góc nhìn: GÓC 1 — rê chuột hoặc cần phải để xoay' }[next], 'info');
-  Sound.play('sfx_click', 0.5);
-};
 
 function relicTick(dt) {
   const P = G.player;
@@ -284,9 +228,18 @@ function meleeAttack(w, shove) {
   Sound.play(w.sfx || RL.weapons.melee.sfx || 'sfx_swing', 0.45, R.range(0.9, 1.2));
   const dmg = w.dmg * (1 + (P.perks.melee || 0) * 0.3) * (tired ? 0.55 : 1) * (shove ? 0.6 : 1);
   const trail = (w.affixes && w.affixes.length ? AFFIXES[w.affixes[0]].color : w.trail) || '#e8e0c8';
-  FX.slash(P.x, P.y, P.angle, w.range + 8, w.arc, trail, 0.16, P.swingDir);
+  const M = w.mt || {};
+  P.comboN = ((P.comboN || 0) + 1) % 3;
+  if (M.thrust) {
+    FX.slash(P.x, P.y, P.angle, w.range + 10, 0.32, trail, 0.12, P.swingDir);
+    for (let k = 0; k < 6; k++) Particles.add({ x: P.x + Math.cos(P.angle) * (20 + k * w.range / 6), y: P.y + Math.sin(P.angle) * (20 + k * w.range / 6), vx: Math.cos(P.angle) * 60, vy: Math.sin(P.angle) * 60, life: 0.18, max: 0.18, size: 2.5, col: trail, drag: 4, glow: true });
+  } else if (M.id === 'scythe') {
+    FX.slash(P.x, P.y, P.angle, w.range + 8, Math.min(TAU, w.arc), trail, 0.22, P.swingDir);
+    FX.ring(P.x, P.y, w.range * 0.5, w.range + 6, trail, 0.2, 3);
+  } else FX.slash(P.x, P.y, P.angle, w.range + 8, w.arc, trail, M.id === 'hammer' || M.id === 'great' ? 0.22 : 0.16, P.swingDir);
   // lunge forward a little
-  P.kx += Math.cos(P.angle) * 120; P.ky += Math.sin(P.angle) * 120;
+  const lunge = M.id === 'dagger' || M.id === 'fist' ? 170 : M.id === 'spear' ? 200 : M.id === 'hammer' ? 60 : 120;
+  P.kx += Math.cos(P.angle) * lunge; P.ky += Math.sin(P.angle) * lunge;
   let hits = 0;
   for (const z of G.zgrid.query(P.x, P.y, w.range + 40)) {
     if (z.dead) continue;
@@ -296,8 +249,19 @@ function meleeAttack(w, shove) {
     if (Math.abs(angDiff(P.angle, a)) > w.arc / 2 && d > z.r + 8) continue;
     G.hitEnemy(z, dmg, Math.cos(a) * w.knock * (shove ? 1.5 : 1), Math.sin(a) * w.knock * (shove ? 1.5 : 1), 'melee', a, w);
     if (w.knock > 150 || shove) z.stun = 0.25;
+    if (M.bleed && !z.dead) { z.poison += dmg * 0.3; Particles.blood(z.x, z.y, a, 4, 120); }
+    if (M.stun && Math.random() < M.stun && !z.boss) { z.stun = 0.7; Floaters.add(z.x, z.y - z.r - 8, 'CHOÁNG', '#fff36b', 8); }
+    if (M.leech) P.hp = Math.min(P.maxHp, P.hp + dmg * 0.025);
     hits++;
   }
+  if (M.slam && !shove) {
+    const sx = P.x + Math.cos(P.angle) * w.range * 0.75, sy = P.y + Math.sin(P.angle) * w.range * 0.75;
+    FX.ring(sx, sy, 10, 100, '#ffd08a', 0.35, 8); Particles.debris(sx, sy, 14); Particles.dust(sx, sy, 8);
+    World.addDecal('scorch', sx, sy, R.range(0, TAU), 0.7, 0.5);
+    G.shake(7); Sound.play('sfx_explosion', 0.35, 1.4);
+    for (const z of G.zgrid.query(sx, sy, 100)) { if (z.dead) continue; const d = dist(sx, sy, z.x, z.y); if (d < 95 + z.r) { const a = Math.atan2(z.y - sy, z.x - sx); G.hitEnemy(z, dmg * 0.55, Math.cos(a) * 260, Math.sin(a) * 260, 'melee', a, null); if (!z.boss) z.stun = 0.6; } }
+  }
+  if (M.combo && P.comboN === 2 && !shove && !w.wave) Bullets.fire(P.x + Math.cos(P.angle) * 20, P.y + Math.sin(P.angle) * 20, P.angle, { speed: 560, knock: 120, affixes: w.affixes }, dmg * 0.8, { proj: 'wave', col: trail, life: 0.45, speed: 560, src: 'melee' });
   if (w.wave && !shove) {
     Bullets.fire(P.x + Math.cos(P.angle) * 20, P.y + Math.sin(P.angle) * 20, P.angle, { speed: 520, knock: 100, affixes: w.affixes }, dmg * 0.7, { proj: 'wave', col: trail, life: 0.5, speed: 520, src: 'melee' });
   }
@@ -334,7 +298,7 @@ function useFood() {
   if (id === 'food') P.hunger = Math.min(100, P.hunger + 45);
   if (id === 'choco') { P.hunger = Math.min(100, P.hunger + 18); P.stamina = P.maxStam; }
   Sound.play(id === 'water' || id === 'energy' ? 'sfx_drink' : 'sfx_eat', 0.6);
-  Floaters.add(P.x, P.y - 24, ITEMS[id].name, '#ffd27a', 9);
+  Floaters.add(P.x, P.y - 24, itm(id).name, '#ffd27a', 9);
 }
 function throwIt(kind) {
   const P = G.player;
@@ -369,10 +333,13 @@ G.update = function (dt) {
     const z = this.zombies[i];
     if (z.dead) { if (z.dying > 0.45) this.zombies.splice(i, 1); continue; }
     const d = dist(z.x, z.y, P.x, P.y);
-    if (World.mode === 'over' && ((d > 1500 && !z.guard) || (d > 2400 && !z.boss))) this.zombies.splice(i, 1);
+    if (World.mode === 'over' && ((d > 1500 && !z.guard) || (d > 2400 && !z.story))) { if (z === this.boss) { this.boss = null; UI.boss(null); } this.zombies.splice(i, 1); }
   }
   for (const a of this.allies) a.update(dt);
-  this.allies = this.allies.filter(a => !a.dead);
+  // drop civilians / merchants left far behind (they respawn with their area)
+  this.allies = this.allies.filter(a => !a.dead && !((a.kind === 'civ' || a.kind === 'merchant') && World.mode === 'over' && dist(a.x, a.y, P.x, P.y) > 3600));
+  this.updateHazards(dt);
+  if (this.frame % 20 === 0) this.biomeTick();
   if (this.boss && (this.boss.dead || dist(this.boss.x, this.boss.y, P.x, P.y) > 900)) UI.boss(null); else if (this.boss) UI.boss(this.boss);
   this.spawnTick(dt);
   Bullets.update(dt);
@@ -387,6 +354,7 @@ G.update = function (dt) {
   if (this.frame % 15 === 0) {
     const sx = Math.floor(P.x / SBPX), sy = Math.floor(P.y / SBPX);
     for (let y = sy - 1; y <= sy + 1; y++) for (let x = sx - 1; x <= sx + 1; x++) World.explored.add(World.mode + nkey(x, y));
+    if (World.explored.size > 6000) World.explored = new Set([...World.explored].slice(-4000));
     if (World.mode === 'over' && Math.hypot(P.x, P.y) > 32000) this.achieve('far');
   }
   this.saveT -= dt;
@@ -412,7 +380,6 @@ G.update = function (dt) {
 
 // ---------- rendering ----------
 G.render = function () {
-  if ((this.cam3d !== 'top' || this.gfx === '3d') && R3D.ok && this.player) { R3D.render(); drawOverlay3D(); return; }
   const P = this.player;
   const Z = this.zoom;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -450,6 +417,7 @@ G.render = function () {
   props.sort((a, b) => a.layer - b.layer);
   for (const p of props) { if (p.dead) continue; if (p.canopy) { canopies.push(p); continue; } drawProp(p); }
   Throws.draw(ctx);
+  drawHazards(ctx);
   Items.draw(ctx);
   for (const c of this.cars) c.draw(ctx);
   for (const z of this.zombies) if (z.x > vx0 - 100 && z.x < vx1 + 100 && z.y > vy0 - 100 && z.y < vy1 + 100) z.draw(ctx);
@@ -480,6 +448,7 @@ G.render = function () {
   ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
   drawLighting(camX, camY);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+  drawBiomeTint();
   if (this.timeSlow > 0) { ctx.fillStyle = 'rgba(40,220,255,0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
   Ambient.update(this.rdt, canvas.width, canvas.height);
   Ambient.draw(ctx);
@@ -508,8 +477,10 @@ function drawProp(p) {
     }
     return;
   }
+  if (p.container === 'chest' && !p.looted) drawChestAura(p);
   if (p.solid && p.layer > 0) { ctx.globalAlpha = 0.28; drawPropImg(p, 4, 5, true); ctx.globalAlpha = 1; }
   drawPropImg(p, 0, 0);
+  if (p.container === 'chest') { if (!p.looted && dist(p.x, p.y, G.player.x, G.player.y) < 220) { const C = CHESTS[p.data.tier]; ctx.font = '9px VT323, monospace'; ctx.textAlign = 'center'; ctx.fillStyle = '#000'; ctx.fillText(C.name, p.x + 1, p.y - p.h / 2 - 5); ctx.fillStyle = C.col; ctx.fillText(C.name, p.x, p.y - p.h / 2 - 6); } return; }
   if (p.container && !p.looted) {
     const special = ['artifact', 'vault', 'dchest', 'boss'].includes(p.container);
     if (dist(p.x, p.y, G.player.x, G.player.y) < 160 || special) {
@@ -526,7 +497,7 @@ function drawProp(p) {
 }
 const ROOF_PATS = {};
 function drawRoof(b, x, y, w, h) {
-  if (b.roofAlpha < 0.02) return;
+  if (b.roofAlpha < 0.02) { drawDoors(b); return; }
   ctx.globalAlpha = b.roofAlpha;
   if (!ROOF_PATS[b.roof]) { ROOF_PATS[b.roof] = ctx.createPattern(IMG[b.roof] || IMG.tex_roof, 'repeat'); ROOF_PATS[b.roof].setTransform(new DOMMatrix().scale(0.5)); }
   ctx.fillStyle = ROOF_PATS[b.roof];
@@ -548,9 +519,10 @@ function drawRoof(b, x, y, w, h) {
     ctx.fillStyle = 'rgba(255,240,210,0.75)'; ctx.fillText(b.name, x + w / 2, y + h / 2 + 4);
   }
   ctx.globalAlpha = 1;
+  drawDoors(b);
 }
 function drawObjective() {
-  const list = World.mode === 'over' ? Story.targets() : [];
+  const list = World.mode === 'over' ? Story.targets() : G.dungeonTargets();
   G.curTargets = list;
   for (const t of list) {
     const v = G.view;
@@ -692,123 +664,6 @@ function drawScreenUI() {
   }
 }
 
-// ---------- overlay for the 3D views ----------
-function drawOverlay3D() {
-  const P = G.player, d = G.dpr, W = canvas.width, H = canvas.height;
-  const fp = G.cam3d === 'fp';
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, W, H);
-  ctx.textAlign = 'center';
-  const tgt = P.car || P;
-  for (const z of G.zombies) {
-    if (z.dead) continue;
-    const dd = dist(z.x, z.y, tgt.x, tgt.y);
-    if (dd > 650 || !(z.hp < z.maxHp || z.elite || z.boss)) continue;
-    const im = IMG[R3D.frontOf(z.img) || z.img];
-    const hh = im ? im.height / 2 * z.scale : 40;
-    const sc = R3D.project(z.x, hh + 6, z.y); if (!sc) continue;
-    const k = clamp(260 / Math.max(60, dd), 0.5, 2);
-    const bw = (z.boss ? 0 : 34 * k) * d, x = sc[0] * d, y = sc[1] * d;
-    if (bw) { ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(x - bw / 2, y, bw, 4 * d); ctx.fillStyle = z.elite ? '#ffb020' : '#e03030'; ctx.fillRect(x - bw / 2, y, bw * Math.max(0, z.hp / z.maxHp), 4 * d); }
-    if (z.elite) { ctx.font = `${Math.round(12 * k * d)}px VT323, monospace`; ctx.fillStyle = '#ffcf3a'; ctx.fillText(`★ ${z.name} Lv${z.lvl}`, x, y - 4 * d); }
-  }
-  for (const a of G.allies) {
-    if (a.kind !== 'comp' && !a.say) continue;
-    const sc = R3D.project(a.x, 46, a.y); if (!sc) continue;
-    const x = sc[0] * d, y = sc[1] * d;
-    ctx.font = `${13 * d}px VT323, monospace`;
-    if (a.kind === 'comp') { ctx.fillStyle = '#ffb3cf'; ctx.fillText((G.romanceReady(a.comp) ? '♥! ' : '♥ ') + a.comp.name, x, y); }
-    if (a.say) {
-      const t = a.say.text.length > 46 ? a.say.text.slice(0, 44) + '…' : a.say.text;
-      const tw = ctx.measureText(t).width + 10 * d;
-      ctx.fillStyle = 'rgba(10,10,14,0.85)'; ctx.fillRect(x - tw / 2, y - 30 * d, tw, 17 * d);
-      ctx.fillStyle = '#fff'; ctx.fillText(t, x, y - 17 * d);
-    }
-  }
-  for (const f of Floaters.list) {
-    const sc = R3D.project(f.x, 36 + (f.max - f.life) * 28, f.y); if (!sc) continue;
-    const k = clamp(260 / Math.max(60, dist(f.x, f.y, tgt.x, tgt.y)), 0.7, 1.8);
-    ctx.globalAlpha = Math.min(1, f.life * 2.5);
-    ctx.font = `${Math.round(f.size * 1.5 * k * d)}px VT323, monospace`;
-    ctx.lineWidth = 3 * d; ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.strokeText(f.text, sc[0] * d, sc[1] * d);
-    ctx.fillStyle = f.col; ctx.fillText(f.text, sc[0] * d, sc[1] * d);
-  }
-  ctx.globalAlpha = 1;
-  if (G.cam3d === 'top') { drawTop3DOverlay(W, H, d); return; }
-  // compass with objectives
-  const yaw = P.car ? P.car.angle : G.yaw;
-  const cw = Math.min(420 * d, W * 0.42), cx = W / 2, cy = 46 * d;
-  ctx.fillStyle = 'rgba(10,8,8,0.55)'; ctx.fillRect(cx - cw / 2, cy - 12 * d, cw, 24 * d);
-  ctx.font = `${16 * d}px VT323, monospace`;
-  const mark = (ang, text, col) => {
-    const df = angDiff(yaw, ang); if (Math.abs(df) > Math.PI / 2) return;
-    ctx.fillStyle = col; ctx.fillText(text, cx + df / (Math.PI / 2) * cw / 2, cy + 5 * d);
-  };
-  mark(-Math.PI / 2, 'B', '#ddd'); mark(0, 'Đ', '#aaa'); mark(Math.PI / 2, 'N', '#aaa'); mark(Math.PI, 'T', '#aaa');
-  G.curTargets = World.mode === 'over' ? Story.targets() : [];
-  for (const t of G.curTargets) mark(Math.atan2(t.y - tgt.y, t.x - tgt.x), '◆ ' + Math.round(dist(tgt.x, tgt.y, t.x, t.y) / TILE) + 'm', '#ffcf3a');
-  for (const c of G.companions) if (c.ally && c.ally.downed) mark(Math.atan2(c.ally.y - tgt.y, c.ally.x - tgt.x), '✚', '#ff6b6b');
-  ctx.fillStyle = '#ffcf3a'; ctx.fillRect(cx - d, cy - 14 * d, 2 * d, 6 * d);
-  if (P.car || P.dead) return;
-  // crosshair
-  let chx = W / 2, chy = H / 2;
-  if (!fp) { const sc = R3D.project(P.x + Math.cos(P.angle) * 220, 22, P.y + Math.sin(P.angle) * 220); if (sc) { chx = sc[0] * d; chy = sc[1] * d; } }
-  const locked = Math.abs(angDiff(P.angle, G.yaw)) > 0.001;
-  ctx.strokeStyle = locked ? '#ff5a5a' : 'rgba(255,255,255,0.85)'; ctx.lineWidth = 2 * d;
-  ctx.beginPath(); ctx.arc(chx, chy, (locked ? 9 : 6) * d, 0, TAU); ctx.stroke();
-  ctx.fillStyle = '#fff'; ctx.fillRect(chx - d, chy - d, 2 * d, 2 * d);
-  if (P.reloading > 0) { const w = P.wdef; const k = 1 - P.reloading / (w.reload * Math.pow(0.8, P.perks.reload || 0)); ctx.strokeStyle = '#ffb347'; ctx.lineWidth = 3 * d; ctx.beginPath(); ctx.arc(chx, chy, 18 * d, -Math.PI / 2, -Math.PI / 2 + k * TAU); ctx.stroke(); }
-  if (fp && G.gfx !== '3d') drawViewModel(W, H, d);
-}
-function drawTop3DOverlay(W, H, d) {
-  const P = G.player;
-  G.curTargets = World.mode === 'over' ? Story.targets() : [];
-  // objective arrows around the screen edge
-  for (const t of G.curTargets) {
-    const sc = R3D.project(t.x, 10, t.y);
-    let x, y, inside = false;
-    if (sc) { x = sc[0] * d; y = sc[1] * d; inside = x > 60 * d && x < W - 60 * d && y > 60 * d && y < H - 60 * d; }
-    if (inside) continue;
-    const a = Math.atan2(t.y - P.y, t.x - P.x);
-    const m = 60 * d;
-    const k = Math.min((W / 2 - m) / Math.abs(Math.cos(a) || 1e-3), (H / 2 - m) / Math.abs(Math.sin(a) || 1e-3));
-    const ax = W / 2 + Math.cos(a) * k, ay = H / 2 + Math.sin(a) * k;
-    ctx.save(); ctx.translate(ax, ay); ctx.rotate(a);
-    ctx.fillStyle = '#ffcf3a'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2 * d;
-    ctx.beginPath(); ctx.moveTo(16 * d, 0); ctx.lineTo(-8 * d, -11 * d); ctx.lineTo(-3 * d, 0); ctx.lineTo(-8 * d, 11 * d); ctx.closePath(); ctx.fill(); ctx.stroke();
-    ctx.restore();
-    ctx.font = `${15 * d}px VT323, monospace`; ctx.fillStyle = '#ffcf3a'; ctx.textAlign = 'center';
-    ctx.fillText((t.label ? t.label + ' ' : '') + Math.round(dist(P.x, P.y, t.x, t.y) / TILE) + 'm', ax - Math.cos(a) * 30 * d, ay - Math.sin(a) * 30 * d + 4 * d);
-  }
-  if (!P.car && !P.dead && !Touch.on) {
-    const mx = Input.mouse.x * d, my = Input.mouse.y * d;
-    ctx.strokeStyle = P.reloading > 0 ? '#ffb347' : '#f2f2f2'; ctx.lineWidth = 2 * d;
-    ctx.beginPath(); ctx.arc(mx, my, 8 * d, 0, TAU); ctx.moveTo(mx - 14 * d, my); ctx.lineTo(mx - 4 * d, my); ctx.moveTo(mx + 4 * d, my); ctx.lineTo(mx + 14 * d, my); ctx.moveTo(mx, my - 14 * d); ctx.lineTo(mx, my - 4 * d); ctx.moveTo(mx, my + 4 * d); ctx.lineTo(mx, my + 14 * d); ctx.stroke();
-  }
-}
-function drawViewModel(W, H, d) {
-  const P = G.player, w = P.wdef;
-  const icon = IMG[w.icon || RL.weapons.melee.icon]; if (!icon) return;
-  const size = Math.min(W, H) * 0.42;
-  const sp = Math.min(1, Math.hypot(P.vx, P.vy) / 120);
-  const bx = Math.sin(P.walkT * 0.65) * 14 * d * sp, by = Math.abs(Math.cos(P.walkT * 0.65)) * 10 * d * sp;
-  let rot = -0.35, ox = W * 0.66 + bx, oy = H - size * 0.42 + by + P.recoil * 26 * d + (P.reloading > 0 ? size * 0.35 : 0);
-  if (w.melee && P.swingT > 0) { const k = 1 - P.swingT / 0.2; rot += (P.swingDir > 0 ? -1 : 1) * Math.sin(k * Math.PI) * 1.1; ox -= Math.sin(k * Math.PI) * size * 0.3; }
-  if (P.spin > 0) rot = G.time * 18;
-  ctx.save(); ctx.translate(ox, oy); ctx.rotate(rot);
-  ctx.imageSmoothingEnabled = false;
-  const s = size / Math.max(icon.width, icon.height);
-  ctx.drawImage(icon, -icon.width * s / 2, -icon.height * s / 2, icon.width * s, icon.height * s);
-  if (P.muzzleT > 0 && !w.melee) {
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.fillStyle = w.color || '#ffd27a';
-    ctx.beginPath(); ctx.arc(icon.width * s * 0.48, -icon.height * s * 0.18, size * 0.12 + Math.random() * size * 0.05, 0, TAU); ctx.fill();
-    ctx.globalCompositeOperation = 'source-over';
-  }
-  ctx.restore();
-}
-
-// ---------- main loop ----------
 let last = performance.now();
 function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000);
@@ -840,11 +695,9 @@ window.addEventListener('blur', () => { Input.keys = {}; Input.mouse.down = fals
 window.addEventListener('mousemove', e => {
   if (Touch.on) return;
   Input.mouse.x = e.clientX; Input.mouse.y = e.clientY;
-  if (G.cam3d !== 'top' && G.state === 'playing') G.yaw += (e.movementX || 0) * (document.pointerLockElement === canvas ? 0.0026 : 0.004);
 });
 canvas.addEventListener('mousedown', e => {
   Sound.unlock();
-  if (G.cam3d !== 'top' && !Touch.on && document.pointerLockElement !== canvas && canvas.requestPointerLock) { try { const r = canvas.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (er) {} }
   if (e.button === 0) { Input.mouse.down = true; Input.mouse.clicked = true; }
   if (e.button === 2) { Input.mouse.rdown = true; Input.mouse.rclicked = true; }
 });

@@ -29,12 +29,12 @@ const G = {
   groanSfx() { return { md: R.pick(['sfx_zombie1', 'sfx_zombie2', 'sfx_zombie3']), cy: 'sfx_robot', ct: R.pick(['sfx_ghost', 'sfx_zombie2']), tt: R.pick(['sfx_monster', 'sfx_zombie3']), sl: R.pick(['sfx_monster', 'sfx_zombie1']) }[RL.id]; },
 
   // ---------- setup ----------
-  newGame(realm, seed, hero) {
+  newGame(realm, seed, hero, gender) {
     RL = REALMS[realm];
     seed = seed || (Math.random() * 1e9) | 0;
     this.seed = seed; this.realm = realm;
     World.init(seed);
-    Story.init(realm, seed, hero || R.pick(LORE[realm].heroNames));
+    Story.init(realm, seed, hero || R.pick(LORE[realm].heroNames), gender || 'm');
     this.setupCompanions();
     World.update(16 * TILE, 16 * TILE);
     const s = World.startPos;
@@ -44,7 +44,8 @@ const G = {
     P.equip.r1 = Loot.weapon('r1', 1, 0);
     P.mags.r1 = Loot.stats(P.equip.r1).mag;
     P.weapon = 'r1';
-    P.inv = { ammo_pistol: 30, bandage: 2, food: 1, water: 1 };
+    P.inv = { ammo_pistol: 30, bandage: 2, food: 1, water: 1, scroll: 1 };
+    P.gold = 25;
     this.resetRuntime();
     this.clock = 8; this.day = 1; this.time = 0;
     this.stats = { kills: 0, looted: 0, gates: 0, rescued: 0, maxCombo: 0, start: Date.now() };
@@ -53,7 +54,7 @@ const G = {
   },
   resetRuntime() {
     this.zombies = []; this.allies = []; this.cars = []; this.corpses = [];
-    Particles.list = []; Bullets.list = []; Items.list = []; Throws.list = []; Throws.fires = []; Throws.acids = []; Throws.traps = []; Floaters.list = []; FX.list = [];
+    Particles.list = []; Bullets.list = []; Items.list = []; this.hazards = []; Throws.list = []; Throws.fires = []; Throws.acids = []; Throws.traps = []; Floaters.list = []; FX.list = [];
     this.night = false; this.rain = 0; this.rainT = 20; this.raining = false; this.lightning = 0;
     this.spawnT = 2; this.flowT = 0; this.saveT = 30; this.action = null; this.timeSlow = 0; this.combo = 0; this.comboT = 0;
     this.boss = null; this.flashes = [];
@@ -77,11 +78,12 @@ const G = {
     for (const [k, d] of World.delta) delta.push([k, [...d.looted], [...d.removed], d.cleared ? 1 : 0]);
     const data = {
       v: 2, realm: RL.id, seed: this.seed, clock: this.clock, day: this.day, time: this.time, uid: UID,
-      p: { x: pos.x, y: pos.y, hp: P.hp, maxHp: P.maxHp, hunger: P.hunger, thirst: P.thirst, equip: P.equip, relics: P.relics, stash: P.stash, weapon: P.weapon, mags: P.mags, inv: P.inv, battery: P.battery, xp: P.xp, level: P.level, perks: P.perks, maxStam: P.maxStam, energy: P.energy },
-      story: Story.serialize(), comps: this.companions.map(c => ({ aff: c.aff, stage: c.stage, joined: c.joined, lover: c.lover, scenePending: c.scenePending })),
-      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000),
+      p: { x: pos.x, y: pos.y, hp: P.hp, maxHp: P.maxHp, hunger: P.hunger, thirst: P.thirst, equip: P.equip, relics: P.relics, stash: P.stash, armor: P.armor, gold: P.gold, gearHp: P.gearHp, weapon: P.weapon, mags: P.mags, inv: P.inv, battery: P.battery, xp: P.xp, level: P.level, perks: P.perks, maxStam: P.maxStam, energy: P.energy },
+      story: Story.serialize(), comps: this.companions.map(c => ({ aff: c.aff, stage: c.stage, joined: c.joined, lover: c.lover, sworn: c.sworn, scenePending: c.scenePending })),
+      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0,
     };
     try { localStorage.setItem('tt_save_v2', JSON.stringify(data)); } catch (e) {}
+    return data;
   },
   hasSave() { try { return !!localStorage.getItem('tt_save_v2'); } catch (e) { return false; } },
   saveInfo() { try { const d = JSON.parse(localStorage.getItem('tt_save_v2')); return d ? `${REALMS[d.realm].name} • ${d.story.names.hero} • Cấp ${d.p.level} • Ngày ${d.day}` : ''; } catch (e) { return ''; } },
@@ -99,12 +101,15 @@ const G = {
     World.update(d.p.x, d.p.y);
     this.player = new Player(d.p.x, d.p.y);
     Object.assign(this.player, d.p);
+    if (!this.player.armor) this.player.armor = { head: null, body: null, legs: null, feet: null };
+    this.player.gold = this.player.gold || 0; this.player.applyGear();
+    this.heartBuys = d.heartBuys || 0;
     UID = Math.max(UID, d.uid || 1);
     this.resetRuntime();
     this.clock = d.clock; this.day = d.day; this.time = d.time;
     this.stats = d.stats; this.achieved = d.ach || {};
     d.comps.forEach((s, i) => {
-      const c = this.companions[i]; Object.assign(c, s);
+      const c = this.companions[i]; Object.assign(c, s); this.setupBond(c);
       if (c.joined) { c.joined = false; const a = new Ally('comp', d.p.x + 30 * (i ? 1 : -1), d.p.y + 30, { img: c.data.sprite, comp: Object.assign(c.data, { ref: c }) }); c.ally = a; c.joined = true; this.allies.push(a); }
     });
     this.camera.x = d.p.x; this.camera.y = d.p.y;
@@ -168,7 +173,7 @@ const G = {
   targets() {
     const P = this.player;
     const out = [P.car || P];
-    for (const a of this.allies) if (!a.downed && !a.dead && !(a.kind === 'civ' && a.rescued)) out.push(a);
+    for (const a of this.allies) if (!a.downed && !a.dead && a.kind !== 'merchant' && !(a.kind === 'civ' && a.rescued)) out.push(a);
     return out;
   },
   hurtTarget(t, dmg, src) {
@@ -181,11 +186,12 @@ const G = {
   // ---------- inventory & gear ----------
   give(id, n, fromGround) {
     const P = this.player;
-    const it = ITEMS[id];
+    const it = itm(id);
     if (!it) return;
+    if (id === 'key' && !RL.cars) { id = 'gold'; n = 10; }
+    if (id === 'gold') { P.gold += n; Floaters.add(P.x, P.y - 22, `+${n} ${cur().name}`, cur().col, 9); Sound.play('sfx_coin', 0.3, 1.3); UI.dirty = true; return; }
     P.inv[id] = (P.inv[id] || 0) + n;
-    const nm = it.kind === 'ammo' ? RL.ammoNames[['ammo_pistol', 'ammo_shell', 'ammo_rifle'].indexOf(id)] : it.name;
-    Floaters.add(P.x, P.y - 22, `+${n} ${nm}`, it.kind === 'ammo' ? '#ffd76a' : '#b8f28a', 9);
+    Floaters.add(P.x, P.y - 22, `+${n} ${it.name}`, it.kind === 'ammo' ? '#ffd76a' : '#b8f28a', 9);
     Sound.play('sfx_pickup', 0.3, 1.2);
     UI.dirty = true;
   },
@@ -206,6 +212,9 @@ const G = {
         if (item.slot !== 'melee' && P.mags[item.slot] === 0) P.mags[item.slot] = Math.min(Loot.stats(item).mag, P.inv[AMMO_OF[item.slot]] || 0), P.mags[item.slot] && this.take(AMMO_OF[item.slot], P.mags[item.slot]);
         P.wcache = {};
       }
+    } else if (item.kind === 'armor') {
+      const cur = P.armor[item.slot];
+      if (!cur || Loot.power(item) > Loot.power(cur) * 1.05) { if (cur) this.stashAdd(cur); P.armor[item.slot] = item; equipped = true; P.applyGear(); }
     } else {
       const empty = P.relics.indexOf(null);
       if (empty >= 0) { P.relics[empty] = item; equipped = true; this.applyRelics(); }
@@ -221,7 +230,7 @@ const G = {
   stashAdd(item) {
     const P = this.player;
     P.stash.push(item);
-    if (P.stash.length > 18) { // auto-salvage the weakest
+    if (P.stash.length > 30) { // auto-salvage the weakest
       P.stash.sort((a, b) => Loot.power(b) * (b.rarity + 1) - Loot.power(a) * (a.rarity + 1));
       const s = P.stash.pop(); this.give('scrap', 1 + s.rarity);
     }
@@ -231,6 +240,7 @@ const G = {
     const i = P.stash.indexOf(item); if (i < 0) return;
     P.stash.splice(i, 1);
     if (item.kind === 'weapon') { if (P.equip[item.slot]) P.stash.push(P.equip[item.slot]); P.equip[item.slot] = item; P.wcache = {}; P.reloading = 0; }
+    else if (item.kind === 'armor') { if (P.armor[item.slot]) P.stash.push(P.armor[item.slot]); P.armor[item.slot] = item; P.applyGear(); }
     else { let slot = P.relics.indexOf(null); if (slot < 0) slot = 0; if (P.relics[slot]) P.stash.push(P.relics[slot]); P.relics[slot] = item; this.applyRelics(); }
     Sound.play('sfx_reload', 0.5);
     UI.dirty = true;
@@ -262,7 +272,8 @@ const G = {
       const cc = (P.perks.crit || 0) * 0.1 + (wp && wp.crit || 0) + (P.relic('critdmg') ? 0.05 : 0) + 0.05;
       if (Math.random() < cc) { dmg *= 2 + P.relic('critdmg') / 100; crit = true; }
     }
-    if (z.t.armor && src !== 'fire' && src !== 'poison') dmg *= 1 - z.t.armor;
+    const zar = (z.t.armor || 0) + (z.armorB || 0);
+    if (zar && src !== 'fire' && src !== 'poison') dmg *= 1 - zar;
     z.hp -= dmg;
     if (src !== 'fire' && src !== 'poison') z.hitT = 0.09;
     const kr = 1 - (z.t.knockRes || 0);
@@ -331,10 +342,11 @@ const G = {
       const n = z.boss ? 3 : 1;
       for (let i = 0; i < n; i++) {
         const bonus = luck + (z.boss ? 2.2 : z.elite ? 0.9 : 0) + (World.mode === 'dungeon' ? 0.5 : 0);
-        const item = Math.random() < 0.25 ? Loot.relic(z.lvl, Loot.rollRarity(bonus)) : Loot.randomWeapon(z.lvl, bonus);
+        const item = Loot.randomGear(z.lvl, bonus);
         Items.dropGear(z.x, z.y, item);
       }
     }
+    if (Math.random() < (z.boss ? 1 : z.elite ? 0.9 : 0.3)) Items.drop(z.x, z.y, 'gold', Math.round((z.boss ? 60 : z.elite ? 12 : 2) * (1 + z.lvl * 0.15) * R.range(0.7, 1.3)));
     if (Math.random() < (z.elite ? 0.8 : 0.14 + luck * 0.1)) {
       const id = R.pick(['ammo_pistol', 'ammo_pistol', 'ammo_shell', 'ammo_rifle', 'food', 'water', 'scrap', 'bandage']);
       Items.drop(z.x, z.y, id, id.startsWith('ammo') ? R.int(5, 14) : 1);
@@ -344,6 +356,7 @@ const G = {
       this.shake(16); this.hitstop = 0.25; this.slowmo = 1.2;
       for (let i = 0; i < 3; i++) setTimeout(() => this.explodeFx(z.x + R.range(-40, 40), z.y + R.range(-40, 40), 60), i * 200);
       Items.drop(z.x, z.y, 'medkit', 2);
+      if (z.mini) World.addProp('chest_' + (Math.random() < 0.3 ? 3 : 2), z.x, z.y + 40, { container: 'chest', kind: 'chest', r: 12, data: { tier: Math.random() < 0.3 ? 3 : 2 } });
       this.toast(`${z.name} đã gục ngã!`, 'quest');
       if (this.boss === z) { this.boss = null; UI.boss(null); }
       if (z.story) Story.onBoss(true);
@@ -357,6 +370,7 @@ const G = {
     if (P.dashT > 0 || P.spin > 0 && !silent) return;
     if (!silent && Math.random() < P.relic('dodge') / 100) { Floaters.add(P.x, P.y - 20, 'NÉ!', '#9affff', 10); return; }
     if (P.perks.armor) dmg *= Math.pow(0.88, P.perks.armor);
+    if (P.armorVal) dmg *= 100 / (100 + P.armorVal);
     if (P.pillsT > 0) dmg *= 0.7;
     P.shieldT = 5;
     if (P.shield > 0) { const a = Math.min(P.shield, dmg); P.shield -= a; dmg -= a; if (dmg <= 0) { FX.ring(P.x, P.y, 14, 26, '#78c8ff', 0.2, 3); return; } }
@@ -378,10 +392,10 @@ const G = {
     const P = this.player;
     // phoenix feather or a lover saves you once
     const feather = P.relics.findIndex(r => r && r.type === 'revive');
-    const lover = this.companions.find(c => c.lover && c.ally && !c.ally.downed && (c.reviveDay || 0) !== this.day);
+    const lover = this.companions.find(c => (c.lover || c.sworn) && c.ally && !c.ally.downed && (c.reviveDay || 0) !== this.day);
     if (feather >= 0 || lover) {
       if (feather >= 0) { P.relics[feather] = null; this.toast('Lông Phượng Hoàng bùng cháy — bạn hồi sinh!', 'quest'); }
-      else { lover.reviveDay = this.day; this.toast(`${lover.data.name} ôm lấy bạn: "Đừng bỏ em/anh lại!" — bạn hồi sinh!`, 'love'); }
+      else { lover.reviveDay = this.day; this.toast(lover.lover ? `${lover.data.name} ôm lấy bạn: "Đừng bỏ lại tôi!" — bạn hồi sinh!` : `${lover.data.name} kéo bạn dậy: "Đã kết nghĩa thì không được chết trước!" — bạn hồi sinh!`, 'love'); }
       P.hp = P.maxHp * 0.6; P.hurtT = 2; this.explode(P.x, P.y, 160, 200 + P.level * 10, true, true);
       FX.pillar(P.x, P.y, '#ffd65a', 1.5, 60); Sound.play('sfx_skill', 0.8);
       return;
@@ -509,13 +523,19 @@ const G = {
       const s = World.pending.shift();
       if (s.kind === 'enemy') this.spawnEnemy(s.arche, s.x, s.y, { elite: s.elite, guard: s.guard });
       else if (s.kind === 'civ') this.allies.push(new Ally('civ', s.x, s.y, { img: RL.npc[s.sprite] }));
+      else if (s.kind === 'merchant') { if (!this.allies.some(a => a.kind === 'merchant' && dist(a.x, a.y, s.x, s.y) < 40)) this.spawnMerchant(s.x, s.y); }
       else if (s.kind === 'boss') {
         if (s.story && !(Story.curAct() && Story.curAct().type === 'boss')) continue;
         const lvl = World.levelAt(s.x, s.y) + (s.story ? 3 : 0);
-        const name = s.story ? Story.names.villain : (RL.dungeon.name + ' — ' + RL.enemyNames[6]);
-        const z = this.spawnEnemy('boss', s.x, s.y, { lvl, name, story: s.story, hpMul: s.story ? 1.4 : World.mode === 'dungeon' ? 0.55 + World.dg.floor * 0.12 : 1, guard: true });
-        z.dungeon = !!s.dungeon;
-        this.boss = z;
+        const rnd = mulberry32((s.seed || ((World.dg && World.dg.seed) || this.seed) + Math.floor(s.x) * 7 + Math.floor(s.y) * 13) | 0);
+        const bd = rollBoss(RL.id, rnd);
+        const title = (bd.mod ? bd.mod.name + ' ' : '') + bd.def.name;
+        const name = s.story ? Story.names.villain + ' — ' + bd.def.name : title;
+        const hpMul = (s.story ? 1.4 : s.mini ? 0.5 : World.mode === 'dungeon' ? 0.55 + World.dg.floor * 0.12 : 1) * (bd.mod && bd.mod.hp || 1);
+        const z = this.spawnEnemy('boss', s.x, s.y, { lvl: lvl + (s.mini ? 1 : 0), name, story: s.story, hpMul, guard: true, bossDef: bd });
+        z.dungeon = !!s.dungeon; z.mini = !!s.mini;
+
+        if (!s.mini) this.boss = z;
       }
     }
   },
@@ -609,6 +629,7 @@ const G = {
     else if (h >= 5 && h < 7) d = 0.88 - (h - 5) / 2 * 0.88;
     else d = 0.88;
     d = Math.max(d, RL.alwaysNightish || 0);
+    if (this.biome && BIOMES[this.biome].dark) d = Math.max(d, BIOMES[this.biome].dark);
     if (this.raining) d = Math.max(d, 0.25 + d * 0.1);
     return clamp(d, 0, 0.9);
   },
@@ -634,11 +655,13 @@ const G = {
     let best = null, bd = 52;
     for (const a of this.allies) {
       const d = dist(P.x, P.y, a.x, a.y);
-      if (d > 50) continue;
+      if (d > (a.kind === 'merchant' ? 60 : 50)) continue;
       if (a.kind === 'comp') { best = { ally: a, kind: a.downed ? 'revive' : 'talk', label: a.downed ? `Cứu ${a.comp.name}` : (a.comp.ref.scenePending ? `♥ Trò chuyện với ${a.comp.name}` : `${a.comp.name} ♥${Math.round(a.comp.ref.aff)}`) }; bd = d; }
       else if (a.kind === 'civ' && !a.rescued) { best = { ally: a, kind: 'civ', label: 'Giải cứu người dân' }; bd = d; }
+      else if (a.kind === 'merchant') { best = { ally: a, kind: 'shop', label: `Giao dịch với ${a.name}` }; bd = d; }
     }
-    if (best) return best;
+    if (best && best.kind !== 'shop') return best;
+    if (best) bd = Math.min(bd, 30);
     for (const p of World.propsNear(P.x, P.y, 90)) {
       if (p.dead) continue;
       let d = 1e9;
@@ -650,7 +673,8 @@ const G = {
       else if (p.kind === 'cage') { best = { prop: p, kind: 'cage', label: `Phá lồng giải cứu ${Story.names.companion}` }; bd = d; }
       else if (p.kind === 'campfire') { best = { prop: p, kind: 'rest', label: 'Nghỉ ngơi bên lửa trại' }; bd = d; }
       else if (p.drivable) { best = { prop: p, kind: 'car', label: this.has('key') ? `Lái xe (xăng ${Math.round(p.fuel)}%)` : 'Lái xe (cần Bộ câu điện)' }; bd = d; }
-      else if (p.container && !p.looted) { best = { prop: p, kind: 'loot', label: 'Lục soát' + (p.container === 'artifact' ? ': ' + Story.names.artifact : p.container === 'vault' || p.container === 'dchest' ? ' rương báu' : '') }; bd = d; }
+      else if (p.container === 'chest' && !p.looted) { best = { prop: p, kind: 'loot', label: 'Mở ' + CHESTS[p.data.tier].name }; bd = d; }
+      else if (p.container && !p.looted) { best = { prop: p, kind: 'loot', label: (p.container === 'crystal' ? 'Khai thác' : p.container === 'grave' ? 'Đào mộ' : 'Lục soát') + (p.container === 'artifact' ? ': ' + Story.names.artifact : p.container === 'vault' || p.container === 'dchest' ? ' rương báu' : '') }; bd = d; }
     }
     return best;
   },
@@ -662,7 +686,8 @@ const G = {
       case 'car':
         if (!this.has('key')) { this.toast('Cần "Bộ câu điện xe" để khởi động.', 'warn'); if (it.prop.container && !it.prop.looted) this.startAction({ kind: 'loot', prop: it.prop, label: 'Lục soát xe', dur: 1 }); return; }
         return this.enterCar(it.prop);
-      case 'loot': return this.startAction({ kind: 'loot', prop: it.prop, label: it.label, dur: ['vault', 'artifact', 'dchest', 'boss'].includes(it.prop.container) ? 1.4 : 0.8 });
+      case 'loot': return this.startAction({ kind: 'loot', prop: it.prop, label: it.label, dur: it.prop.container === 'chest' ? CHESTS[it.prop.data.tier].time : ['vault', 'artifact', 'dchest', 'boss'].includes(it.prop.container) ? 1.4 : 0.8 });
+      case 'shop': return UI.openShop(it.ally);
       case 'gate': return this.enterGate(it.prop);
       case 'exit': return this.exitDungeon(false);
       case 'stairs': return this.descend();
@@ -726,7 +751,8 @@ const G = {
     a.speak(R.pick(this.lore().civilians.thanks), 4);
     this.stats.rescued++; this.achieve('rescue');
     this.addXp(60 + P.level * 8);
-    if (Math.random() < 0.6) Items.dropGear(a.x, a.y, Math.random() < 0.3 ? Loot.relic(World.levelAt(a.x, a.y), Loot.rollRarity(0.8)) : Loot.randomWeapon(World.levelAt(a.x, a.y), 0.8));
+    if (Math.random() < 0.6) Items.dropGear(a.x, a.y, Loot.randomGear(World.levelAt(a.x, a.y), 0.8));
+    Items.drop(a.x, a.y, 'gold', R.int(10, 25));
     Items.drop(a.x, a.y, R.pick(['medkit', 'food', 'water', 'flower']), 1);
     Sound.play('sfx_heart', 0.5);
     for (const c of this.companions) if (c.joined) this.addAff(c, 2);
@@ -739,8 +765,14 @@ const G = {
     const give = (id, n) => Items.drop(p.x, p.y, id, n);
     const lvl = World.levelAt(p.x, p.y);
     const luck = (P.perks.luck || 0) * 0.35 + P.relic('luck') / 100;
-    const gear = (bonus, n = 1) => { for (let i = 0; i < n; i++) Items.dropGear(p.x, p.y, Math.random() < 0.3 ? Loot.relic(lvl, Loot.rollRarity(bonus + luck)) : Loot.randomWeapon(lvl, bonus + luck)); };
+    const gear = (bonus, n = 1) => { for (let i = 0; i < n; i++) Items.dropGear(p.x, p.y, Loot.randomGear(lvl, bonus + luck)); };
     const kind = p.container;
+    if (kind === 'chest') { this.openChest(p); return; }
+    if (kind === 'crystal') { give('gold', R.int(15, 35) + lvl * 2); give(Math.random() < 0.5 ? 'battery' : 'ammo_rifle', Math.random() < 0.5 ? 1 : R.int(10, 20)); if (Math.random() < 0.12) gear(0.8); Particles.burst(p.x, p.y, 16, '#b07bff', 160); Sound.play('sfx_freeze', 0.5, 1.4); return; }
+    if (kind === 'grave') {
+      if (Math.random() < 0.4) { const z = this.spawnEnemy(R.pick(['walker', 'armored', 'runner']), p.x + R.range(-20, 20), p.y + 26, { state: 'chase', rise: true, elite: Math.random() < 0.2 }); Sound.at(this.groanSfx(), z.x, z.y, 0.8); this.toast('Có thứ gì đó trồi lên từ mộ!', 'warn'); }
+      give('gold', R.int(8, 25)); if (Math.random() < 0.18) gear(0.6); else give(R.pick(['bandage', 'pills', 'flower', 'scrap']), 1); return;
+    }
     if (kind === 'start1') { Items.dropGear(p.x, p.y, Loot.weapon('r2', 1, 1)); give('ammo_shell', 12); give('food', 1); }
     else if (kind === 'start2') { give('water', 2); give('bandage', 2); give('flower', 1); Items.dropGear(p.x, p.y, Loot.relic(1, 1)); }
     else if (kind === 'start3') { Items.dropGear(p.x, p.y, Loot.weapon('r3', 1, 2)); give('ammo_rifle', 40); give('molotov', 2); give('key', 1); give('planks', 2); }
@@ -754,6 +786,7 @@ const G = {
       if (Math.random() < 0.15 && !luck) rolls = 0;
       if (Math.random() < 0.05 + luck * 0.05) gear(0.2);
       if (rolls <= 0) { Floaters.add(p.x, p.y - 20, 'Trống rỗng...', '#aaa', 9); return; }
+      if (Math.random() < 0.35) give('gold', R.int(2, 8) + Math.floor(lvl / 2));
       for (let i = 0; i < rolls; i++) {
         const tbl = {}; table.forEach((e, k) => tbl[k] = e[1]);
         const e = table[+weighted(tbl)];
@@ -770,10 +803,11 @@ const G = {
     const rank = p.data.rank;
     Sound.play('sfx_portal', 0.8);
     UI.fade(() => {
+      this.dgTarget = null;
       const dg = { rank, floor: 1, floors: RANK_FLOORS[rank], level: Math.max(RANK_LVL[rank], World.levelAt(p.x, p.y)), seed: p.data.seed, story: p.data.story };
       this.saveOver = { delta: World.delta, explored: World.explored, minis: World.minis };
       World.enterDungeon(dg);
-      this.zombies = []; this.cars = []; Items.list = []; Bullets.list = []; Throws.fires = []; Throws.acids = []; Throws.traps = [];
+      this.zombies = []; this.cars = []; Items.list = []; this.hazards = []; Bullets.list = []; Throws.fires = []; Throws.acids = []; Throws.traps = [];
       World.update(16 * TILE, 16 * TILE);
       P.x = World.startPos.x; P.y = World.startPos.y; P.car = null;
       for (const a of this.allies) { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
@@ -788,10 +822,10 @@ const G = {
     const P = this.player;
     Sound.play('sfx_portal', 0.6, 0.8);
     UI.fade(() => {
-      const dg = World.dg;
+      const dg = World.dg; this.dgTarget = null;
       dg.floor++; dg.level += 2;
       World.enterDungeon(dg);
-      this.zombies = []; Items.list = []; Bullets.list = [];
+      this.zombies = []; Items.list = []; this.hazards = []; Bullets.list = [];
       World.update(16 * TILE, 16 * TILE);
       P.x = World.startPos.x; P.y = World.startPos.y;
       for (const a of this.allies) { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
@@ -803,10 +837,13 @@ const G = {
     const dg = World.dg;
     if (dg.floor < dg.floors) {
       World.addProp('fx_2', z.x, z.y, { solid: false, layer: 0, kind: 'stairs', light: 120 });
+      this.dgTarget = { x: z.x, y: z.y, label: 'Lối xuống' };
       this.toast('Lối xuống tầng tiếp theo đã mở!', 'quest');
     } else {
       World.addProp(RL.id === 'sl' ? 'sl_p_9' : 'fx_0', z.x, z.y - 60, { solid: false, layer: 0, kind: 'exit', light: 170, lightCol: 'blue' });
-      World.addProp('fx_3', z.x, z.y + 30, { container: 'boss', r: 14 });
+      this.dgTarget = { x: z.x, y: z.y - 60, label: 'Lối ra' };
+      const tier = RANKS.indexOf(dg.rank) >= 2 ? 3 : 2;
+      World.addProp('chest_' + tier, z.x, z.y + 30, { container: 'chest', kind: 'chest', r: 12, data: { tier, bonus: RANKS.indexOf(dg.rank) * 0.4 } });
       dg.cleared = true;
       this.stats.gates++;
       this.achieve('gate'); if (dg.rank === 'S') this.achieve('gateS');
@@ -819,11 +856,11 @@ const G = {
     const cleared = World.dg && World.dg.cleared, story = World.dg && World.dg.story;
     Sound.play('sfx_portal', 0.7);
     UI.fade(() => {
-      World.mode = 'over';
+      World.mode = 'over'; this.dgTarget = null;
       World.reset();
       World.delta = this.saveOver.delta; World.explored = this.saveOver.explored;
       if (cleared && this.gateProp) World.markRemoved(this.gateProp);
-      this.zombies = []; Items.list = []; Bullets.list = [];
+      this.zombies = []; Items.list = []; this.hazards = []; Bullets.list = [];
       P.x = this.returnPos.x; P.y = this.returnPos.y;
       World.update(P.x, P.y);
       if (cleared && this.gateProp) { const g = World.propsNear(P.x, P.y - 70, 40).find(p => p.kind === 'gate'); if (g) World.removeProp(g); }
@@ -872,12 +909,12 @@ const G = {
     for (const k in r.need) this.take(k, r.need[k]);
     this.player.inv[r.out] = (this.player.inv[r.out] || 0) + r.n;
     Sound.play('sfx_craft', 0.6);
-    this.toast(`Chế tạo: ${ITEMS[r.out].name} x${r.n}`, 'good');
+    this.toast(`Chế tạo: ${itm(r.out).name} x${r.n}`, 'good');
     UI.dirty = true;
   },
   place(kind) {
     const P = this.player;
-    if (P.car || !this.has(kind)) { if (!this.has(kind)) this.toast(`Không có ${ITEMS[kind].name}. Chế tạo bằng [C].`, 'warn'); return; }
+    if (P.car || !this.has(kind)) { if (!this.has(kind)) this.toast(`Không có ${itm(kind).name}. Chế tạo bằng [C].`, 'warn'); return; }
     const x = P.x + Math.cos(P.angle) * 34, y = P.y + Math.sin(P.angle) * 34;
     if (World.solidAt(Math.floor(x / TILE), Math.floor(y / TILE))) { this.toast('Không đặt được ở đây.', 'warn'); return; }
     this.take(kind);

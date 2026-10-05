@@ -137,6 +137,57 @@ body.touch #banner p { font-size: 16px; }
 @media (max-width: 800px) { #worldPick { grid-template-columns: 1fr; } .stats2 { grid-template-columns: 1fr; } .wimg { height: 100px; } .wbody p { display: none; } }
 
 /* 3D views */
-#game3d { position: fixed; inset: 0; width: 100%; height: 100%; display: none; image-rendering: pixelated; }
-body.v3d #game3d { display: block; }
-body.v3d #vignette { background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.45) 100%); }
+
+/* ---------- v3: gender pick, shop, save files ---------- */
+.gender { display: flex; gap: 8px; margin: 8px 0 2px; }
+.gender button { min-width: 0; flex: 1; font-size: 22px; padding: 2px 10px; }
+.gender button.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 10px rgba(255,207,58,0.35); }
+.pc em { font-style: normal; font-size: 14px; line-height: 1.1; margin-top: 2px; }
+.pc em.rom { color: #ff8ab8; }
+.pc em.bond { color: var(--gold); }
+#dPort.pop { animation: portpop .22s ease-out; }
+@keyframes portpop { from { transform: scale(0.94); filter: brightness(1.4); } to { transform: none; filter: none; } }
+.shophead { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; padding-right: 40px; }
+.shophead img { width: 64px; height: 64px; object-fit: contain; image-rendering: pixelated; background: rgba(0,0,0,0.5); border: 2px solid var(--gold); }
+.shophead h2 { margin: 0; font-size: 28px; }
+.shophead p { margin: 2px 0 0; color: var(--muted); font-size: 18px; line-height: 1.1; }
+.shophead > div:nth-child(2) { flex: 1; min-width: 0; }
+#shopGold { display: flex; align-items: center; gap: 6px; font-size: 30px; color: var(--gold); white-space: nowrap; }
+#shopGold img { width: 34px; image-rendering: pixelated; }
+#shopGold small { font-size: 16px; color: var(--muted); }
+#shopBody h3 { margin: 10px 0 6px; font-size: 22px; color: var(--gold); font-weight: normal; }
+#shopBody h3 small { color: var(--muted); font-size: 15px; }
+.srows { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 6px; }
+.srow { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.45); border: 2px solid var(--rc, #3a2a1a); padding: 4px 8px; min-width: 0; }
+.srow > img { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
+.srow .sinfo { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.05; }
+.srow .sinfo b { font-weight: normal; font-size: 19px; }
+.srow .sinfo small { color: var(--muted); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.srow button { min-width: 0; font-size: 17px; padding: 1px 10px; letter-spacing: 1px; }
+.srow button.dim, .menu button.dim { opacity: 0.45; }
+.price { display: flex; align-items: center; gap: 3px; color: var(--gold); font-size: 20px; white-space: nowrap; }
+.price img { width: 18px; image-rendering: pixelated; }
+.chestrow { box-shadow: inset 0 0 14px var(--rc); }
+.chestrow > img { width: 48px; height: 48px; }
+.menu.row.wrap { flex-wrap: wrap; }
+.filebtn { display: inline-flex; align-items: center; justify-content: center; font-size: 28px; letter-spacing: 3px; padding: 6px 20px; cursor: pointer; border: 2px solid var(--edge); background: linear-gradient(#4a1e0e, #24100a); color: var(--text); }
+.filebtn input { display: none; }
+#sioText { width: 100%; height: 140px; margin-top: 10px; background: rgba(0,0,0,0.6); color: #cfe8c0; border: 2px solid var(--edge); font-family: monospace; font-size: 12px; resize: vertical; user-select: text; }
+#saveio .menu button, .filebtn { min-width: 0; font-size: 22px; }
+@media (max-width: 800px) { .srows { grid-template-columns: 1fr; } .shophead h2 { font-size: 22px; } #shopGold { font-size: 22px; } }
+.pickbox { min-width: 0; }
+.gender button, #worldPick .menu.row button, #saveio .menu button, .shophead button { min-width: 0 !important; flex: 1 1 auto; }
+#worldPick .menu.row { flex-wrap: nowrap; }
+body.touch #shop button, body.touch #saveio button, body.touch .gender button, body.touch #inv .tabs button { min-width: 0; }
+#shop .tabs button { flex: 1; }
+@media (max-width: 640px) {
+  .shophead { flex-wrap: wrap; gap: 8px; }
+  .shophead img { width: 44px; height: 44px; }
+  .shophead h2 { font-size: 20px; line-height: 1; }
+  .shophead p { font-size: 15px; }
+  #shopGold { width: 100%; }
+  .srow { flex-wrap: wrap; }
+  .srow .sinfo { flex-basis: calc(100% - 52px); }
+  .srow .price { margin-left: 48px; }
+  .srow button { font-size: 16px; margin-left: auto; }
+}

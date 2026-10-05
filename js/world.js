@@ -22,7 +22,7 @@ const World = {
     NOISE_SEED = seed;
     this.mode = 'over';
     this.delta = new Map();
-    this.minis = new Map();
+    this.minis = new Map(); this.miniCv = new Map();
     this.explored = new Set();
     this.reset();
   },
@@ -35,7 +35,6 @@ const World = {
     this.pending = [];
     this._last = null;
     this._gen = null;
-    if (typeof R3D !== 'undefined') R3D.reset();
   },
   // ---------- superblock access ----------
   sbOf(tx, ty) {
@@ -61,7 +60,8 @@ const World = {
   occAt(tx, ty) { const sb = this.sbOf(tx, ty); return sb ? sb.occ[(ty - sb.ty0) * SB + (tx - sb.tx0)] : 1; },
   setOcc(tx, ty) { const sb = this.sbOf(tx, ty); if (sb) sb.occ[(ty - sb.ty0) * SB + (tx - sb.tx0)] = 1; },
   inb() { return true; },
-  isSolidT(t) { return t === T.WALL || t === T.WATER || t === T.WINDOW; },
+  isSolidT(t) { return t === T.WALL || t === T.WATER || t === T.WINDOW || t === T.LAVA; },
+  isGround(t) { return t === T.GRASS || t === T.DIRT || (t >= 13 && t !== T.ICE && t !== T.LAVA); },
   solidAt(tx, ty) { return this.isSolidT(this.get(tx, ty)); },
   fill(x0, y0, x1, y1, t) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.set(x, y, t); },
   reserve(x0, y0, x1, y1) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.setOcc(x, y); },
@@ -107,7 +107,7 @@ const World = {
     sb.props.forEach((p, idx) => {
       p.id = k + ':' + idx;
       if (d && d.removed && d.removed.has(idx)) { p.dead = true; return; }
-      if (d && d.looted && d.looted.has(idx)) p.looted = true;
+      if (d && d.looted && d.looted.has(idx)) { p.looted = true; if (p.container === 'chest') p.img = 'chest_' + p.data.tier + 'o'; }
       this.gridAdd(p);
       this.markBlock(p, 1, sb);
       if (p.light) this.lights.push(p);
@@ -164,6 +164,19 @@ const World = {
     const d = Math.hypot(sx, sy) + (h3(sx, sy, 99) - 0.5) * 4;
     return d < 4 ? 'E' : d < 8 ? 'D' : d < 13 ? 'C' : d < 19 ? 'B' : d < 27 ? 'A' : 'S';
   },
+  // biome at fractional superblock coordinates
+  biomeAt(fx, fy) {
+    if (this.mode === 'dungeon' || Math.hypot(fx, fy) < 2.6) return 'plains';
+    const w = fbm(fx / 5 + 900, fy / 5 + 900, 2);
+    if (w > 0.69) { const k = fbm(fx / 4 + 1300, fy / 4 + 1300, 2); return k < 0.42 ? 'volcano' : k < 0.5 ? 'grave' : k < 0.58 ? 'mushroom' : 'crystal'; }
+    const t = fbm(fx / 7 + 300, fy / 7 + 300, 2), m = fbm(fx / 6 + 700, fy / 6 + 700, 2);
+    if (t < 0.35) return 'snow';
+    if (t > 0.65) return m < 0.48 ? 'desert' : 'jungle';
+    if (m > 0.64) return 'swamp';
+    if (m < 0.37) return t < 0.5 ? 'autumn' : 'sakura';
+    return m > 0.53 ? 'forest' : 'plains';
+  },
+  biomeOfPos(x, y) { const sb = this.sbs.get(nkey(Math.floor(x / SBPX), Math.floor(y / SBPX))); return sb && sb.biome || 'plains'; },
   levelAt(x, y) {
     if (this.mode === 'dungeon') return this.dg.level;
     return Math.max(1, Math.floor(1 + Math.hypot(x, y) / TILE / 45));
@@ -176,18 +189,24 @@ const World = {
     sb.zone = zone;
     const R = RL;
     // ground
+    sb.biome = this.biomeAt(sx + 0.5, sy + 0.5);
+    const BI = BIOMES[sb.biome];
     for (let y = 0; y < SB; y++) for (let x = 0; x < SB; x++) {
       const gx = tx0 + x, gy = ty0 + y;
       const n = fbm(gx / 16, gy / 16, 3);
-      sb.tiles[y * SB + x] = n > 0.66 ? T.DIRT : T.GRASS;
+      const j = (fbm(gx / 9 + 77, gy / 9 + 77, 2) - 0.5) * 0.6;
+      const b = BIOMES[this.biomeAt(gx / SB + j, gy / SB - j)];
+      sb.tiles[y * SB + x] = n > 0.66 ? (b.alt ?? (b.ground ?? T.DIRT)) : (b.ground ?? T.GRASS);
     }
-    // lakes in the wild
-    if (zone === 0 && fbm(sx / 3 + 40, sy / 3 + 40, 2) > 0.63) {
-      const cx = tx0 + 16 + SR.int(-4, 4), cy = ty0 + 16 + SR.int(-4, 4), rr = SR.int(8, 12);
+    // lakes in the wild (frozen in the snow, lava in the volcano, oasis in the desert)
+    if (zone === 0 && fbm(sx / 3 + 40, sy / 3 + 40, 2) > (BI.lakes ?? 0.63)) {
+      const cx = tx0 + 16 + SR.int(-4, 4), cy = ty0 + 16 + SR.int(-4, 4), rr = SR.int(8, 12) * (sb.biome === 'desert' ? 0.55 : 1);
+      const shore = sb.biome === 'snow' ? T.SNOW : sb.biome === 'volcano' ? T.ASH : sb.biome === 'swamp' ? T.SWAMP : T.SAND;
       for (let y = 0; y < SB; y++) for (let x = 0; x < SB; x++) {
         const d = Math.hypot(tx0 + x - cx, ty0 + y - cy) + (fbm((tx0 + x) / 6, (ty0 + y) / 6, 2) - 0.5) * 8;
-        if (d < rr) sb.tiles[y * SB + x] = T.WATER; else if (d < rr + 2) sb.tiles[y * SB + x] = T.SAND;
+        if (d < rr) sb.tiles[y * SB + x] = BI.water ?? T.WATER; else if (d < rr + 2) sb.tiles[y * SB + x] = shore;
       }
+      if (BI.oasis) for (let k = 0; k < 5; k++) { const a = SR.range(0, TAU); sb.pendingTrees = (sb.pendingTrees || []).concat([[Math.round(cx + Math.cos(a) * (rr + 2)), Math.round(cy + Math.sin(a) * (rr + 2)), BI.oasis]]); }
     }
     // roads along the west / north edges
     const V = this.hasV(sx, sy), H = this.hasH(sx, sy);
@@ -220,10 +239,12 @@ const World = {
       else if (r < gateP + 0.05) this.genPOI(bk, { kind: 'cache' }, sb);
       else if (r < gateP + 0.10) this.genPOI(bk, { kind: 'rescue' }, sb);
       else if (r < gateP + 0.13) this.genPOI(bk, { kind: 'camp' }, sb);
+      else if (r < gateP + 0.165 && Math.hypot(sx, sy) >= 3) this.genPOI(bk, { kind: 'ruins' }, sb);
       else if (zone === 2) (R.style === 'sect' ? this.genPalace(bk) : this.genTown(bk));
       else if (zone === 1) (R.style === 'cyber' && SR.chance(0.25) ? this.genParking(bk) : SR.chance(0.12) ? this.genPark(bk) : this.genVillage(bk));
       else this.genWild(bk);
     }
+    if (sb.pendingTrees) { for (const [x, y, img] of sb.pendingTrees) this.tryTree(x, y, false, [img]); sb.pendingTrees = null; }
     // road clutter
     for (let y = 0; y < SB; y++) for (let x = 0; x < SB; x++) {
       const i = y * SB + x;
@@ -254,8 +275,11 @@ const World = {
     this.container(RL.props.crate[0], cx + 2, cy - 1, 'start2');
     this.container(RL.props.special, cx, cy + 1, 'start3');
     this.startPos = { x: cx * TILE + 16, y: (cy + 1) * TILE + 16 };
+    this.shelterPos = this.startPos;
     this.startHouse = b;
     this.addProp('fx_4', cx * TILE + 16, (cy + 6) * TILE, { solid: false, light: 150, kind: 'campfire', lightCol: 'fire' });
+    this._gen.spawns.push({ kind: 'merchant', x: (cx + 4) * TILE, y: (cy + 6) * TILE + 8 });
+    this.chest(cx - 4, cy + 7, 0);
     for (let k = 0; k < 6; k++) this.tryTree(SR.int(bk.x0, bk.x1), SR.int(bk.y0, bk.y1), true);
   },
 
@@ -345,12 +369,16 @@ const World = {
       if (!this.isSolidT(sb.tiles[i])) sb.block[i] = v;
     }
   },
+  // tier: 0 wood, 1 silver, 2 gold, 3 diamond (rolled up a little at random)
+  rollChest(base) { let t = base; if (SR.chance(0.25)) t++; if (SR.chance(0.06)) t++; return clamp(t, 0, 3); },
+  chest(tx, ty, tier) { return this.container('chest_' + tier, tx, ty, 'chest', { kind: 'chest', r: 12, data: { tier } }); },
   container(img, tx, ty, kind, o = {}) {
     return this.addProp(img, tx * TILE + 16, ty * TILE + 16, Object.assign({ container: kind }, o));
   },
-  tryTree(tx, ty, city) {
+  tryTree(tx, ty, city, list) {
     if (!this.free(tx, ty, 1)) return;
-    const t = SR.pick(RL.props.trees);
+    const B = this._gen && BIOMES[this._gen.biome];
+    const t = SR.pick(list || (B && B.trees && B.trees.length ? B.trees : RL.props.trees));
     this.addProp(t, tx * TILE + 16, ty * TILE + 16, { canopy: true, r: 9, layer: 3, rot: SR.range(0, TAU) });
   },
 
@@ -409,6 +437,7 @@ const World = {
       if (this.get(tx, ty) !== o.floor || this.occAt(tx, ty)) continue;
       const nearWall = this.isSolidT(this.get(tx - 1, ty)) || this.isSolidT(this.get(tx + 1, ty)) || this.isSolidT(this.get(tx, ty - 1)) || this.isSolidT(this.get(tx, ty + 1));
       if (!nearWall) continue;
+      if (SR.chance(0.07)) { this.chest(tx, ty, this.rollChest(0)); placed++; continue; }
       const spr = typeof o.cimg === 'function' ? o.cimg() : (o.cimg || SR.pick(RL.props.crate));
       this.container(spr, tx, ty, o.loot || 'house');
       placed++;
@@ -481,6 +510,7 @@ const World = {
         else this.addProp(SR.pick(RL.props[k]), x * TILE + 16, y * TILE + 16, { container: k === 'bin' || k === 'trash' ? 'trash' : 'crate' });
       }
     }
+    if (SR.chance(0.25)) for (let k = 0; k < 40; k++) { const x = SR.int(bk.x0, bk.x1), y = SR.int(bk.y0, bk.y1); if (this.get(x, y) === T.CONC && this.free(x, y, 1)) { this.merchant(x, y); break; } }
     if (RL.props.lamp) for (let k = 0; k < 2; k++) { const x = SR.int(bk.x0, bk.x1), y = SR.int(bk.y0, bk.y1); if (this.get(x, y) === T.CONC && this.free(x, y)) this.addProp(RL.props.lamp, x * TILE + 16, y * TILE + 16, { solid: false, light: 110, lightCol: RL.id === 'cy' ? 'magenta' : RL.id === 'ct' ? 'red' : null }); }
   },
   genVillage(bk) {
@@ -552,12 +582,18 @@ const World = {
       this.reserve(bk.x0, bk.y0, bk.x1, bk.y1);
       return;
     }
+    const B = BIOMES[this._gen.biome] || BIOMES.plains;
+    if (SR.chance(0.14)) for (let k = 0; k < 30; k++) { const x = SR.int(bk.x0 + 2, bk.x1 - 2), y = SR.int(bk.y0 + 2, bk.y1 - 2); if (this.isGround(this.get(x, y)) && this.free(x, y, 1)) { this.chest(x, y, this.rollChest(0)); break; } }
     for (let y = bk.y0; y <= bk.y1; y++) for (let x = bk.x0; x <= bk.x1; x++) {
       if (this.occAt(x, y)) continue;
       const t = this.get(x, y);
-      if (t !== T.GRASS && t !== T.DIRT) continue;
+      if (!this.isGround(t)) continue;
       const n = fbm(x / 13 + 50, y / 13 + 50, 3);
-      if (n > 0.5 && SR.chance(0.08 + (n - 0.5) * 0.6)) this.tryTree(x, y, false);
+      if (B.deco && SR.chance(0.012)) {
+        const img = SR.pick(B.deco), lk = B.loot && B.loot[img];
+        if (this.free(x, y)) this.addProp(img, x * TILE + 16, y * TILE + 16, { r: img === 'b_reeds' || img === 'b_glowshroom' ? 0 : 11, solid: img !== 'b_reeds' && img !== 'b_glowshroom', container: lk || null, light: img === 'b_glowshroom' || img === 'b_crystal' || img === 'b_lavarock' ? 70 : 0, lightCol: img === 'b_lavarock' ? 'fire' : img === 'b_glowshroom' ? 'cyan' : img === 'b_crystal' ? 'magenta' : null });
+      }
+      else if (n > 0.5 && SR.chance((0.08 + (n - 0.5) * 0.6) * B.treeD)) this.tryTree(x, y, false);
       else if (SR.chance(0.006)) this.addProp(SR.pick(RL.props.rocks), x * TILE + 16, y * TILE + 16, { r: 12, rot: SR.range(0, TAU) });
       else if (SR.chance(0.012)) this.addProp(SR.pick([RL.props.bush, RL.props.weeds, RL.props.weeds]), x * TILE + 16, y * TILE + 16, { solid: false, rot: SR.range(0, TAU) });
       else if (st === 'sect' && SR.chance(0.004)) this.container(SR.pick(['tt_p_0', 'tt_p_1']), x, y, 'herb', { solid: false });
@@ -578,6 +614,11 @@ const World = {
     for (const [gx, gy] of [[cx, y0], [cx, y1], [x0, cy], [x1, cy]]) for (let k = -1; k <= 1; k++) this.set(gx === cx ? gx + k : gx, gy === cy ? gy + k : gy, T.CONC);
     for (const [x, y] of [[x0 + 2, y0 + 2], [x1 - 2, y0 + 2], [x0 + 2, y1 - 2], [x1 - 2, y1 - 2]]) this.addProp(RL.props.lamp || 'lamp', x * TILE + 16, y * TILE + 16, { light: 130, r: 9, lightCol: 'fire' });
     return { cx, cy, x0, y0, x1, y1 };
+  },
+  merchant(tx, ty) {
+    this.setOcc(tx, ty);
+    this._gen.spawns.push({ kind: 'merchant', x: tx * TILE + 16, y: ty * TILE + 16 });
+    if (RL.props.tent && this.free(tx + 2, ty - 1)) this.addProp(RL.props.tent, (tx + 2) * TILE + 16, (ty - 1) * TILE + 16, { shrink: 0.6 });
   },
   spawnGuards(x, y, n, o = {}) {
     for (let i = 0; i < n; i++) {
@@ -601,7 +642,7 @@ const World = {
       }
       case 'cache': {
         const f = this.fort(bk, 7);
-        this.container(RL.props.special, f.cx, f.cy, 'vault', { name: 'vault' });
+        this.chest(f.cx, f.cy, this.rollChest(1));
         for (let k = 0; k < 3; k++) this.container(SR.pick(RL.props.crate), f.cx + SR.int(-4, 4), f.cy + SR.int(-4, 4), 'crate');
         this.spawnGuards(px, py, 7, { r: 160, elite: 0.35 });
         break;
@@ -623,13 +664,30 @@ const World = {
         this.addProp(RL.props.tent, px + 70, py - 40, { shrink: 0.65 });
         this.container(SR.pick(RL.props.crate), cx - 3, cy + 2, 'camp');
         this.container(SR.pick(RL.props.crate), cx + 3, cy + 2, 'camp');
+        if (SR.chance(0.6)) this.merchant(cx - 1, cy - 2);
+        break;
+      }
+      case 'ruins': {
+        const S = 9, x0 = cx - S, y0 = cy - S, x1 = cx + S, y1 = cy + S;
+        for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+          const edge = x === x0 || x === x1 || y === y0 || y === y1;
+          const gap = Math.abs(x - cx) <= 1 || Math.abs(y - cy) <= 1;
+          this.set(x, y, edge && !gap && SR.chance(0.72) ? T.WALL : T.GRAVEL);
+          if (!edge && (x - x0) % 6 === 3 && (y - y0) % 6 === 3 && Math.hypot(x - cx, y - cy) > 3) this.set(x, y, T.WALL);
+        }
+        this.reserve(x0 - 1, y0 - 1, x1 + 1, y1 + 1);
+        for (const [x, y] of [[x0 + 2, y0 + 2], [x1 - 2, y0 + 2], [x0 + 2, y1 - 2], [x1 - 2, y1 - 2]]) this.addProp(RL.props.lamp || 'lamp', x * TILE + 16, y * TILE + 16, { light: 140, r: 9, lightCol: 'fire' });
+        this.chest(cx, cy + 3, this.rollChest(2));
+        sb.spawns.push({ kind: 'boss', x: px, y: py - 30, mini: true, seed: (h3(sb.sx, sb.sy, 41) * 1e9) | 0 });
+        this.spawnGuards(px, py, 6, { r: 200, elite: 0.25 });
+        for (let k = 0; k < 6; k++) this.addDecal(SR.pick(['blood1', 'scorch', 'blood3']), SR.int(x0, x1) * TILE, SR.int(y0, y1) * TILE, SR.range(0, TAU), 0.9, 0.6);
         break;
       }
       case 'landmark': {
         const f = this.fort(bk, 6);
         this.addProp('fx_4', px, py, { solid: false, light: 170, kind: 'campfire', lightCol: 'fire' });
         this.addProp(SR.pick(RL.props.decor), px, py - 80, {});
-        this.container(RL.props.special, f.cx + 3, f.cy + 3, 'vault');
+        this.chest(f.cx + 3, f.cy + 3, this.rollChest(1));
         this.spawnGuards(px, py, 4, { r: 200 });
         break;
       }
@@ -665,30 +723,33 @@ const World = {
     this.mode = 'dungeon';
     this.dg = dg;
     this.reset();
-    for (const k of [...this.minis.keys()]) if (String(k).startsWith('dungeon')) this.minis.delete(k);
+    for (const k of [...this.minis.keys()]) if (String(k).startsWith('dungeon')) { this.minis.delete(k); this.miniCv.delete(k); }
     for (const k of [...this.explored]) if (String(k).startsWith('dungeon')) this.explored.delete(k);
     // path from start (0,0) to boss room
     const ang = h3(dg.floor, dg.seed % 997, 3) * TAU;
-    const dist = 3 + Math.floor(h3(dg.floor, 1, dg.seed % 991) * 2) + Math.min(2, dg.floor - 1);
+    const dist = 2 + Math.floor(h3(dg.floor, 1, dg.seed % 991) * 2) + Math.min(1, dg.floor - 1);
     dg.bx = Math.round(Math.cos(ang) * dist); dg.by = Math.round(Math.sin(ang) * dist);
     if (!dg.bx && !dg.by) dg.bx = 3;
     dg.forced = new Set();
+    dg.box = { x0: Math.min(0, dg.bx) - 1, x1: Math.max(0, dg.bx) + 1, y0: Math.min(0, dg.by) - 1, y1: Math.max(0, dg.by) + 1 };
     let x = 0, y = 0;
     while (x !== dg.bx) { const nx = x + Math.sign(dg.bx - x); dg.forced.add('e' + Math.min(x, nx) + ',' + y); x = nx; }
     while (y !== dg.by) { const ny = y + Math.sign(dg.by - y); dg.forced.add('s' + x + ',' + Math.min(y, ny)); y = ny; }
   },
-  edgeE(sx, sy) { return this.dg.forced.has('e' + sx + ',' + sy) || h3(sx, sy, 11 + this.dg.floor) < 0.6; },
-  edgeS(sx, sy) { return this.dg.forced.has('s' + sx + ',' + sy) || h3(sx, sy, 23 + this.dg.floor) < 0.6; },
+  inBox(sx, sy) { const b = this.dg.box; return sx >= b.x0 && sx <= b.x1 && sy >= b.y0 && sy <= b.y1; },
+  edgeE(sx, sy) { return this.dg.forced.has('e' + sx + ',' + sy) || (this.inBox(sx, sy) && this.inBox(sx + 1, sy) && h3(sx, sy, 11 + this.dg.floor) < 0.6); },
+  edgeS(sx, sy) { return this.dg.forced.has('s' + sx + ',' + sy) || (this.inBox(sx, sy) && this.inBox(sx, sy + 1) && h3(sx, sy, 23 + this.dg.floor) < 0.6); },
   genDungeon(sb) {
     const { sx, sy, tx0, ty0 } = sb;
     const dg = this.dg;
     sb.tiles.fill(T.WALL);
+    if (!this.inBox(sx, sy)) return;
     const isStart = sx === 0 && sy === 0, isBoss = sx === dg.bx && sy === dg.by;
     const floor = SR.chance(0.5) ? T.TILEF : T.WOOD;
     const carve = (x0, y0, x1, y1) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (x >= tx0 + 1 && x < tx0 + SB - 1 || true) this.set(x, y, T.TILEF); };
     const mx = tx0 + 16, my = ty0 + 16;
     let room = null;
-    if (isStart || isBoss || SR.chance(0.72)) {
+    if (isStart || isBoss || SR.chance(0.8)) {
       const w = isBoss ? 11 : SR.int(4, 9), h = isBoss ? 11 : SR.int(4, 9);
       room = { x0: mx - w, y0: my - h, x1: mx + w, y1: my + h };
       carve(room.x0, room.y0, room.x1, room.y1);
@@ -706,7 +767,7 @@ const World = {
       for (const [x, y] of [[room.x0, room.y0], [room.x1, room.y0], [room.x0, room.y1], [room.x1, room.y1]]) this.addProp(D.torch, x * TILE + 16, y * TILE + 16, { light: 150, r: 8, lightCol: 'fire', kind: 'torch' });
       const nd = SR.int(1, 4);
       for (let k = 0; k < nd; k++) { const x = SR.int(room.x0 + 1, room.x1 - 1), y = SR.int(room.y0 + 1, room.y1 - 1); if (this.free(x, y, 1) && Math.hypot(x - mx, y - my) > 2) this.addProp(SR.pick(D.decor), x * TILE + 16, y * TILE + 16, { container: SR.chance(0.4) ? 'crate' : null }); }
-      if (SR.chance(0.35) && !isStart) { const x = SR.int(room.x0 + 1, room.x1 - 1), y = SR.int(room.y0 + 1, room.y1 - 1); if (this.free(x, y)) this.container(RL.id === 'sl' ? 'sl_p_0' : 'fx_3', x, y, 'dchest'); }
+      if (SR.chance(0.4) && !isStart) { const x = SR.int(room.x0 + 1, room.x1 - 1), y = SR.int(room.y0 + 1, room.y1 - 1); if (this.free(x, y)) this.chest(x, y, this.rollChest(RANKS.indexOf(dg.rank) >= 3 ? 1 : 0)); }
       if (SR.chance(0.25)) for (let k = 0; k < 3; k++) this.addDecal(SR.pick(['blood1', 'blood2', 'scorch']), SR.int(room.x0, room.x1) * TILE, SR.int(room.y0, room.y1) * TILE, SR.range(0, TAU), 0.8, 0.6);
     }
     if (isStart) {
@@ -730,7 +791,6 @@ const World = {
   // ---------- decals ----------
   addDecal(img, x, y, rot = 0, scale = 1, alpha = 1, dark) {
     const im = IMG[img]; if (!im) return;
-    if (!this._gen && typeof R3D !== 'undefined') R3D.markDirty(x, y);
     const d = { img, x, y, rot, scale, alpha, dark };
     const r = Math.max(im.width, im.height) / 4 * scale;
     const cx0 = Math.floor((x - r) / CHPX), cx1 = Math.floor((x + r) / CHPX), cy0 = Math.floor((y - r) / CHPX), cy1 = Math.floor((y + r) / CHPX);
@@ -770,7 +830,7 @@ const World = {
     this.renderChunk(ctx, cx, cy);
     c = { canvas, ctx, used: G.frame };
     this.cache.set(k, c);
-    if (this.cache.size > (G.lowGfx ? 110 : 80)) {
+    if (this.cache.size > (G.lowGfx ? 70 : Touch.on ? 34 : 48)) {
       let oldK = null, old = 1e12;
       for (const [kk, v] of this.cache) if (v.used < old) { old = v.used; oldK = kk; }
       this.cache.delete(oldK);
@@ -785,7 +845,7 @@ const World = {
   },
   texOf(t) {
     if (this.mode === 'dungeon' && (t === T.TILEF || t === T.WOOD)) return RL.dungeon.floor;
-    return RL.tex[t] || RL.tex[0];
+    return RL.tex[t] || BIOME_TEX[t] || RL.tex[0];
   },
   renderChunk(ctx, cx, cy) {
     const pats = {};
@@ -901,10 +961,20 @@ const World = {
   },
 
   // ---------- minimap ----------
+  getMini(k) {
+    const id = this.minis.get(k); if (!id) return null;
+    let c = this.miniCv.get(k);
+    if (c) { this.miniCv.delete(k); this.miniCv.set(k, c); return c; }
+    c = this.miniCv.size >= 160 ? this.miniCv.get(this.miniCv.keys().next().value) : null;
+    if (c) this.miniCv.delete(this.miniCv.keys().next().value);
+    else { c = document.createElement('canvas'); c.width = SB; c.height = SB; }
+    c.getContext('2d').putImageData(id, 0, 0);
+    this.miniCv.set(k, c);
+    return c;
+  },
   buildMini(sb) {
-    const c = document.createElement('canvas'); c.width = SB; c.height = SB;
-    const g = c.getContext('2d');
-    const im = g.createImageData(SB, SB);
+    const im = new ImageData(SB, SB);
+    const dot = (x, y, s, col) => { for (let yy = y; yy < y + s; yy++) for (let xx = x; xx < x + s; xx++) if (xx >= 0 && yy >= 0 && xx < SB && yy < SB) { const i = (yy * SB + xx) * 4; im.data[i] = col[0]; im.data[i + 1] = col[1]; im.data[i + 2] = col[2]; } };
     const dung = this.mode === 'dungeon';
     for (let i = 0; i < SB * SB; i++) {
       let col = MINI_COL[sb.tiles[i]] || [0, 0, 0];
@@ -913,12 +983,15 @@ const World = {
       if (bi >= 0 && sb.tiles[i] !== T.WALL && sb.tiles[i] !== T.WINDOW) col = sb.buildings[bi].roof === RL.roofs[1] ? [120, 60, 45] : [85, 85, 95];
       im.data[i * 4] = col[0]; im.data[i * 4 + 1] = col[1]; im.data[i * 4 + 2] = col[2]; im.data[i * 4 + 3] = 255;
     }
-    g.putImageData(im, 0, 0);
     for (const p of sb.props) {
-      if (p.canopy) { g.fillStyle = 'rgba(30,60,25,0.9)'; g.fillRect(Math.floor(p.x / TILE) - sb.tx0 - 1, Math.floor(p.y / TILE) - sb.ty0 - 1, 3, 3); }
-      if (p.kind === 'gate') { g.fillStyle = p.img === 'fx_1' ? '#ff3b3b' : '#4da6ff'; g.fillRect(Math.floor(p.x / TILE) - sb.tx0 - 2, Math.floor(p.y / TILE) - sb.ty0 - 2, 5, 5); }
+      const x = Math.floor(p.x / TILE) - sb.tx0, y = Math.floor(p.y / TILE) - sb.ty0;
+      if (p.canopy) dot(x - 1, y - 1, 3, [30, 60, 25]);
+      if (p.kind === 'gate') dot(x - 2, y - 2, 5, p.img === 'fx_1' ? [255, 59, 59] : [77, 166, 255]);
     }
-    this.minis.set(this.mode + sb.key, c);
-    if (this.minis.size > 3000) this.minis.delete(this.minis.keys().next().value);
+    for (const b of sb.buildings) for (const [x, y] of b.doors || []) dot(x - sb.tx0, y - sb.ty0, 1, [255, 214, 90]);
+    if (sb.poi && sb.poi.kind === 'ruins') dot(14, 14, 4, [190, 90, 255]);
+    const k = this.mode + sb.key;
+    this.minis.set(k, im); this.miniCv.delete(k);
+    if (this.minis.size > 5000) this.minis.delete(this.minis.keys().next().value);
   },
 };

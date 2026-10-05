@@ -23,7 +23,7 @@ const Touch = {
       b.addEventListener('touchstart', e => {
         e.preventDefault(); e.stopPropagation();
         const a = b.dataset.a;
-        if (a === 'pause') UI.pause(); else if (a === 'fs') this.fullscreen(); else if (a === 'view') G.cycleView(); else if (a === 'gfx') G.toggleGfx(); else UI.openPanel(a);
+        if (a === 'pause') UI.pause(); else if (a === 'fs') this.fullscreen(); else UI.openPanel(a);
       }, opt);
     });
     // attack button: hold to shoot / swing, auto-aims at the nearest zombie
@@ -86,7 +86,6 @@ const Touch = {
   },
   playerScreen() {
     const P = G.player;
-    if (G.gfx === '3d' && G.cam3d === 'top' && R3D.ok && R3D.camera) { const t = P.car || P; const sc = R3D.project(t.x, 20, t.y); if (sc) return { x: sc[0], y: sc[1] }; }
     return { x: (P.x - G.camera.x) * G.zoom / G.dpr + VW / 2, y: (P.y - G.camera.y) * G.zoom / G.dpr + VH / 2 };
   },
   // point the aim at the closest visible zombie; returns true when one was found
@@ -117,15 +116,6 @@ const Touch = {
       Input.keys.KeyA = L.dx < -0.38; Input.keys.KeyD = L.dx > 0.38;
       Input.keys.ShiftLeft = L.m > 0.97;
     } else if (L) { Input.keys.KeyW = Input.keys.KeyS = Input.keys.KeyA = Input.keys.KeyD = Input.keys.ShiftLeft = false; }
-    if (G.cam3d !== 'top') {
-      // 3D views: right stick turns the camera, left stick moves relative to it
-      const now = performance.now(), dt = Math.min(0.05, (now - (this.lastT || now)) / 1000); this.lastT = now;
-      if (R && Math.abs(R.dx) > 0.15) G.yaw += R.dx * Math.abs(R.dx) * dt * 4.2;
-      Input.mouse.down = this.fire || !!(R && R.m > 0.92);
-      const eb = document.querySelector('#tbtns [data-k="KeyE"]');
-      if (eb) eb.classList.toggle('ready', !!G.interactTarget);
-      return;
-    }
     let aimed = false;
     if (R && R.m > 0.2) {
       const a = Math.atan2(R.dy, R.dx);

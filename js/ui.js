@@ -20,9 +20,6 @@ const UI = {
     $('btnWinMenu').onclick = () => this.toTitle();
     $('btnWinGo').onclick = () => { G.state = 'playing'; this.showScreen(null); this.hud(true); };
     $('btnFs').onclick = () => Touch.fullscreen();
-    $('btnView').onclick = () => G.cycleView();
-    $('btnGfx').onclick = () => G.toggleGfx();
-    $('btnGfxT').onclick = () => G.toggleGfx();
     $('btnPauseFs').onclick = () => Touch.fullscreen();
     $('btnStart').onclick = () => this.startWorld();
     $('btnWorldBack').onclick = () => this.showScreen('title');
@@ -91,17 +88,25 @@ const UI = {
     const L = LORE[r];
     $('pickName').textContent = L.name;
     $('pickArt').style.backgroundImage = `url(assets/img/${REALMS[r].art}.jpg)`;
-    $('heroName').value = R.pick(L.heroNames);
-    $('pickComps').innerHTML = L.companions.map((c, i) => `<div class="pc"><img src="assets/img/${REALMS[r].port[i]}.jpg" alt=""><b>${esc(c.name)}</b><span>${esc(c.role)}</span></div>`).join('');
+    this.refreshPick(true);
     $('worldCards').classList.add('hidden'); $('worldPick').classList.remove('hidden');
     Sound.play('sfx_gong', 0.5);
+  },
+  refreshPick(newName) {
+    const r = this.pickedRealm, L = LORE[r], g = this.pickedGender || 'm';
+    const names = (HERO_NAMES[r] || HERO_NAMES.md)[g];
+    if (newName || !$('heroName').value) $('heroName').value = R.pick(names);
+    $('pickComps').innerHTML = L.companions.map((c, i) => {
+      const rom = c.gender !== g;
+      return `<div class="pc"><img src="assets/img/${REALMS[r].port[i]}.jpg" alt=""><b>${esc(c.name)}</b><span>${esc(c.role)}</span><em class="${rom ? 'rom' : 'bond'}">${rom ? '♥ Có thể thành người thương' : '★ ' + esc(c.bondTitle || 'Kết nghĩa')}</em></div>`;
+    }).join('');
   },
   startWorld() {
     const r = this.pickedRealm;
     const name = ($('heroName').value || '').trim().slice(0, 20) || R.pick(LORE[r].heroNames);
     if (Touch.on) Touch.fullscreen(true);
     try { localStorage.removeItem('tt_save_v2'); } catch (e) {}
-    this.loadRealm(r, () => { G.newGame(r, null, name); G.start(true); });
+    this.loadRealm(r, () => { G.newGame(r, null, name, this.pickedGender || 'm'); G.start(true); });
   },
   continueGame() {
     let d; try { d = JSON.parse(localStorage.getItem('tt_save_v2')); } catch (e) {}
@@ -115,10 +120,17 @@ const UI = {
     $('loadHint').textContent = 'Đang mở cánh cổng tới ' + LORE[r].name + '...';
     $('loadHint').classList.remove('blink');
     Sound.setRealm(r);
-    loadImages(COMMON_IMAGES.concat(realmImages(r)), p => this.setLoad(p)).then(() => { G.whiteCache = {}; G.darkCache = {}; G.shadowCache = {}; cb(); });
+    loadImages(COMMON_IMAGES.concat(realmImages(r)), p => this.setLoad(p)).then(() => {
+      G.whiteCache = {}; G.darkCache = {}; G.shadowCache = {};
+      // prefetch portrait expressions and theme the touch buttons for this world
+      for (const pt of REALMS[r].port) if (EXPR_PORTS.has(pt)) for (const e of EXPRESSIONS) { const im = new Image(); im.src = `assets/img/${pt}_${e}.jpg`; }
+      RL = REALMS[r];
+      for (const [k, id] of [['KeyH', 'medkit'], ['KeyF', 'food'], ['KeyG', 'grenade']]) { const b = document.querySelector(`#tbtns [data-k="${k}"] img`); if (b) b.src = IMG[itm(id).icon].src; }
+      cb();
+    });
   },
 
-  pause() { if (G.state !== 'playing') return; G.state = 'paused'; this.showScreen('pause'); if (document.pointerLockElement) document.exitPointerLock(); },
+  pause() { if (G.state !== 'playing') return; G.state = 'paused'; this.showScreen('pause'); },
   resume() { G.state = 'playing'; this.showScreen(null); },
   openPanel(id) {
     if (G.state !== 'playing' || G.player.dead) return;
@@ -140,8 +152,6 @@ const UI = {
       return;
     }
     if (G.state === 'levelup' && /^Digit[123]$/.test(code)) { this.pickPerk(+code.slice(5) - 1); return; }
-    if (code === 'KeyV' && G.state === 'playing') { G.cycleView(); return; }
-    if (code === 'KeyK' && G.state === 'playing') { G.toggleGfx(); return; }
     const panels = { KeyC: 'craft', Tab: 'inv', KeyI: 'inv', KeyM: 'map' };
     if (panels[code]) {
       if (G.state === 'playing') this.openPanel(panels[code]);
@@ -243,7 +253,12 @@ const UI = {
     const who = line.who || 'sys';
     const P = d.portrait;
     $('dPort').style.display = who === 'npc' && P ? '' : 'none';
-    if (P) $('dPort').src = 'assets/img/' + P + '.jpg';
+    if (P) {
+      let pt = P;
+      if (who === 'npc' && EXPR_PORTS.has(P)) { const e = line.e || guessExpr(line.text, d.romance !== false); if (e && e !== 'normal') pt = P + '_' + e; }
+      const src = 'assets/img/' + pt + '.jpg';
+      if (!$('dPort').src.endsWith(src)) { $('dPort').src = src; $('dPort').classList.remove('pop'); void $('dPort').offsetWidth; $('dPort').classList.add('pop'); }
+    }
     $('dName').textContent = who === 'npc' ? (d.name || '') : who === 'hero' ? Story.names.hero : '';
     $('dName').style.display = who === 'sys' ? 'none' : '';
     $('dText').className = 'dtext ' + who;
@@ -268,7 +283,7 @@ const UI = {
     d.choices = null;
     if (d.menu) { this.dialogEnd(); return; }
     if (c.aff > 0) Sound.play('sfx_heart', 0.5);
-    d.lines = d.lines.concat([{ who: 'hero', text: c.text }]).concat(c.reply ? [{ who: 'npc', text: c.reply + (c.aff >= 7 ? '  ♥' : '') }] : []);
+    d.lines = d.lines.concat([{ who: 'hero', text: c.text }]).concat(c.reply ? [{ who: 'npc', text: c.reply + (c.aff >= 7 ? (d.romance === false ? '  ★' : '  ♥') : ''), e: c.e }] : []);
     d.i++; this.dialogShow();
   },
   dialogNext() {
@@ -325,16 +340,16 @@ const UI = {
   // ---------- panels ----------
   buildCraft() {
     const box = $('craftList'); box.innerHTML = '';
-    const nm = id => ITEMS[id].kind === 'ammo' ? RL.ammoNames[['ammo_pistol', 'ammo_shell', 'ammo_rifle'].indexOf(id)] : ITEMS[id].name;
+    const nm = id => itm(id).name;
     for (const r of RECIPES) {
       const ok = G.canCraft(r);
       const row = document.createElement('div');
       row.className = 'recipe' + (ok ? '' : ' no');
       const needs = Object.entries(r.need).map(([k, n]) => {
         const have = G.player.inv[k] || 0;
-        return `<span class="need ${have >= n ? 'ok' : 'bad'}"><img src="${IMG[ITEMS[k].icon].src}" alt="">${esc(nm(k))} ${have}/${n}</span>`;
+        return `<span class="need ${have >= n ? 'ok' : 'bad'}"><img src="${IMG[itm(k).icon].src}" alt="">${esc(nm(k))} ${have}/${n}</span>`;
       }).join('');
-      row.innerHTML = `<img class="ricon" src="${IMG[ITEMS[r.out].icon].src}" alt=""><div class="rinfo"><b>${esc(nm(r.out))} x${r.n}</b><small>${esc(ITEMS[r.out].desc || '')}</small><div>${needs}</div></div><button ${ok ? '' : 'disabled'}>CHẾ TẠO</button>`;
+      row.innerHTML = `<img class="ricon" src="${IMG[itm(r.out).icon].src}" alt=""><div class="rinfo"><b>${esc(nm(r.out))} x${r.n}</b><small>${esc(itm(r.out).desc || '')}</small><div>${needs}</div></div><button ${ok ? '' : 'disabled'}>CHẾ TẠO</button>`;
       const btn = row.querySelector('button');
       this.bindBtn(btn);
       btn.onclick = () => { G.craft(r); this.buildCraft(); };
@@ -352,11 +367,13 @@ const UI = {
     const box = $('invBody');
     const tab = this.invTab;
     if (tab === 'gear') {
-      const slotNames = { melee: RL.weapons.melee.name, r1: RL.weapons.r1.name, r2: RL.weapons.r2.name, r3: RL.weapons.r3.name };
+      const slotNames = { melee: 'Cận chiến', r1: RL.weapons.r1.name, r2: RL.weapons.r2.name, r3: RL.weapons.r3.name };
       let h = '<h3>Đang trang bị</h3><div class="gequip">';
       for (const s of SLOT_ORDER) h += `<div class="geqs">${this.itemHtml(P.equip[s])}<small>${esc(slotNames[s])}</small></div>`;
       for (let i = 0; i < 3; i++) h += `<div class="geqs">${this.itemHtml(P.relics[i])}<small>Thánh vật ${i + 1}</small></div>`;
-      h += '</div><h3>Túi đồ (' + P.stash.length + '/18)</h3><div class="gstash">';
+      for (const sl of ARMOR_SLOTS) h += `<div class="geqs">${this.itemHtml(P.armor[sl])}<small>${ARMOR_SLOT_LABEL[sl]}</small></div>`;
+      h += `</div><p class="muted">Giáp: <b>${P.armorVal}</b> (giảm ${Math.round(P.armorVal / (P.armorVal + 100) * 100)}% sát thương) • ${esc(cur().name)}: <b style="color:${cur().col}">${P.gold}</b></p>`;
+      h += '<h3>Túi đồ (' + P.stash.length + '/30)</h3><div class="gstash">';
       for (const it of P.stash) h += this.itemHtml(it);
       if (!P.stash.length) h += '<p class="muted">Chưa có trang bị dự phòng. Hạ tinh anh, boss và mở rương báu để nhận đồ.</p>';
       h += '</div><div id="gdetail" class="gdetail"><p class="muted">Chạm vào một món đồ để xem chi tiết.</p></div>';
@@ -366,23 +383,22 @@ const UI = {
       const ids = Object.keys(P.inv).filter(k => P.inv[k] > 0);
       let h = '<div class="ggrid">';
       for (const id of ids) {
-        const it = ITEMS[id];
-        const nm = it.kind === 'ammo' ? RL.ammoNames[['ammo_pistol', 'ammo_shell', 'ammo_rifle'].indexOf(id)] : it.name;
-        h += `<div class="slot" data-id="${id}"><img src="${IMG[it.icon].src}" alt=""><span class="cnt">${P.inv[id]}</span><div class="tip"><b>${esc(nm)}</b><br>${esc(it.desc || '')}</div></div>`;
+        const it = itm(id);
+        h += `<div class="slot" data-id="${id}"><img src="${IMG[it.icon].src}" alt=""><span class="cnt">${P.inv[id]}</span><div class="tip"><b>${esc(it.name)}</b><br>${esc(it.desc || '')}</div></div>`;
       }
       if (!ids.length) h += '<p class="muted">Túi trống. Lục soát thùng, xe, tủ đồ [E].</p>';
       box.innerHTML = h + '</div>';
       box.querySelectorAll('.slot').forEach(el => el.onclick = () => {
         const id = el.dataset.id;
-        if (['medkit', 'bandage', 'pills'].includes(id)) useHeal();
-        if (['food', 'water', 'choco', 'energy'].includes(id)) useFood();
+        if (id === 'scroll') { this.closePanel(); G.useScroll(); return; }
+        G.useItem(id);
         this.buildInv();
       });
     } else if (tab === 'comp') {
       let h = '<div class="comps">';
       for (const c of G.companions) {
         const known = c.joined;
-        h += `<div class="compc ${known ? '' : 'locked'}"><img src="assets/img/${c.data.portrait}.jpg" alt=""><div><b>${known ? esc(c.data.name) : '???'}</b><small>${known ? esc(c.data.role) : 'Chưa gặp'}</small>${known ? `<div class="affbar"><i style="width:${c.aff}%"></i></div><span class="hearts">${'♥'.repeat(c.stage)}${'♡'.repeat(5 - c.stage)} ${c.lover ? 'NGƯỜI THƯƠNG' : Math.round(c.aff) + '/100'}</span><p>${esc(c.data.personality)}</p><p class="muted">Thích: ${(c.data.likes || []).map(id => ITEMS[id] ? ITEMS[id].name : id).join(', ')}</p>` : ''}</div></div>`;
+        h += `<div class="compc ${known ? '' : 'locked'}"><img src="assets/img/${c.data.portrait}.jpg" alt=""><div><b>${known ? esc(c.data.name) : '???'}</b><small>${known ? esc(c.data.role) : 'Chưa gặp'}</small>${known ? `<div class="affbar"><i style="width:${c.aff}%"></i></div><span class="hearts">${(c.romance ? '♥' : '★').repeat(c.stage)}${(c.romance ? '♡' : '☆').repeat(5 - c.stage)} ${c.lover ? 'NGƯỜI THƯƠNG' : c.sworn ? esc(c.data.bondTitle || 'TRI KỶ').toUpperCase() : (c.romance ? '' : '(' + esc(c.data.bondTitle || 'tình bạn') + ') ') + Math.round(c.aff) + '/100'}</span><p>${esc(c.data.personality)}</p><p class="muted">Thích: ${(c.data.likes || []).map(id => itm(id) ? itm(id).name : id).join(', ')}</p>` : ''}</div></div>`;
       }
       box.innerHTML = h + '</div><p class="muted">Tăng thân mật: chiến đấu cùng nhau, tặng quà họ thích, nghỉ bên lửa trại, chọn lời thoại chân thành. Đạt mốc ♥ sẽ mở cảnh tâm sự.</p>';
     } else {
@@ -392,11 +408,11 @@ const UI = {
   },
   showDetail(uid) {
     const P = G.player;
-    const it = P.stash.find(x => x.uid === uid) || Object.values(P.equip).find(x => x && x.uid === uid) || P.relics.find(x => x && x.uid === uid);
+    const it = P.stash.find(x => x.uid === uid) || Object.values(P.equip).find(x => x && x.uid === uid) || Object.values(P.armor).find(x => x && x.uid === uid) || P.relics.find(x => x && x.uid === uid);
     if (!it) return;
     const inStash = P.stash.includes(it);
     const r = RARITY[it.rarity];
-    const cur = it.kind === 'weapon' ? P.equip[it.slot] : null;
+    const cur = it.kind === 'weapon' ? P.equip[it.slot] : it.kind === 'armor' ? P.armor[it.slot] : null;
     const cmp = cur && cur !== it ? ` <small>(${Loot.power(it) > Loot.power(cur) ? '▲ mạnh hơn' : '▼ yếu hơn'} đồ đang dùng)</small>` : '';
     $('gdetail').innerHTML = `<div class="gd" style="--rc:${r.color}"><img src="${IMG[Loot.iconOf(it)].src}" alt=""><div><b style="color:${r.color}">${esc(it.name)}</b> <small>${r.name} • Cấp ${it.ilvl}</small>${cmp}<p>${esc(Loot.describe(it)).replace(/\n/g, '<br>')}</p>${inStash ? '<button id="bEq">TRANG BỊ</button> <button id="bSal">PHÂN GIẢI</button>' : ''}</div></div>`;
     if (inStash) {
@@ -415,7 +431,7 @@ const UI = {
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       const k = World.mode + nkey(psx - 12 + x, psy - 12 + y);
       if (!World.explored.has(k)) continue;
-      const m = World.minis.get(k); if (!m) continue;
+      const m = World.getMini(k); if (!m) continue;
       g.drawImage(m, x * SB * S, y * SB * S, SB * S + 0.5, SB * S + 0.5);
     }
     const toM = (wx, wy) => [((wx / TILE) - (psx - 12) * SB) * S, ((wy / TILE) - (psy - 12) * SB) * S];
@@ -512,13 +528,13 @@ const UI = {
       html += `<div class="hslot ${P.weapon === s ? 'active' : ''}" data-w="${s}" style="--rc:${col}" title="${esc(it ? it.name : 'Tay không')}"><span class="hk">${i + 1}</span>${icon}${ammo}</div>`;
     });
     $('hotbar').innerHTML = html;
-    const q = [['medkit', 'H'], ['bandage', 'H'], ['food', 'F'], ['water', 'F'], ['grenade', 'G'], ['molotov', 'G'], ['barricade', 'B'], ['trap', 'T']];
+    const q = [['medkit', 'H'], ['bandage', 'H'], ['food', 'F'], ['water', 'F'], ['grenade', 'G'], ['molotov', 'G'], ['barricade', 'B'], ['trap', 'T'], ['scroll', 'U']];
     let qh = '';
-    for (const [id, k] of q) { const n = P.inv[id] || 0; qh += `<div class="qslot ${n ? '' : 'none'}"><img src="${IMG[ITEMS[id].icon].src}" alt=""><span class="cnt">${n}</span><span class="qk">${k}</span></div>`; }
+    for (const [id, k] of q) { const n = P.inv[id] || 0; qh += `<div class="qslot ${n ? '' : 'none'}" data-q="${id}"><img src="${IMG[itm(id).icon].src}" alt=""><span class="cnt">${n}</span><span class="qk">${k}</span></div>`; }
     $('quick').innerHTML = qh;
     let cp = '';
     for (const c of G.companions) if (c.joined && c.ally) {
-      cp += `<div class="cpm ${c.ally.downed ? 'down' : ''} ${c.scenePending ? 'love' : ''}"><img src="assets/img/${c.data.portrait}.jpg" alt=""><div><b>${esc(c.data.name)}</b><div class="cphp"><i style="width:${c.ally.hp / c.ally.maxHp * 100}%"></i></div><span>${'♥'.repeat(c.stage)}${'♡'.repeat(5 - c.stage)}</span></div></div>`;
+      cp += `<div class="cpm ${c.ally.downed ? 'down' : ''} ${c.scenePending ? 'love' : ''}"><img src="assets/img/${c.data.portrait}.jpg" alt=""><div><b>${esc(c.data.name)}</b><div class="cphp"><i style="width:${c.ally.hp / c.ally.maxHp * 100}%"></i></div><span>${(c.romance ? '♥' : '★').repeat(c.stage)}${(c.romance ? '♡' : '☆').repeat(5 - c.stage)}</span></div></div>`;
     }
     $('comphud').innerHTML = cp;
   },
@@ -532,7 +548,7 @@ const UI = {
     for (let sy = sy0; sy <= sy0 + 3; sy++) for (let sx = sx0; sx <= sx0 + 3; sx++) {
       const k = World.mode + nkey(sx, sy);
       if (!World.explored.has(k)) continue;
-      const m = World.minis.get(k); if (!m) continue;
+      const m = World.getMini(k); if (!m) continue;
       g.drawImage(m, (sx * SB - ox) * S, (sy * SB - oy) * S, SB * S + 0.5, SB * S + 0.5);
     }
     const toM = (x, y) => [(x / TILE - ox) * S, (y / TILE - oy) * S];
@@ -542,7 +558,9 @@ const UI = {
       g.fillStyle = z.boss ? '#ff3b3b' : z.elite ? '#ffb020' : '#ff5a5a';
       g.fillRect(x - 1.5, y - 1.5, z.boss ? 6 : 3, z.boss ? 6 : 3);
     }
-    for (const a of G.allies) { const [x, y] = toM(a.x, a.y); g.fillStyle = a.kind === 'comp' ? '#ff8ab8' : a.kind === 'shadow' ? '#8a7bff' : '#6dff7a'; g.fillRect(x - 1.5, y - 1.5, 3, 3); }
+    for (const a of G.allies) { const [x, y] = toM(a.x, a.y); if (a.kind === 'merchant') { g.fillStyle = '#ffd23a'; g.font = 'bold 11px sans-serif'; g.textAlign = 'center'; g.fillText('$', clamp(x, 6, 194), clamp(y, 10, 196)); continue; } g.fillStyle = a.kind === 'comp' ? '#ff8ab8' : a.kind === 'shadow' ? '#8a7bff' : '#6dff7a'; g.fillRect(x - 1.5, y - 1.5, 3, 3); }
+    if (G.frame % 30 === 0 || !this.chestMarks) this.chestMarks = World.propsNear(P.x, P.y, 1500, []).filter(p => p.container === 'chest' && !p.looted && !p.dead);
+    for (const p of this.chestMarks) { if (p.looted) continue; const [x, y] = toM(p.x, p.y); if (x < 0 || y < 0 || x > 200 || y > 200) continue; g.fillStyle = CHESTS[p.data.tier].col; g.strokeStyle = '#000'; g.lineWidth = 1; g.fillRect(x - 2.5, y - 2, 5, 4); g.strokeRect(x - 2.5, y - 2, 5, 4); }
     for (const t of G.curTargets || []) {
       let [x, y] = toM(t.x, t.y);
       x = clamp(x, 6, 194); y = clamp(y, 6, 194);

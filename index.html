@@ -10,7 +10,6 @@
 <link rel="stylesheet" href="css/v2.css">
 </head>
 <body>
-<canvas id="game3d"></canvas>
 <canvas id="game"></canvas>
 <div id="touchLayer"></div>
 <div id="joyL" class="joy"><div></div></div>
@@ -27,8 +26,8 @@
 <button id="tDash"><span>LƯỚT</span></button>
 <button id="tSkill"><span>TUYỆT KỸ</span></button>
 <div id="tmenu">
-  <button data-a="pause">II</button><button data-a="gfx" id="tGfx">3D</button><button data-a="view" id="tView">👁</button><button data-a="fs">⛶</button><button data-a="map">Bản đồ</button><button data-a="craft">Chế tạo</button><button data-a="inv">Túi</button>
-  <button data-k="KeyL" class="ico"><img src="assets/img/i_flashlight.png" alt="Đèn"></button><button data-k="KeyB" class="ico"><img src="assets/img/i_planks.png" alt="Rào"><i></i></button><button data-k="KeyT" class="ico"><img src="assets/img/i_scrap.png" alt="Bẫy"><i></i></button>
+  <button data-a="pause">II</button><button data-a="fs">⛶</button><button data-a="map">Bản đồ</button><button data-a="craft">Chế tạo</button><button data-a="inv">Túi</button>
+  <button data-k="KeyL" class="ico"><img src="assets/img/i_flashlight.png" alt="Đèn"></button><button data-k="KeyB" class="ico"><img src="assets/img/i_planks.png" alt="Rào"><i></i></button><button data-k="KeyT" class="ico"><img src="assets/img/i_scrap.png" alt="Bẫy"><i></i></button><button data-k="KeyU" class="ico"><img src="assets/img/ui_5.png" alt="Truyền tống"></button>
 </div>
 <div id="fsHint" hidden></div>
 <div id="rotate">Xoay ngang điện thoại để chơi dễ hơn</div>
@@ -45,7 +44,7 @@
   </div>
   <div id="topright">
     <canvas id="minimap" width="200" height="200"></canvas>
-    <div id="mmlabel">[M] Bản đồ • [C] Chế tạo • [Tab] Túi đồ • [V] Góc nhìn</div>
+    <div id="mmlabel">[M] Bản đồ • [C] Chế tạo • [Tab] Túi đồ • [U] Truyền tống</div>
   </div>
   <div id="bossbar" class="hidden"><div id="bossname"></div><div class="bar"><div id="bossfill"></div></div></div>
   <div id="feed"></div>
@@ -92,13 +91,13 @@
   <div class="shade"></div>
   <div class="title-box">
     <div class="logo">TÀN THÀNH</div>
-    <div class="sub">VẠN GIỚI • 5 THẾ GIỚI • BẢN ĐỒ VÔ HẠN</div>
+    <div class="sub">VẠN GIỚI • 3 THẾ GIỚI • BẢN ĐỒ VÔ HẠN</div>
     <div class="menu">
       <button id="btnContinue">▶ TIẾP TỤC</button>
       <div id="saveInfo"></div>
       <button id="btnNew">☣ CHƠI MỚI</button>
       <button id="btnHelp">? HƯỚNG DẪN</button>
-      <button id="btnGfxT">🎮 ĐỒ HOẠ: 3D</button>
+      <button id="btnSaveIOT">💾 LƯU / TẢI FILE</button>
       <button id="btnSettings">♪ CÀI ĐẶT</button>
       <button id="btnFs">⛶ TOÀN MÀN HÌNH</button>
     </div>
@@ -116,7 +115,8 @@
         <h2 id="pickName"></h2>
         <label for="heroName">Tên nhân vật của bạn</label>
         <input id="heroName" maxlength="20" autocomplete="off">
-        <p class="muted">Cốt truyện, kẻ thù, địa điểm và bảo vật được sinh ngẫu nhiên. Hai người đồng hành có thể trở thành người thương của bạn:</p>
+        <div class="gender"><button id="gM" class="on">♂ NAM</button><button id="gF">♀ NỮ</button></div>
+        <p class="muted" id="pickNote">Cốt truyện, kẻ thù, địa điểm và bảo vật được sinh ngẫu nhiên.</p>
         <div id="pickComps"></div>
         <div class="menu row"><button id="btnWorldBack">◀ QUAY LẠI</button><button id="btnStart">▶ BẮT ĐẦU</button></div>
       </div>
@@ -131,8 +131,7 @@
       <button id="btnResume">▶ CHƠI TIẾP</button>
       <button id="btnPauseHelp">? HƯỚNG DẪN</button>
       <button id="btnPauseSettings">♪ CÀI ĐẶT</button>
-      <button id="btnGfx">🎮 ĐỒ HOẠ: 3D</button>
-      <button id="btnView">👁 GÓC NHÌN: TỪ TRÊN</button>
+      <button id="btnSaveIO">💾 LƯU / TẢI FILE</button>
       <button id="btnPauseFs">⛶ TOÀN MÀN HÌNH</button>
       <button id="btnQuit">⌂ LƯU &amp; VỀ MENU</button>
     </div>
@@ -151,12 +150,11 @@
           <tr><td>Chuột trái / phải</td><td>Tấn công / Đẩy lùi</td></tr>
           <tr><td>1-4 / Lăn chuột</td><td>Đổi vũ khí</td></tr>
           <tr><td>Q</td><td>Tuyệt kỹ (khi đầy năng lượng)</td></tr>
-          <tr><td>E</td><td>Lục soát • Trò chuyện • Vào Cổng • Lái xe</td></tr>
+          <tr><td>E</td><td>Lục soát • Mở rương • Mua bán • Trò chuyện • Vào Cổng • Lái xe</td></tr>
           <tr><td>R • H • F</td><td>Nạp đạn • Hồi máu • Ăn uống</td></tr>
           <tr><td>G • B • T • L</td><td>Ném • Rào chắn • Bẫy • Đèn</td></tr>
           <tr><td>C / Tab / M</td><td>Chế tạo / Túi đồ / Bản đồ</td></tr>
-          <tr><td>V</td><td>Đổi góc nhìn: từ trên → góc 3 → góc 1 (rê chuột để xoay)</td></tr>
-          <tr><td>K</td><td>Đổi đồ hoạ 2D pixel ↔ 3D</td></tr>
+          <tr><td>U</td><td>Cuộn truyền tống: về nơi trú ẩn / thoát hầm ngục</td></tr>
         </table>
         <h3>Điện thoại</h3>
         <p class="muted">Cần trái di chuyển, cần phải ngắm. Giữ nút đỏ để tấn công (tự ngắm kẻ gần nhất). LƯỚT để né, TUYỆT KỸ khi vòng năng lượng đầy.</p>
@@ -170,6 +168,12 @@
           <li>Tinh anh (viền vàng) rơi đồ tốt. Hạ địch liên tiếp tạo combo, thưởng thêm kinh nghiệm.</li>
           <li>Bạn đồng hành chiến đấu cùng bạn. Tặng quà, nghỉ bên lửa trại, trò chuyện để mở cảnh tình cảm.</li>
           <li>Giải cứu dân thường bị vây để nhận thưởng. Thùng phuy nổ khi bị bắn.</li>
+          <li><b>Rương</b> có 4 bậc: Gỗ, Bạc, Vàng, Kim Cương. Rương càng quý càng sáng rực, rơi nhiều trang bị hiếm (vũ khí, mũ, áo, quần, giày, thánh vật).</li>
+          <li><b>Thương nhân</b> (biểu tượng $ trên bản đồ nhỏ) ở nơi trú ẩn, trại và thị trấn: bán đồ thừa lấy tiền, mua thuốc, cuộn truyền tống, rương báu.</li>
+          <li>Mỗi vùng đất có địa hình riêng: băng nguyên, sa mạc, đầm lầy, hỏa sơn, rừng nấm, thung lũng pha lê, nghĩa địa... <b>Phế tích</b> (chấm tím) có boss ngẫu nhiên canh giữ rương vàng.</li>
+          <li>Trong hầm ngục, mũi tên vàng chỉ đường tới Chủ Hầm Ngục rồi tới lối ra.</li>
+          <li>Đồng hành khác giới có thể thành người thương; cùng giới sẽ kết nghĩa huynh đệ / tỷ muội.</li>
+          <li>💾 Lưu / tải file .json trong menu để giữ tiến độ trên máy.</li>
         </ul>
       </div>
     </div>
@@ -214,6 +218,26 @@
   </div>
 </div>
 
+<div id="shop" class="screen hidden">
+  <div class="panel wide">
+    <button class="close" onclick="UI.closePanel()">✕</button>
+    <div class="shophead"><img id="shopPort" alt=""><div><h2 id="shopName"></h2><p id="shopSay"></p></div><div id="shopGold"></div></div>
+    <div class="tabs"><button data-stab="buy">Mua</button><button data-stab="sell">Bán</button></div>
+    <div id="shopBody"></div>
+  </div>
+</div>
+
+<div id="saveio" class="screen hidden">
+  <div class="panel wide">
+    <button class="close" onclick="UI.back()">✕</button>
+    <h2>LƯU / TẢI TIẾN ĐỘ</h2>
+    <p class="muted">Xuất tiến độ ra file <b>.json</b> để giữ trên máy, rồi nạp lại bất cứ lúc nào (kể cả trên máy khác). Nếu nút tải file không chạy (một số trình xem chặn tải xuống), hãy bấm <b>Sao chép mã</b> rồi dán vào ghi chú.</p>
+    <div class="menu row wrap"><button id="sioDown">⬇ TẢI FILE .JSON</button><button id="sioCopy">⧉ SAO CHÉP MÃ</button><label class="filebtn">⬆ NẠP TỪ FILE<input type="file" id="sioFile" accept=".json,application/json,text/plain"></label><button id="sioPaste">⤓ NẠP TỪ Ô BÊN DƯỚI</button></div>
+    <textarea id="sioText" spellcheck="false" placeholder="Mã lưu (JSON) hiện ở đây — hoặc dán mã của bạn vào rồi bấm NẠP TỪ Ô BÊN DƯỚI"></textarea>
+    <p id="sioMsg" class="muted"></p>
+  </div>
+</div>
+
 <div id="map" class="screen hidden">
   <div class="panel mapp">
     <button class="close" onclick="UI.closePanel()">✕</button>
@@ -246,35 +270,31 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="js/util.js"></script>
 <script src="js/data.js"></script>
 <script src="js/realms.js"></script>
 <script src="js/lore.js"></script>
+<script src="js/lore_bond.js"></script>
 <script src="js/assets.js"></script>
 <script src="js/world.js"></script>
+<script src="js/data2.js"></script>
 <script src="js/fx.js"></script>
 <script src="js/loot.js"></script>
 <script src="js/entities.js"></script>
 <script src="js/game.js"></script>
 <script src="js/story.js"></script>
 <script src="js/ui.js"></script>
-<script src="js/r3d.js"></script>
-<script src="js/models3d.js"></script>
-<script src="js/r3d_models.js"></script>
 <script src="js/play.js"></script>
 <script src="js/touch.js"></script>
+<script src="js/v3.js"></script>
 <script>
-  try { G.lowGfx = !!localStorage.getItem('tt_low'); G.cam3d = localStorage.getItem('tt_view') || 'top'; G.gfx = localStorage.getItem('tt_gfx') || '3d'; } catch (e) { G.cam3d = 'top'; G.gfx = '3d'; }
+  try { G.lowGfx = !!localStorage.getItem('tt_low'); } catch (e) {}
   resize();
   Sound.init();
   UI.init();
   Touch.init();
-  R3D.init();
-  G.setView(G.cam3d);
-  G.setGfx(G.gfx);
   if (G.lowGfx) Particles.cap = 500;
-  const boot = ART_IMAGES.concat(['md_port1', 'md_port2', 'cy_port1', 'cy_port2', 'ct_port1', 'ct_port2', 'tt_port1', 'tt_port2', 'sl_port1', 'sl_port2']);
+  const boot = ART_IMAGES.concat(['md_port1', 'md_port2', 'tt_port1', 'tt_port2', 'sl_port1', 'sl_port2']);
   loadImages(boot, p => UI.setLoad(p)).then(() => { UI.loaded(); requestAnimationFrame(loop); });
 </script>
 </body>
