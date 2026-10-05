@@ -15,7 +15,7 @@ const COMMON_IMAGES = [
 ];
 const JPG = new Set(['title', 'gameover', 'victory', 'cy_art', 'ct_art', 'tt_art', 'sl_art',
   'md_port1', 'md_port2', 'cy_port1', 'cy_port2', 'ct_port1', 'ct_port2', 'tt_port1', 'tt_port2', 'sl_port1', 'sl_port2']);
-const ART_IMAGES = ['title', 'gameover', 'victory', 'cy_art', 'ct_art', 'tt_art', 'sl_art'];
+const ART_IMAGES = ['title', 'gameover', 'victory'].concat(REALM_ORDER.filter(r => r !== 'md').map(r => r + '_art'));
 
 function loadImages(list, onProgress) {
   const todo = [...new Set(list)].filter(n => !IMG[n]);
