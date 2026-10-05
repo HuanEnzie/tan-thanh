@@ -1,0 +1,321 @@
+{
+ "sprites": {
+  "p_pistol": [
+   "player_0",
+   "x0.236"
+  ],
+  "p_shotgun": [
+   "player_1",
+   "x0.236"
+  ],
+  "p_rifle": [
+   "player_2",
+   "x0.236"
+  ],
+  "p_bat": [
+   "player_3",
+   "x0.236"
+  ],
+  "z_walker": [
+   "zombies_0",
+   "x0.23"
+  ],
+  "z_runner": [
+   "zombies_1",
+   "x0.23"
+  ],
+  "z_brute": [
+   "zombies_2",
+   "x0.23"
+  ],
+  "z_spitter": [
+   "zombies_3",
+   "x0.23"
+  ],
+  "z_police": [
+   "zombies_4",
+   "x0.23"
+  ],
+  "z_boomer": [
+   "zombies2_0",
+   "x0.21"
+  ],
+  "z_hazmat": [
+   "zombies2_1",
+   "x0.21"
+  ],
+  "z_nurse": [
+   "zombies2_2",
+   "x0.21"
+  ],
+  "z_boss": [
+   "zombies2_3",
+   "x0.32"
+  ],
+  "car_red": [
+   "vehicles_0",
+   "x0.2"
+  ],
+  "car_police": [
+   "vehicles_1",
+   "x0.2"
+  ],
+  "car_burnt": [
+   "vehicles_2",
+   "x0.2"
+  ],
+  "car_ambulance": [
+   "vehicles_3",
+   "x0.2"
+  ],
+  "bus": [
+   "vehicles2_0",
+   "x0.33"
+  ],
+  "truck": [
+   "vehicles2_1",
+   "x0.33"
+  ],
+  "heli": [
+   "vehicles2_2",
+   "x0.42"
+  ],
+  "tree_oak": [
+   "nature_0",
+   "x0.62"
+  ],
+  "tree_pine": [
+   "nature_1",
+   "x0.6"
+  ],
+  "tree_dead": [
+   "nature_2",
+   "x0.56"
+  ],
+  "tree_autumn": [
+   "nature_3",
+   "x0.62"
+  ],
+  "bush": [
+   "nature_5",
+   "x0.22"
+  ],
+  "rock": [
+   "nature_6",
+   "x0.24"
+  ],
+  "rocks": [
+   "nature_7",
+   "x0.24"
+  ],
+  "weeds": [
+   "nature_8",
+   "x0.22"
+  ],
+  "barrel": [
+   "props_0",
+   40
+  ],
+  "crate": [
+   "props_1",
+   52
+  ],
+  "dumpster": [
+   "props_2",
+   92
+  ],
+  "trash": [
+   "props_3",
+   60
+  ],
+  "sandbags": [
+   "props_4",
+   96
+  ],
+  "barrier": [
+   "props_5",
+   96
+  ],
+  "firebarrel": [
+   "props_6",
+   44
+  ],
+  "bench": [
+   "props_7",
+   80
+  ],
+  "ammocrate": [
+   "props_8",
+   64
+  ],
+  "fence": [
+   "props_9",
+   64
+  ],
+  "lamp": [
+   "props_10",
+   48
+  ],
+  "vending": [
+   "props_11",
+   64
+  ],
+  "blood1": [
+   "decals_0",
+   72
+  ],
+  "blood2": [
+   "decals_1",
+   64
+  ],
+  "blood3": [
+   "decals_2",
+   72
+  ],
+  "blood4": [
+   "decals_3",
+   60
+  ],
+  "acid": [
+   "decals_4",
+   72
+  ],
+  "scorch": [
+   "decals_5",
+   84
+  ],
+  "corpse": [
+   "decals_6",
+   84
+  ],
+  "pothole": [
+   "decals_7",
+   64
+  ],
+  "tower": [
+   "buildings_0",
+   256
+  ],
+  "helipad": [
+   "buildings_1",
+   384
+  ],
+  "tent": [
+   "buildings_2",
+   256
+  ],
+  "i_pistol": [
+   "items1_0",
+   80
+  ],
+  "i_shotgun": [
+   "items1_1",
+   80
+  ],
+  "i_rifle": [
+   "items1_2",
+   80
+  ],
+  "i_bat": [
+   "items1_3",
+   80
+  ],
+  "i_machete": [
+   "items1_4",
+   80
+  ],
+  "i_ammo_pistol": [
+   "items1_5",
+   80
+  ],
+  "i_ammo_shell": [
+   "items1_6",
+   80
+  ],
+  "i_ammo_rifle": [
+   "items1_7",
+   80
+  ],
+  "i_medkit": [
+   "items1_8",
+   80
+  ],
+  "i_bandage": [
+   "items1_9",
+   80
+  ],
+  "i_food": [
+   "items1_10",
+   80
+  ],
+  "i_water": [
+   "items1_11",
+   80
+  ],
+  "i_molotov": [
+   "items2_0",
+   80
+  ],
+  "i_grenade": [
+   "items2_1",
+   80
+  ],
+  "i_planks": [
+   "items2_2",
+   80
+  ],
+  "i_scrap": [
+   "items2_3",
+   80
+  ],
+  "i_gas": [
+   "items2_4",
+   80
+  ],
+  "i_radio": [
+   "items2_5",
+   80
+  ],
+  "i_battery": [
+   "items2_6",
+   80
+  ],
+  "i_key": [
+   "items2_7",
+   80
+  ],
+  "i_energy": [
+   "items2_8",
+   80
+  ],
+  "i_pills": [
+   "items2_9",
+   80
+  ],
+  "i_flashlight": [
+   "items2_10",
+   80
+  ],
+  "i_choco": [
+   "items2_11",
+   80
+  ]
+ },
+ "textures": {
+  "tex_grass": 256,
+  "tex_asphalt": 256,
+  "tex_sidewalk": 256,
+  "tex_dirt": 256,
+  "tex_wood": 256,
+  "tex_tile": 256,
+  "tex_water": 256,
+  "tex_roof": 256,
+  "tex_roof2": 256,
+  "tex_sand": 256
+ },
+ "art": {
+  "title": 1600,
+  "gameover": 1600,
+  "victory": 1600
+ }
+}

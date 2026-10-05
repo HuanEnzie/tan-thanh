@@ -1,0 +1,272 @@
+<title>Tàn Thành</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/v2.css">
+<canvas id="game3d"></canvas>
+<canvas id="game"></canvas>
+<div id="touchLayer"></div>
+<div id="joyL" class="joy"><div></div></div>
+<div id="joyR" class="joy"><div></div></div>
+<div id="tbtns">
+  <button data-k="KeyE" class="big">E<span>Dùng</span></button>
+  <button data-k="KeyR">R<span>Nạp</span></button>
+  <button data-k="KeyH"><img src="assets/img/i_medkit.png" alt="Hồi máu"><i></i></button>
+  <button data-k="KeyF"><img src="assets/img/i_food.png" alt="Ăn uống"><i></i></button>
+  <button data-k="KeyG"><img src="assets/img/i_grenade.png" alt="Ném"><i></i></button>
+</div>
+<button id="tFire"><img id="tFireImg" src="assets/img/i_pistol.png" alt=""><span id="tFireLbl">BẮN</span></button>
+<button id="tMelee"><img src="assets/img/i_bat.png" alt=""><span>ĐẨY</span></button>
+<button id="tDash"><span>LƯỚT</span></button>
+<button id="tSkill"><span>TUYỆT KỸ</span></button>
+<div id="tmenu">
+  <button data-a="pause">II</button><button data-a="gfx" id="tGfx">3D</button><button data-a="view" id="tView">👁</button><button data-a="fs">⛶</button><button data-a="map">Bản đồ</button><button data-a="craft">Chế tạo</button><button data-a="inv">Túi</button>
+  <button data-k="KeyL" class="ico"><img src="assets/img/i_flashlight.png" alt="Đèn"></button><button data-k="KeyB" class="ico"><img src="assets/img/i_planks.png" alt="Rào"><i></i></button><button data-k="KeyT" class="ico"><img src="assets/img/i_scrap.png" alt="Bẫy"><i></i></button>
+</div>
+<div id="fsHint" hidden></div>
+<div id="rotate">Xoay ngang điện thoại để chơi dễ hơn</div>
+<div id="dmg"></div>
+<div id="vignette"></div>
+
+<!-- ================= HUD ================= -->
+<div id="hud" class="hidden">
+  <div id="xpbar"><div id="xpfill"></div><span id="lvl">CẤP 1</span></div>
+  <div id="topleft">
+    <div id="dayclock"><span id="dayicon">☀</span> <span id="dayN">NGÀY 1</span> <span id="clock">08:00</span> <span id="weather"></span><span id="kills">☠ 0</span></div>
+    <div id="objective"><b>▶ NHIỆM VỤ</b><span id="objText"></span></div>
+    <div id="comphud"></div>
+  </div>
+  <div id="topright">
+    <canvas id="minimap" width="200" height="200"></canvas>
+    <div id="mmlabel">[M] Bản đồ • [C] Chế tạo • [Tab] Túi đồ • [V] Góc nhìn</div>
+  </div>
+  <div id="bossbar" class="hidden"><div id="bossname"></div><div class="bar"><div id="bossfill"></div></div></div>
+  <div id="feed"></div>
+  <div id="combo"></div>
+  <div id="skillflash"></div>
+  <div id="banner"></div>
+  <div id="lootcard"></div>
+  <div id="bars">
+    <div class="brow" id="hpRow"><img src="assets/img/i_medkit.png" alt=""><div class="bar"><div id="hpFill" class="fill hp"></div><span id="hpTxt"></span></div></div>
+    <div class="brow" id="foodRow"><img src="assets/img/i_food.png" alt=""><div class="bar"><div id="foodFill" class="fill food"></div><span id="foodTxt"></span></div></div>
+    <div class="brow" id="waterRow"><img src="assets/img/i_water.png" alt=""><div class="bar"><div id="waterFill" class="fill water"></div><span id="waterTxt"></span></div></div>
+    <div class="brow" id="stamRow"><img src="assets/img/i_energy.png" alt=""><div class="bar"><div id="stamFill" class="fill stam"></div><span id="stamTxt"></span></div></div>
+    <div class="brow" id="enRow"><img src="assets/img/relic_8.png" alt=""><div class="bar"><div id="enFill" class="fill en"></div><span id="enTxt"></span></div></div>
+  </div>
+  <div id="hotbar"></div>
+  <div id="quick"></div>
+  <div id="prompt"></div>
+  <div id="actionbar"><div id="actionfill"></div><span id="actionlabel"></span></div>
+  <div id="carhud"></div>
+  <div id="radio" class="hidden"><div class="radio-head"><span class="rec"></span> <span id="radioHead">RADIO</span></div><div id="radioText"></div></div>
+  <div id="ach"></div>
+</div>
+
+<!-- ================= DIALOG ================= -->
+<div id="dialog" class="hidden">
+  <div id="dTitle"></div>
+  <div class="dbox">
+    <img id="dPort" alt="">
+    <div class="dmain"><div id="dName"></div><div id="dText" class="dtext"></div><div id="dChoices"></div><div id="dHint">▼</div></div>
+  </div>
+</div>
+<div id="fader"></div>
+
+<!-- ================= SCREENS ================= -->
+<div id="loading" class="screen">
+  <div class="logo small">TÀN THÀNH</div>
+  <div class="sub">VẠN GIỚI</div>
+  <div class="loadbar"><div id="loadFill"></div></div>
+  <div id="loadHint">Đang tải...</div>
+</div>
+
+<div id="title" class="screen hidden">
+  <div class="art" style="background-image:url(assets/img/title.jpg)"></div>
+  <div class="shade"></div>
+  <div class="title-box">
+    <div class="logo">TÀN THÀNH</div>
+    <div class="sub">VẠN GIỚI • 5 THẾ GIỚI • BẢN ĐỒ VÔ HẠN</div>
+    <div class="menu">
+      <button id="btnContinue">▶ TIẾP TỤC</button>
+      <div id="saveInfo"></div>
+      <button id="btnNew">☣ CHƠI MỚI</button>
+      <button id="btnHelp">? HƯỚNG DẪN</button>
+      <button id="btnGfxT">🎮 ĐỒ HOẠ: 3D</button>
+      <button id="btnSettings">♪ CÀI ĐẶT</button>
+      <button id="btnFs">⛶ TOÀN MÀN HÌNH</button>
+    </div>
+  </div>
+  <div class="credits">Đồ hoạ: gpt-image • Âm thanh &amp; nhạc nền: Mixkit (Mixkit Free License)</div>
+</div>
+
+<div id="worlds" class="screen hidden">
+  <div class="worlds-wrap">
+    <h2 class="wtitle">CHỌN THẾ GIỚI</h2>
+    <div id="worldCards"></div>
+    <div id="worldPick" class="hidden">
+      <div id="pickArt"></div>
+      <div class="pickbox">
+        <h2 id="pickName"></h2>
+        <label for="heroName">Tên nhân vật của bạn</label>
+        <input id="heroName" maxlength="20" autocomplete="off">
+        <p class="muted">Cốt truyện, kẻ thù, địa điểm và bảo vật được sinh ngẫu nhiên. Hai người đồng hành có thể trở thành người thương của bạn:</p>
+        <div id="pickComps"></div>
+        <div class="menu row"><button id="btnWorldBack">◀ QUAY LẠI</button><button id="btnStart">▶ BẮT ĐẦU</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pause" class="screen hidden">
+  <div class="panel center">
+    <h2>TẠM DỪNG</h2>
+    <div class="menu">
+      <button id="btnResume">▶ CHƠI TIẾP</button>
+      <button id="btnPauseHelp">? HƯỚNG DẪN</button>
+      <button id="btnPauseSettings">♪ CÀI ĐẶT</button>
+      <button id="btnGfx">🎮 ĐỒ HOẠ: 3D</button>
+      <button id="btnView">👁 GÓC NHÌN: TỪ TRÊN</button>
+      <button id="btnPauseFs">⛶ TOÀN MÀN HÌNH</button>
+      <button id="btnQuit">⌂ LƯU &amp; VỀ MENU</button>
+    </div>
+  </div>
+</div>
+
+<div id="help" class="screen hidden">
+  <div class="panel wide">
+    <h2>HƯỚNG DẪN</h2>
+    <div class="cols">
+      <div>
+        <h3>Điều khiển (máy tính)</h3>
+        <table class="keys">
+          <tr><td>W A S D</td><td>Di chuyển • Shift chạy</td></tr>
+          <tr><td>Space</td><td>Lướt né (bất tử khi lướt)</td></tr>
+          <tr><td>Chuột trái / phải</td><td>Tấn công / Đẩy lùi</td></tr>
+          <tr><td>1-4 / Lăn chuột</td><td>Đổi vũ khí</td></tr>
+          <tr><td>Q</td><td>Tuyệt kỹ (khi đầy năng lượng)</td></tr>
+          <tr><td>E</td><td>Lục soát • Trò chuyện • Vào Cổng • Lái xe</td></tr>
+          <tr><td>R • H • F</td><td>Nạp đạn • Hồi máu • Ăn uống</td></tr>
+          <tr><td>G • B • T • L</td><td>Ném • Rào chắn • Bẫy • Đèn</td></tr>
+          <tr><td>C / Tab / M</td><td>Chế tạo / Túi đồ / Bản đồ</td></tr>
+          <tr><td>V</td><td>Đổi góc nhìn: từ trên → góc 3 → góc 1 (rê chuột để xoay)</td></tr>
+          <tr><td>K</td><td>Đổi đồ hoạ 2D pixel ↔ 3D</td></tr>
+        </table>
+        <h3>Điện thoại</h3>
+        <p class="muted">Cần trái di chuyển, cần phải ngắm. Giữ nút đỏ để tấn công (tự ngắm kẻ gần nhất). LƯỚT để né, TUYỆT KỸ khi vòng năng lượng đầy.</p>
+      </div>
+      <div>
+        <h3>Mẹo</h3>
+        <ul>
+          <li>Thế giới vô hạn: càng xa nơi trú ẩn, quái càng mạnh và đồ càng quý.</li>
+          <li><b>Cổng</b> hạng E→S dẫn vào hầm ngục nhiều tầng. Hạ Chủ Hầm Ngục để mở rương báu.</li>
+          <li>Đồ có 6 độ hiếm: <span style="color:#cfcfcf">Thường</span>, <span style="color:#6ee06e">Tốt</span>, <span style="color:#4da6ff">Hiếm</span>, <span style="color:#b46bff">Sử Thi</span>, <span style="color:#ffa31a">Huyền Thoại</span>, <span style="color:#ff3b3b">Thần Thoại</span>.</li>
+          <li>Tinh anh (viền vàng) rơi đồ tốt. Hạ địch liên tiếp tạo combo, thưởng thêm kinh nghiệm.</li>
+          <li>Bạn đồng hành chiến đấu cùng bạn. Tặng quà, nghỉ bên lửa trại, trò chuyện để mở cảnh tình cảm.</li>
+          <li>Giải cứu dân thường bị vây để nhận thưởng. Thùng phuy nổ khi bị bắn.</li>
+        </ul>
+      </div>
+    </div>
+    <button class="back">◀ QUAY LẠI</button>
+  </div>
+</div>
+
+<div id="settings" class="screen hidden">
+  <div class="panel center">
+    <h2>CÀI ĐẶT</h2>
+    <label>Tổng <input type="range" id="vol_master" min="0" max="100"></label>
+    <label>Nhạc nền <input type="range" id="vol_music" min="0" max="100"></label>
+    <label>Hiệu ứng <input type="range" id="vol_sfx" min="0" max="100"></label>
+    <label>Chế độ nhẹ (máy yếu) <input type="checkbox" id="lowGfx"></label>
+    <button class="back">◀ QUAY LẠI</button>
+  </div>
+</div>
+
+<div id="levelup" class="screen hidden">
+  <div class="lvl-box">
+    <h1 id="lvlTitle">LÊN CẤP!</h1>
+    <div id="lvlRank"></div>
+    <p>Chọn một thiên phú (1 / 2 / 3)</p>
+    <div id="cards"></div>
+  </div>
+</div>
+
+<div id="craft" class="screen hidden">
+  <div class="panel wide">
+    <button class="close" onclick="UI.closePanel()">✕</button>
+    <h2>CHẾ TẠO <small>[C] đóng</small></h2>
+    <div id="craftList"></div>
+  </div>
+</div>
+
+<div id="inv" class="screen hidden">
+  <div class="panel wide">
+    <button class="close" onclick="UI.closePanel()">✕</button>
+    <h2>TÚI ĐỒ <small>[Tab] đóng</small></h2>
+    <div class="tabs"><button data-tab="gear">Trang bị</button><button data-tab="items">Vật phẩm</button><button data-tab="comp">Đồng hành ♥</button><button data-tab="stats">Nhân vật</button></div>
+    <div id="invBody"></div>
+  </div>
+</div>
+
+<div id="map" class="screen hidden">
+  <div class="panel mapp">
+    <button class="close" onclick="UI.closePanel()">✕</button>
+    <h2>BẢN ĐỒ <small>[M] đóng</small></h2>
+    <canvas id="bigmap" width="800" height="800"></canvas>
+    <div id="mapInfo" class="muted"></div>
+  </div>
+</div>
+
+<div id="death" class="screen hidden">
+  <div class="art" style="background-image:url(assets/img/gameover.jpg)"></div>
+  <div class="shade red"></div>
+  <div class="end-box">
+    <div class="logo dead">BẠN ĐÃ GỤC NGÃ</div>
+    <div class="sub" id="deathLine"></div>
+    <div class="stats" id="deathStats"></div>
+    <div class="menu row"><button id="btnRetry">☣ HÀNH TRÌNH MỚI</button><button id="btnDeathMenu">⌂ MENU</button></div>
+  </div>
+</div>
+
+<div id="victory" class="screen hidden">
+  <div class="art" id="winArt"></div>
+  <div class="shade gold"></div>
+  <div class="end-box">
+    <img id="winPort" alt="">
+    <div class="logo win" id="winTitle">CHIẾN THẮNG</div>
+    <div class="sub" id="winSub"></div>
+    <div class="stats" id="winStats"></div>
+    <div class="menu row"><button id="btnWinGo">▶ TIẾP TỤC KHÁM PHÁ</button><button id="btnWinMenu">⌂ MENU</button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/util.js"></script>
+<script src="js/data.js"></script>
+<script src="js/realms.js"></script>
+<script src="js/lore.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/world.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/loot.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/game.js"></script>
+<script src="js/story.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/r3d.js"></script>
+<script src="js/models3d.js"></script>
+<script src="js/r3d_models.js"></script>
+<script src="js/play.js"></script>
+<script src="js/touch.js"></script>
+<script>
+  try { G.lowGfx = !!localStorage.getItem('tt_low'); G.cam3d = localStorage.getItem('tt_view') || 'top'; G.gfx = localStorage.getItem('tt_gfx') || '3d'; } catch (e) { G.cam3d = 'top'; G.gfx = '3d'; }
+  resize();
+  Sound.init();
+  UI.init();
+  Touch.init();
+  R3D.init();
+  G.setView(G.cam3d);
+  G.setGfx(G.gfx);
+  if (G.lowGfx) Particles.cap = 500;
+  const boot = ART_IMAGES.concat(['md_port1', 'md_port2', 'cy_port1', 'cy_port2', 'ct_port1', 'ct_port2', 'tt_port1', 'tt_port2', 'sl_port1', 'sl_port2']);
+  loadImages(boot, p => UI.setLoad(p)).then(() => { UI.loaded(); requestAnimationFrame(loop); });
+</script>

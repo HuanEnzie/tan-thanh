@@ -1,0 +1,48 @@
+{
+ "md_efront": [
+  "zombies",
+  "zombies2"
+ ],
+ "md_nfront": [
+  "md_npc"
+ ],
+ "md_hback": [
+  "player"
+ ],
+ "cy_efront": [
+  "cy_enemies"
+ ],
+ "cy_nfront": [
+  "cy_npc"
+ ],
+ "cy_hback": [
+  "cy_hero"
+ ],
+ "ct_efront": [
+  "ct_enemies"
+ ],
+ "ct_nfront": [
+  "ct_npc"
+ ],
+ "ct_hback": [
+  "ct_hero"
+ ],
+ "tt_efront": [
+  "tt_enemies"
+ ],
+ "tt_nfront": [
+  "tt_npc"
+ ],
+ "tt_hback": [
+  "tt_hero"
+ ],
+ "sl_efront": [
+  "sl_enemies"
+ ],
+ "sl_nfront": [
+  "sl_npc"
+ ],
+ "sl_hback": [
+  "sl_hero"
+ ]
+}

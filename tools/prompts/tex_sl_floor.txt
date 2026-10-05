@@ -1,0 +1,1 @@
+Seamless tileable square texture for a 16-bit pixel art top-down game, viewed straight from above, flat even lighting, no perspective, no large objects, no shadows, crisp visible pixels, fills the entire image edge to edge, tiles seamlessly. No text. Square image. Dark purple-grey runic dungeon floor tiles with faint glowing runes.

@@ -1,0 +1,1 @@
+Seamless tileable square texture for a 16-bit pixel art top-down game, viewed straight from above, flat even lighting, no perspective, no objects, no shadows, crisp visible pixels, texture fills the entire image edge to edge, must tile seamlessly. No text. Square image. Red-brown clay roof shingles in rows.
