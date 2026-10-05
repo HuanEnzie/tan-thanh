@@ -1,6 +1,6 @@
 # TÀN THÀNH: VẠN GIỚI
 
-Game hành động 2D pixel, góc nhìn từ trên xuống. Có 3 thế giới đang mở, bản đồ vô hạn với 12 vùng địa hình, và cốt truyện ngẫu nhiên. Chạy được trên trình duyệt máy tính lẫn điện thoại.
+Game hành động 2D pixel, góc nhìn từ trên xuống. Có 3 thế giới đang mở, bản đồ vô hạn với 12 vùng địa hình, và cốt truyện ngẫu nhiên. Chạy được trên trình duyệt máy tính lẫn điện thoại. 
 
 Có hai cách chơi:
 - Chơi online: https://claude.ai/artifact/HNwsvSuoVAEXYxXWtcDnbp
