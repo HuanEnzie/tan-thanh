@@ -254,12 +254,13 @@
     <button class="close" onclick="UI.back()">✕</button>
     <h2>👥 CHƠI CÙNG BẠN BÈ</h2>
     <div id="coopHost">
-      <p class="muted">Bạn là chủ phòng: bạn bè vào thế giới của bạn, cùng đánh quái, vào Cổng và hạ boss. Kinh nghiệm chia đều, đồ rơi là của riêng từng người. Tối đa 4 người.</p>
-      <div class="menu row wrap"><button id="cOpen">📡 MỞ PHÒNG</button><button id="cCopy" hidden>⧉ SAO CHÉP LỜI MỜI</button><button id="cClose" hidden>✖ ĐÓNG PHÒNG</button></div>
-      <div class="ccode" id="cCode">-----</div>
-      <input id="cLink" readonly>
+      <h3>① TẠO PHÒNG — bạn làm chủ phòng</h3>
+      <p class="muted" id="cHostNote">Bạn bè vào thế giới của bạn, cùng đánh quái, vào Cổng và hạ boss. Kinh nghiệm chia đều, đồ rơi là của riêng từng người. Tối đa 4 người.</p>
+      <div class="menu row wrap"><button id="cOpen">📡 TẠO PHÒNG</button><button id="cShare" hidden>📤 GỬI LỜI MỜI</button><button id="cCopy" hidden>⧉ SAO CHÉP LINK</button><button id="cClose" hidden>✖ ĐÓNG PHÒNG</button></div>
+      <div id="cRoom" hidden><div class="ccode" id="cCode">-----</div><input id="cLink" readonly><p class="muted small">Gửi mã hoặc link này cho bạn bè. Phòng mở chừng nào bạn còn trong game.</p></div>
     </div>
     <div id="coopJoin">
+      <h3>② VÀO PHÒNG CỦA BẠN BÈ</h3>
       <p class="muted">Nhập mã phòng bạn bè gửi, hoặc mở link mời. Nhân vật co-op của bạn được lưu riêng theo từng thế giới (lần đầu sẽ mượn nhân vật trong bản lưu nếu cùng thế giới).</p>
       <div class="cform"><label>Tên hiển thị <input id="cName" maxlength="20" autocomplete="off"></label><label>Mã phòng <input id="cJoinCode" maxlength="6" placeholder="VD: K7M2Q" autocomplete="off"></label></div>
       <div class="menu row"><button id="cJoin">▶ VÀO PHÒNG</button></div>

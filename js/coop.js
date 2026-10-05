@@ -24,21 +24,24 @@ const Net = {
   msg(t) { this.status = t; const m = $('cMsg'); if (m) m.textContent = t; },
 
   async hostRoom() {
-    if (this.active) return;
+    if (this.active || this.opening) return;
     if (!this.supported()) { this.msg('Trình duyệt / trang này không hỗ trợ kết nối trực tiếp. Hãy mở game từ link GitHub Pages hoặc app đã cài.'); return; }
-    this.msg('Đang tạo phòng...');
+    this.msg('Đang tạo phòng...'); this.opening = true; setTimeout(() => { this.opening = false; }, 12000);
     try { await this.loadLib(); } catch (e) { this.msg(e.message); return; }
+    clearTimeout(this.openTO);
+    this.openTO = setTimeout(() => { if (!this.active) this.msg('✖ Không kết nối được máy chủ ghép phòng. Kiểm tra mạng rồi bấm TẠO PHÒNG lại.'); }, 12000);
     const tryOpen = (n) => {
       this.code = this.genCode();
       const peer = new Peer(NET_PREFIX + this.code, { debug: 0 });
       this.peer = peer;
       peer.on('open', () => {
         this.active = this.host = true; this.guest = false; this.pid = 0; G.remotes = [];
-        this.msg('Phòng đã mở! Gửi mã hoặc link cho bạn bè.');
+        clearTimeout(this.openTO);
+        this.msg('✔ Phòng đã mở! Gửi mã hoặc link bên dưới cho bạn bè rồi chờ họ vào.');
         UI.coopRefresh(); G.toast(`👥 Đã mở phòng ${this.code} — mời bạn bè vào chơi cùng!`, 'quest');
       });
       peer.on('connection', c => this.onIncoming(c));
-      peer.on('error', e => { if (e.type === 'unavailable-id' && n < 4) { peer.destroy(); tryOpen(n + 1); } else this.msg('Lỗi kết nối: ' + (e.type || e.message)); });
+      peer.on('error', e => { if (e.type === 'unavailable-id' && n < 4) { peer.destroy(); tryOpen(n + 1); } else { clearTimeout(this.openTO); this.msg('✖ Lỗi kết nối: ' + (e.type || e.message) + '. Bấm TẠO PHÒNG để thử lại.'); try { peer.destroy(); } catch (er) {} this.peer = null; } });
       peer.on('disconnected', () => { if (this.active && this.host) try { peer.reconnect(); } catch (er) {} });
     };
     tryOpen(0);
@@ -761,12 +764,15 @@ Object.assign(UI, {
   coopRefresh() {
     if (!$('coop')) return;
     const inGame = G.player && G.state !== 'title' && G.state !== 'loading';
-    $('coopHost').hidden = !inGame || Net.guest;
-    $('coopJoin').hidden = inGame && !Net.guest;
+    $('coopHost').hidden = Net.guest;
+    $('coopJoin').hidden = inGame || Net.active;
     $('coopGuest').hidden = !Net.guest;
+    $('cRoom').hidden = !Net.host;
     $('cCode').textContent = Net.host ? Net.code : '-----';
     $('cLink').value = Net.host ? Net.link() : '';
     $('cOpen').hidden = Net.host; $('cCopy').hidden = !Net.host; $('cClose').hidden = !Net.host;
+    $('cShare').hidden = !Net.host || !navigator.share;
+    $('cOpen').textContent = inGame ? '📡 TẠO PHÒNG' : (G.hasSave() ? '📡 TẠO PHÒNG (tiếp tục bản lưu)' : '📡 TẠO PHÒNG (chơi mới)');
     const names = [`👑 ${Net.host || !Net.active ? (Story.names && Story.names.hero || 'Bạn') : (Net.hostName || 'Chủ phòng')}`].concat(G.remotes.filter(r => Net.host || r.pid !== 0).map(r => '👤 ' + r.name));
     $('cPlayers').innerHTML = Net.active ? names.map(n => `<span>${esc(n)}</span>`).join('') : '';
     $('cMsg').textContent = Net.status;
@@ -777,7 +783,8 @@ Object.assign(UI, {
     const el = $('partyHud'); if (!el) return;
     if (!Net.active || !G.player) { el.hidden = true; return; }
     el.hidden = false;
-    el.innerHTML = `<b>👥 ${Net.host ? 'PHÒNG ' + Net.code : 'ĐANG CHƠI CÙNG'}</b>` + G.remotes.map(r => `<div class="pm ${r.dead ? 'dead' : ''}"><span>${esc(r.name)}</span><i><u style="width:${clamp(r.hp / (r.maxHp || 1), 0, 1) * 100}%"></u></i></div>`).join('');
+    el.onclick = () => { if (Net.host) { try { navigator.clipboard.writeText(Net.link()); G.toast('⧉ Đã sao chép link mời phòng ' + Net.code, 'good'); } catch (e) {} } };
+    el.innerHTML = `<b>👥 ${Net.host ? 'PHÒNG ' + Net.code + ' ⧉' : 'ĐANG CHƠI CÙNG'}</b>` + G.remotes.map(r => `<div class="pm ${r.dead ? 'dead' : ''}"><span>${esc(r.name)}</span><i><u style="width:${clamp(r.hp / (r.maxHp || 1), 0, 1) * 100}%"></u></i></div>`).join('');
   },
   chatOpen() {
     if (!Net.active) { this.toast('Mở phòng hoặc vào phòng bạn bè để trò chuyện.', 'info'); return; }
@@ -795,7 +802,15 @@ Object.assign(UI, {
 (function () {
   $('btnCoopT').onclick = () => UI.openCoop();
   $('btnCoopP').onclick = () => UI.openCoop();
-  $('cOpen').onclick = () => Net.hostRoom();
+  $('cOpen').onclick = () => {
+    const inGame = G.player && G.state !== 'title' && G.state !== 'loading';
+    if (inGame) { Net.hostRoom(); return; }
+    Net.autoHost = true;
+    if (G.hasSave()) UI.continueGame(); else { UI.newArmed = true; UI.worldSelect(); Net.msg('Chọn thế giới và nhân vật — phòng sẽ tự mở khi vào game.'); }
+  };
+  $('cShare').onclick = () => { try { navigator.share({ title: 'Tàn Thành', text: `Vào chơi Tàn Thành cùng mình! Mã phòng: ${Net.code}`, url: Net.link() }).catch(() => {}); } catch (e) {} };
+  const st0 = G.start;
+  G.start = function (isNew) { st0.call(this, isNew); if (Net.autoHost) { Net.autoHost = false; setTimeout(() => { UI.openCoop(); Net.hostRoom(); }, isNew ? 600 : 300); } };
   $('cClose').onclick = () => { Net.close(); UI.coopRefresh(); };
   $('cCopy').onclick = () => {
     const t = `Vào chơi Tàn Thành cùng mình! Mã phòng: ${Net.code}\n${Net.link()}`;
