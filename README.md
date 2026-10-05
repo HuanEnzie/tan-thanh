@@ -43,7 +43,7 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
   - Boss canh giữ phế tích, hầm ngục và hang ổ trùm cuối.
 - **Hầm ngục có giới hạn**: mỗi tầng chỉ gồm vài khu, có mũi tên dẫn tới Chủ Hầm Ngục rồi tới lối xuống hoặc lối ra.
 - **Cốt truyện ngẫu nhiên**: 5 hồi, có kết thúc thường và kết thúc tình cảm.
-- **Bạn đồng hành**:
+- **Bạn đồng hành**: 
   - Khi chơi, bạn chọn giới tính nhân vật.
   - Đồng hành khác giới có tuyến tình cảm. Đồng hành cùng giới có tuyến kết nghĩa huynh đệ hoặc tỷ muội, với cảnh riêng.
   - Chân dung có 6 biểu cảm (bình thường, vui, buồn, giận, ngượng, ngạc nhiên), đổi theo từng câu thoại.
