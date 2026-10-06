@@ -357,3 +357,9 @@ body.touch #mapInfo { font-size: 13px; line-height: 1.1; }
 body.touch #mapTp { position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%); z-index: 3; font-size: 18px; }
 body.touch .mapp { position: relative; }
 #base .tabs button { flex: 1; min-width: 0 !important; font-size: 17px; padding: 2px 6px; }
+/* v6: breakthrough tab, mount button */
+.bthead { padding: 8px 10px; margin-bottom: 8px; border: 1px solid rgba(255,230,160,0.3); border-radius: 8px; background: rgba(255,230,160,0.06); }
+.bthead b { font-size: 18px; } .bthead b.gold { color: #ffe6a0; }
+.btn6 { font: 16px VT323, monospace; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
+.btn6.ok { color: #6dff7a; } .btn6.bad { color: #ff6a5a; }
+#tMount.on { border-color: #ffd65a; box-shadow: 0 0 12px rgba(255,214,90,0.7); background: rgba(90,60,10,0.85); }

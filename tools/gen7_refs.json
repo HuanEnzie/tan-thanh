@@ -1,0 +1,35 @@
+{
+ "mounts": [
+  "pets"
+ ],
+ "outfit_md_1": [
+  "ref_hero_md"
+ ],
+ "outfit_md_2": [
+  "ref_hero_md"
+ ],
+ "outfit_md_3": [
+  "ref_hero_md"
+ ],
+ "outfit_tt_1": [
+  "ref_hero_tt"
+ ],
+ "outfit_tt_2": [
+  "ref_hero_tt"
+ ],
+ "outfit_tt_3": [
+  "ref_hero_tt"
+ ],
+ "outfit_sl_1": [
+  "ref_hero_sl"
+ ],
+ "outfit_sl_2": [
+  "ref_hero_sl"
+ ],
+ "outfit_sl_3": [
+  "ref_hero_sl"
+ ],
+ "bt_items": [],
+ "skills": [],
+ "shelter": []
+}

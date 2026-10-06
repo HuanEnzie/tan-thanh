@@ -405,7 +405,7 @@ const UI = {
       box.innerHTML = h + '</div><p class="muted">Tăng thân mật: chiến đấu cùng nhau, tặng quà họ thích, nghỉ bên lửa trại, chọn lời thoại chân thành. Đạt mốc ♥ sẽ mở cảnh tâm sự.</p>';
     } else {
       const perks = Object.entries(P.perks).map(([k, n]) => `<li>${esc(PERKS.find(p => p.id === k).name)}${n > 1 ? ' x' + n : ''}</li>`).join('') || '<li>Chưa có</li>';
-      box.innerHTML = `<div class="stats2"><div><h3>${esc(Story.names.hero)} — ${esc(G.rankTitle())}</h3><p>Cấp ${P.level} • Máu ${Math.round(P.maxHp)} • Ngày ${G.day}</p><p>Hạ địch: ${G.stats.kills} • Combo cao nhất: x${G.stats.maxCombo} • Cổng đã chinh phục: ${G.stats.gates} • Đã cứu: ${G.stats.rescued}</p><p>Kỹ năng tối thượng [Q]: <b>${esc(RL.skill.name)}</b> — ${esc(RL.skill.desc)}</p></div><div><h3>Thiên phú</h3><ul>${perks}</ul></div></div>`;
+      box.innerHTML = `<div class="stats2"><div><h3>${esc(Story.names.hero)} — ${esc(G.rankTitle())}</h3><p>Cấp ${P.level} • Máu ${Math.round(P.maxHp)} • Ngày ${G.day}</p><p>Hạ địch: ${G.stats.kills} • Combo cao nhất: x${G.stats.maxCombo} • Cổng đã chinh phục: ${G.stats.gates} • Đã cứu: ${G.stats.rescued}</p><p>Kỹ năng tối thượng [Q]: <b>${esc(G.skillName())}</b>${G.v6 && G.v6.skEq >= 0 ? '' : ' — ' + esc(RL.skill.desc)} • Trang phục: <b>${esc(OUTFIT_NAMES[rk(RL.id)][G.outfitTier(P)])}</b> (theo độ hiếm giáp thân)</p></div><div><h3>Thiên phú</h3><ul>${perks}</ul></div></div>`;
     }
   },
   showDetail(uid) {
@@ -495,7 +495,7 @@ const UI = {
     bar('foodFill', P.hunger, 100); $('foodTxt').textContent = Math.ceil(P.hunger);
     bar('waterFill', P.thirst, 100); $('waterTxt').textContent = Math.ceil(P.thirst);
     bar('stamFill', P.stamina, P.maxStam); $('stamTxt').textContent = Math.ceil(P.stamina);
-    bar('enFill', P.energy, 100); $('enTxt').textContent = P.energy >= 100 ? RL.skill.name + ' [Q]' : Math.floor(P.energy) + '%';
+    bar('enFill', P.energy, 100); $('enTxt').textContent = P.energy >= 100 ? G.skillName() + ' [Q]' : Math.floor(P.energy) + '%';
     $('enRow').classList.toggle('ready', P.energy >= 100);
     $('bars').classList.toggle('lowhp', P.hp < P.maxHp * 0.3);
     const h = Math.floor(G.clock), mi = Math.floor((G.clock - h) * 60);
@@ -506,7 +506,7 @@ const UI = {
     const goal = World.mode === 'dungeon' ? (World.dg.cleared ? 'Mở rương báu và rời Cổng' : 'Tìm và tiêu diệt Chủ Hầm Ngục') : Story.goal();
     if ($('objText').textContent !== goal) { $('objText').textContent = goal; $('objective').classList.remove('pulse'); void $('objective').offsetWidth; $('objective').classList.add('pulse'); }
     $('xpfill').style.width = (P.xp / G.xpNeed(P.level) * 100) + '%';
-    $('lvl').textContent = `CẤP ${P.level} • ${G.rankTitle()}`;
+    $('lvl').textContent = `CẤP ${P.level} • ${G.rankTitle()}${G.btBlocked && G.btBlocked() ? ' • BÌNH CẢNH' : ''}`;
     $('kills').textContent = '☠ ' + G.stats.kills;
     $('combo').style.opacity = G.combo >= 5 ? 1 : 0;
     if (G.combo >= 5) $('combo').textContent = 'x' + G.combo + ' COMBO';

@@ -83,7 +83,7 @@ const G = {
       v: 2, realm: RL.id, seed: this.seed, clock: this.clock, day: this.day, time: this.time, uid: UID,
       p: { x: pos.x, y: pos.y, hp: P.hp, maxHp: P.maxHp, hunger: P.hunger, thirst: P.thirst, equip: P.equip, relics: P.relics, stash: P.stash, armor: P.armor, gold: P.gold, gearHp: P.gearHp, weapon: P.weapon, mags: P.mags, inv: P.inv, battery: P.battery, xp: P.xp, level: P.level, perks: P.perks, maxStam: P.maxStam, energy: P.energy },
       story: Story.serialize(), comps: this.companions.map(c => ({ aff: c.aff, stage: c.stage, joined: c.joined, lover: c.lover, sworn: c.sworn, scenePending: c.scenePending, reviveDay: c.reviveDay })),
-      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0, v4: this.v4Save(), v5: this.v5,
+      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0, v4: this.v4Save(), v5: this.v5, v6: this.v6,
     };
     try { localStorage.setItem('tt_save_v2', JSON.stringify(data)); } catch (e) {}
     return data;
@@ -180,7 +180,7 @@ const G = {
   targets() {
     const P = this.player;
     const out = [P.car || P];
-    for (const a of this.allies) if (!a.downed && !a.dead && a.kind !== 'merchant' && !(a.kind === 'civ' && a.rescued)) out.push(a);
+    for (const a of this.allies) if (!a.downed && !a.dead && a.kind !== 'merchant' && a.kind !== 'resident' && a.kind !== 'villager' && a.kind !== 'elder' && !a.home && !a.leaving && !(a.kind === 'civ' && a.rescued)) out.push(a);
     return out;
   },
   hurtTarget(t, dmg, src) {
@@ -363,7 +363,7 @@ const G = {
       this.shake(16); this.hitstop = 0.25; this.slowmo = 1.2;
       for (let i = 0; i < 3; i++) setTimeout(() => this.explodeFx(z.x + R.range(-40, 40), z.y + R.range(-40, 40), 60), i * 200);
       Items.drop(z.x, z.y, 'medkit', 2);
-      if (z.mini) World.keepChest(z.x, z.y + 40, Math.random() < 0.3 ? 3 : 2, 0.5);
+      if (z.mini && !z.noChest) World.keepChest(z.x, z.y + 40, Math.random() < 0.3 ? 3 : 2, 0.5);
       this.toast(`${z.name} đã gục ngã!`, 'quest');
       if (this.boss === z) { this.boss = null; UI.boss(null); }
       if (z.story) Story.onBoss(true);
@@ -389,9 +389,9 @@ const G = {
     }
     if (src) { const a = Math.atan2(P.y - src.y, P.x - src.x); const k = src.arche === 'brute' || src.boss ? 380 : 120; P.kx += Math.cos(a) * k; P.ky += Math.sin(a) * k; }
     // companion heals when the player is in trouble
-    if (P.hp < P.maxHp * 0.35) for (const c of this.companions) if (c.joined && c.stage >= 2 && c.ally && !c.ally.downed && (c.healT || 0) < this.time) {
+    if (P.hp < P.maxHp * 0.35) for (const c of this.companions) if (c.joined && c.stage >= 2 && !(c.ally && c.ally.downed) && (c.healT || 0) < this.time) {
       c.healT = this.time + 60; P.hp = Math.min(P.maxHp, P.hp + 35);
-      c.ally.speak(R.pick(c.data.combat), 2); FX.ring(P.x, P.y, 10, 60, '#6dff7a', 0.5, 4); Floaters.add(P.x, P.y - 26, '+35 ♥', '#ff8ab8', 11);
+      if (c.ally && dist(c.ally.x, c.ally.y, P.x, P.y) < 400) c.ally.speak(R.pick(c.data.combat), 2); else this.toast(`${c.romance ? '♥' : '★'} ${c.data.name} gửi thuốc từ xa: +35 máu`, 'love'); FX.ring(P.x, P.y, 10, 60, '#6dff7a', 0.5, 4); Floaters.add(P.x, P.y - 26, '+35 ♥', '#ff8ab8', 11);
     }
     if (P.hp <= 0) this.die();
   },
@@ -399,7 +399,7 @@ const G = {
     const P = this.player;
     // phoenix feather or a lover saves you once
     const feather = P.relics.findIndex(r => r && r.type === 'revive');
-    const lover = this.companions.find(c => (c.lover || c.sworn) && c.ally && !c.ally.downed && (c.reviveDay || 0) !== this.day);
+    const lover = this.companions.find(c => (c.lover || c.sworn) && !(c.ally && c.ally.downed) && (c.reviveDay || 0) !== this.day);
     if (feather >= 0 || lover) {
       if (feather >= 0) { P.relics[feather] = null; this.applyRelics(); this.toast('Lông Phượng Hoàng bùng cháy — bạn hồi sinh!', 'quest'); }
       else { lover.reviveDay = this.day; this.toast(lover.lover ? `${lover.data.name} ôm lấy bạn: "Đừng bỏ lại tôi!" — bạn hồi sinh!` : `${lover.data.name} kéo bạn dậy: "Đã kết nghĩa thì không được chết trước!" — bạn hồi sinh!`, 'love'); }
@@ -489,6 +489,7 @@ const G = {
     const P = this.player;
     P.xp += n;
     while (P.xp >= this.xpNeed(P.level)) {
+      if (this.btBlocked && this.btBlocked()) { P.xp = this.xpNeed(P.level); this.btNotify(); break; }
       P.xp -= this.xpNeed(P.level);
       P.level++;
       P.maxHp += 4; P.hp = Math.min(P.maxHp, P.hp + 20);
@@ -528,11 +529,14 @@ const G = {
   processPending() {
     while (World.pending.length) {
       const s = World.pending.shift();
-      if (s.kind === 'enemy') this.spawnEnemy(s.arche, s.x, s.y, { elite: s.elite, guard: s.guard });
+      if (s.kind === 'enemy') { const z = this.spawnEnemy(s.arche, s.x, s.y, { elite: s.elite, guard: s.guard }); if (s.gid) z.gid = s.gid; }
       else if (s.kind === 'civ') this.allies.push(new Ally('civ', s.x, s.y, { img: RL.npc[s.sprite] }));
+      else if (s.kind === 'elder' || s.kind === 'villager') { if (this.spawnCustom) this.spawnCustom(s); }
       else if (s.kind === 'merchant') { if (!this.allies.some(a => a.kind === 'merchant' && dist(a.x, a.y, s.x, s.y) < 40)) this.spawnMerchant(s.x, s.y); }
       else if (s.kind === 'boss') {
         if (s.story && !(Story.curAct() && Story.curAct().type === 'boss')) continue;
+        if (s.lord && this.v6 && this.v6.lord[s.lord]) continue;
+        if (s.gid && this.zombies.some(o => o.gid === s.gid && o.boss && !o.dead)) continue;
         const lvl = World.levelAt(s.x, s.y) + (s.story ? 3 : 0);
         const rnd = mulberry32((s.seed || ((World.dg && World.dg.seed) || this.seed) + Math.floor(s.x) * 7 + Math.floor(s.y) * 13) | 0);
         const bd = rollBoss(RL.id, rnd);
@@ -541,6 +545,9 @@ const G = {
         const hpMul = (s.story ? 1.4 : s.mini ? 0.5 : World.mode === 'dungeon' ? 0.55 + World.dg.floor * 0.12 : 1) * (bd.mod && bd.mod.hp || 1);
         const z = this.spawnEnemy('boss', s.x, s.y, { lvl: lvl + (s.mini ? 1 : 0), name, story: s.story, hpMul, guard: true, bossDef: bd });
         z.dungeon = !!s.dungeon; z.mini = !!s.mini;
+        if (s.gid) z.gid = s.gid;
+        if (s.noChest) z.noChest = true;
+        if (s.lord) { z.lord = s.lord; z.maxHp *= 1.4; z.hp = z.maxHp; z.lvl += 2; const [lx, ly] = s.lord.split(',').map(Number); z.name = LORD_NAME[rk(RL.id)] + ' ' + World.regionInfo(lx, ly).name.split(' ').slice(-2).join(' ') + ' — ' + bd.def.name; }
 
         if (!s.mini) this.boss = z;
       }

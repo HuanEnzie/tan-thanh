@@ -217,7 +217,7 @@ const Net = {
     if (ch && ch.p) return ch;
     let solo = null;
     try { solo = JSON.parse(localStorage.getItem('tt_save_v2')); } catch (e) {}
-    if (solo && solo.realm === realm && solo.p) { const p = Object.assign({}, solo.p); delete p.x; delete p.y; return { p, v4: solo.v4, uid: solo.uid, name: solo.story && solo.story.names.hero, stats: solo.stats, ach: solo.ach, heartBuys: solo.heartBuys }; }
+    if (solo && solo.realm === realm && solo.p) { const p = Object.assign({}, solo.p); delete p.x; delete p.y; return { p, v4: solo.v4, v6: solo.v6, uid: solo.uid, name: solo.story && solo.story.names.hero, stats: solo.stats, ach: solo.ach, heartBuys: solo.heartBuys }; }
     // brand-new hero for this world
     RL = REALMS[realm];
     const eq = { melee: Loot.weapon('melee', 1, 1, -1), r1: Loot.weapon('r1', 1, 0), r2: null, r3: null };
@@ -227,7 +227,7 @@ const Net = {
     const P = G.player; if (!P || !this.guest) return;
     const p = {};
     for (const k of ['hp', 'maxHp', 'hunger', 'thirst', 'equip', 'relics', 'stash', 'armor', 'gold', 'gearHp', 'weapon', 'mags', 'inv', 'battery', 'xp', 'level', 'perks', 'maxStam', 'energy']) p[k] = P[k];
-    const data = { p, v4: G.v4Save(), v5: G.v5, uid: UID, name: this.myName, stats: G.stats, ach: G.achieved, heartBuys: G.heartBuys || 0, t: Date.now() };
+    const data = { p, v4: G.v4Save(), v5: G.v5, v6: G.v6, uid: UID, name: this.myName, stats: G.stats, ach: G.achieved, heartBuys: G.heartBuys || 0, t: Date.now() };
     data.v4.keep = []; data.v4.pending = [];
     try { localStorage.setItem('tt_coop_' + RL.id, JSON.stringify(data)); } catch (e) {}
   },
@@ -655,7 +655,7 @@ G.remoteKill = function (k) {
   const kill = G.killEnemy;
   G.killEnemy = function (z, src) {
     kill.call(this, z, src);
-    if (Net.host) Net.bcast(['kill', { id: z.id, xp: z.xp, lvl: z.lvl, x: z.x | 0, y: z.y | 0, elite: z.elite, boss: z.boss, mini: z.mini, goblin: z.goblin, mimic: z.mimic, story: z.story, dungeon: z.dungeon, name: z.name, r: z.r, img: z.img, scale: z.scale, a: Math.round(z.angle * 100), arche: z.arche, by: src === 'net' ? Net.lastHitBy : 0 }]);
+    if (Net.host) Net.bcast(['kill', { id: z.id, xp: z.xp, lvl: z.lvl, x: z.x | 0, y: z.y | 0, elite: z.elite, boss: z.boss, mini: z.mini, goblin: z.goblin, mimic: z.mimic, story: z.story, lord: z.lord, gid: z.gid ? 1 : 0, dungeon: z.dungeon, name: z.name, r: z.r, img: z.img, scale: z.scale, a: Math.round(z.angle * 100), arche: z.arche, by: src === 'net' ? Net.lastHitBy : 0 }]);
   };
 
   const fire = Bullets.fire;
@@ -732,7 +732,7 @@ G.remoteKill = function (k) {
   G.die = function () {
     if (!Net.active) return die.call(this);
     const P = this.player;
-    const canRevive = P.relics.some(r => r && r.type === 'revive') || this.companions.some(c => (c.lover || c.sworn) && c.ally && !c.ally.downed && (c.reviveDay || 0) !== this.day);
+    const canRevive = P.relics.some(r => r && r.type === 'revive') || this.companions.some(c => (c.lover || c.sworn) && !(c.ally && c.ally.downed) && (c.reviveDay || 0) !== this.day);
     if (canRevive) return die.call(this);
     P.dead = true; P.hp = 0; P.respawnT = 10;
     Sound.play('sfx_player_die', 0.8); Particles.blood(P.x, P.y, 0, 30, 200);

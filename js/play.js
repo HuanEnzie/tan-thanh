@@ -340,7 +340,7 @@ G.update = function (dt) {
   }
   for (const a of this.allies) a.update(dt);
   // drop civilians / merchants left far behind (they respawn with their area)
-  this.allies = this.allies.filter(a => !a.dead && !((a.kind === 'civ' || a.kind === 'merchant') && World.mode === 'over' && (this.nearestPlayerDist ? this.nearestPlayerDist(a.x, a.y) : dist(a.x, a.y, P.x, P.y)) > 3600));
+  this.allies = this.allies.filter(a => !a.dead && !((a.kind === 'civ' || a.kind === 'merchant' || a.kind === 'villager' || a.kind === 'elder') && World.mode === 'over' && (this.nearestPlayerDist ? this.nearestPlayerDist(a.x, a.y) : dist(a.x, a.y, P.x, P.y)) > 3600));
   this.updateHazards(dt);
   if (this.frame % 20 === 0) this.biomeTick();
   this.v4Tick(dt);

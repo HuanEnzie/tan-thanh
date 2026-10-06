@@ -28,6 +28,7 @@
   <button data-k="KeyH"><img src="assets/img/i_medkit.png" alt="Hồi máu"><i></i></button>
   <button data-k="KeyF"><img src="assets/img/i_food.png" alt="Ăn uống"><i></i></button>
   <button data-k="KeyG"><img src="assets/img/i_grenade.png" alt="Ném"><i></i></button>
+  <button id="tMount" hidden><img src="assets/img/pet_0.png" alt="Cưỡi"></button>
 </div>
 <button id="tFire"><img id="tFireImg" src="assets/img/i_pistol.png" alt=""><span id="tFireLbl">BẮN</span></button>
 <button id="tMelee"><img src="assets/img/i_bat.png" alt=""><span>ĐẨY</span></button>
@@ -55,7 +56,7 @@
   </div>
   <div id="topright">
     <canvas id="minimap" width="200" height="200"></canvas>
-    <div id="mmlabel">[M] Bản đồ • [C] Chế tạo • [Tab] Túi đồ • [Y] Triệu hồi</div>
+    <div id="mmlabel">[M] Bản đồ • [C] Chế tạo • [Tab] Túi đồ • [Y] Triệu hồi • [N] Căn cứ • [Z] Cưỡi</div>
   </div>
   <div id="bossbar" class="hidden"><div id="bossname"></div><div class="bar"><div id="bossfill"></div></div></div>
   <div id="feed"></div>
@@ -237,7 +238,7 @@
   <div class="panel wide">
     <button class="close" onclick="UI.closePanel()">✕</button>
     <h2>TÚI ĐỒ <small>[Tab] đóng</small></h2>
-    <div class="tabs"><button data-tab="gear">Trang bị</button><button data-tab="items">Vật phẩm</button><button data-tab="comp">Đồng hành ♥</button><button data-tab="pets">Thú cưng</button><button data-tab="codex">Sổ tay</button><button data-tab="stats">Nhân vật</button></div>
+    <div class="tabs"><button data-tab="gear">Trang bị</button><button data-tab="items">Vật phẩm</button><button data-tab="comp">Đồng hành ♥</button><button data-tab="pets">Thú cưng</button><button data-tab="skills">Kỹ năng</button><button data-tab="codex">Sổ tay</button><button data-tab="stats">Nhân vật</button></div>
     <div id="invBody"></div>
   </div>
 </div>
@@ -258,7 +259,7 @@
     <div class="gbanner">
       <img src="assets/img/ev_altar.png" alt="" class="galtar">
       <div class="gbtext"><b>Thú cưng 5★ đang xuất hiện</b><div id="gFeat"></div><p id="gPity"></p>
-        <p class="muted">Tỉ lệ: 5★ 1.6% (tăng dần từ lượt 45, chắc chắn ở lượt 60) • 4★ 13% (chắc chắn mỗi 10 lượt). Phần thưởng: thú cưng, trang bị Huyền Thoại, rương Kim Cương, tinh thể sinh mệnh…</p></div>
+        <p class="muted">Tỉ lệ: 5★ 1.6% (tăng dần từ lượt 45, chắc chắn ở lượt 60) • 4★ 13% (chắc chắn mỗi 10 lượt). Phần thưởng: thú cưng (cưỡi được), kỹ năng thay tuyệt kỹ, trang bị Huyền Thoại, rương Kim Cương, tinh thể sinh mệnh…</p></div>
     </div>
     <div class="menu row wrap gbtns"><button id="gPull1">TRIỆU HỒI x1</button><button id="gPull10" class="gold">TRIỆU HỒI x10</button><button id="gTrade">ĐỔI 10 MẢNH SAO → 1 VÉ</button><button id="gBuy"></button></div>
   </div>
@@ -269,7 +270,7 @@
   <div class="panel wide basep">
     <button class="close" onclick="UI.closePanel()">✕</button>
     <div class="bhead"><h2>🏠 CĂN CỨ <small id="bLvl"></small></h2><div id="bRes"></div></div>
-    <div class="tabs"><button data-btab="build">Công trình</button><button data-btab="forge">Lò rèn</button><button data-btab="kitchen">Bếp</button><button data-btab="bounty">Nhiệm vụ</button></div>
+    <div class="tabs"><button data-btab="build">Công trình</button><button data-btab="forge">Lò rèn</button><button data-btab="kitchen">Bếp</button><button data-btab="bounty">Nhiệm vụ</button><button data-btab="bt">Đột phá</button></div>
     <div id="bAway" class="baway" hidden>Bạn đang ở xa Căn cứ — xem được nhưng phải về mới xây, rèn, nấu, nhận thưởng. <button id="bHome">⌂ DỊCH CHUYỂN VỀ CĂN CỨ</button></div>
     <div id="baseBody"></div>
   </div>
@@ -365,6 +366,7 @@
 <script src="js/v4.js"></script>
 <script src="js/coop.js"></script>
 <script src="js/v5.js"></script>
+<script src="js/v6.js"></script>
 <script>
   try { G.lowGfx = !!localStorage.getItem('tt_low'); } catch (e) {}
   resize();

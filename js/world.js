@@ -463,7 +463,7 @@ const World = {
       if (this.get(tx, ty) !== o.floor || this.occAt(tx, ty)) continue;
       const nearWall = this.isSolidT(this.get(tx - 1, ty)) || this.isSolidT(this.get(tx + 1, ty)) || this.isSolidT(this.get(tx, ty - 1)) || this.isSolidT(this.get(tx, ty + 1));
       if (!nearWall) continue;
-      if (SR.chance(0.07)) { this.chest(tx, ty, this.rollChest(0)); placed++; continue; }
+      if (SR.chance(0.02)) { this.chest(tx, ty, this.rollChest(0)); placed++; continue; }
       const spr = typeof o.cimg === 'function' ? o.cimg() : (o.cimg || SR.pick(RL.props.crate));
       this.container(spr, tx, ty, o.loot || 'house');
       placed++;
@@ -608,7 +608,7 @@ const World = {
       this.reserve(bk.x0, bk.y0, bk.x1, bk.y1);
       return;
     }
-    if (SR.chance(0.14)) for (let k = 0; k < 30; k++) { const x = SR.int(bk.x0 + 2, bk.x1 - 2), y = SR.int(bk.y0 + 2, bk.y1 - 2); if (this.isGround(this.get(x, y)) && this.free(x, y, 1)) { this.chest(x, y, this.rollChest(0)); break; } }
+    if (SR.chance(0.26)) for (let k = 0; k < 30; k++) { const x = SR.int(bk.x0 + 2, bk.x1 - 2), y = SR.int(bk.y0 + 2, bk.y1 - 2); if (this.isGround(this.get(x, y)) && this.free(x, y, 1)) { this.chest(x, y, this.rollChest(0)); break; } }
     // which biomes share this block, and how much of it
     const share = {};
     for (let y = bk.y0; y <= bk.y1; y++) for (let x = bk.x0; x <= bk.x1; x++) { const b = this.bioAt(x, y); share[b] = (share[b] || 0) + 1; }
