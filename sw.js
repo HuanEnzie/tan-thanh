@@ -5,7 +5,7 @@ const VERSION = 'tt-v11';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css', 'css/v2.css',
   'js/util.js', 'js/data.js', 'js/realms.js', 'js/lore.js', 'js/lore_bond.js', 'js/assets.js', 'js/world.js', 'js/data2.js',
-  'js/fx.js', 'js/loot.js', 'js/entities.js', 'js/game.js', 'js/story.js', 'js/ui.js', 'js/play.js', 'js/touch.js', 'js/v3.js', 'js/v4.js', 'js/coop.js', 'js/v5.js', 'js/v6.js',
+  'js/fx.js', 'js/loot.js', 'js/entities.js', 'js/game.js', 'js/story.js', 'js/ui.js', 'js/play.js', 'js/touch.js', 'js/v3.js', 'js/v4.js', 'js/coop.js', 'js/v5.js', 'js/atlas6.js', 'js/v6.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon-32.png',
 ];
 

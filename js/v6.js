@@ -59,14 +59,28 @@ const RUMORS = {
     if (d && /^bt_[abc]$/.test(id)) { const k = rk(RL.id), j = 'abc'.indexOf(id[3]); d.name = BT_NAMES[k][j]; d.icon = `bt_${k}_${id[3]}`; d.desc = BT_DESC[j]; }
     return d;
   };
+  // new sprites ship as a few atlases; loading one slices it into IMG entries under the usual names
   const _ri = realmImages;
-  realmImages = function (r) {
-    const out = _ri(r), k = rk(r);
-    for (let i = 0; i < 8; i++) out.push('mount_' + i, 'sk_' + i);
-    for (const c of 'abc') out.push(`bt_${k}_${c}`);
-    out.push('sh_tower_' + k, 'sh_gate_' + k, 'sh_hall_' + k);
-    for (let t = 1; t <= 3; t++) for (let i = 0; i < 4; i++) out.push(`${k}_o${t}_${i}`);
-    return out;
+  realmImages = function (r) { const out = _ri(r); out.push('atlas6_common', 'atlas6_' + rk(r)); return out; };
+  const _li = loadImages;
+  loadImages = function (list, onProgress) {
+    const atl = [...new Set(list)].filter(n => ATLAS6[n] && !IMG[n]);
+    const rest = list.filter(n => !ATLAS6[n]);
+    const cut = atl.map(n => new Promise(res => {
+      const im = new Image();
+      im.onload = () => {
+        for (const [k, [x, y, w, h]] of Object.entries(ATLAS6[n])) {
+          const c = document.createElement('canvas'); c.width = w; c.height = h;
+          c.getContext('2d').drawImage(im, x, y, w, h, 0, 0, w, h);
+          try { c.src = c.toDataURL(); } catch (e) { c.src = ''; }
+          IMG[k] = c;
+        }
+        IMG[n] = im; res();
+      };
+      im.onerror = () => { console.warn('missing atlas', n); res(); };
+      im.src = 'assets/img/' + n + '.png';
+    }));
+    return Promise.all([_li(rest, onProgress)].concat(cut));
   };
 })();
 
