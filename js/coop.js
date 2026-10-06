@@ -105,7 +105,8 @@ const Net = {
       UI.coopRefresh();
       return;
     }
-    if (d.t === 'up' && c.rem) this.applyUp(c, d);
+    if (d.t === 'ready' && c.rem) { c.ready = true; c.known = new Set(); return; }
+    if (d.t === 'up' && c.rem) { c.ready = true; this.applyUp(c, d); }
   },
   dropGuest(c) {
     const i = this.conns.indexOf(c); if (i < 0) return;
@@ -204,6 +205,7 @@ const Net = {
       G.updateNight();
       G.start(false);
       Sound.setRealm(RL.id);
+      try { this.conn.send({ t: 'ready' }); } catch (e) {}
       G.toast(`👥 Đã vào thế giới của ${d.host}! Đồ rơi là của riêng bạn — cứ thoải mái nhặt.`, 'quest');
       UI.coopRefresh();
     });
@@ -225,7 +227,7 @@ const Net = {
     const P = G.player; if (!P || !this.guest) return;
     const p = {};
     for (const k of ['hp', 'maxHp', 'hunger', 'thirst', 'equip', 'relics', 'stash', 'armor', 'gold', 'gearHp', 'weapon', 'mags', 'inv', 'battery', 'xp', 'level', 'perks', 'maxStam', 'energy']) p[k] = P[k];
-    const data = { p, v4: G.v4Save(), uid: UID, name: this.myName, stats: G.stats, ach: G.achieved, heartBuys: G.heartBuys || 0, t: Date.now() };
+    const data = { p, v4: G.v4Save(), v5: G.v5, uid: UID, name: this.myName, stats: G.stats, ach: G.achieved, heartBuys: G.heartBuys || 0, t: Date.now() };
     data.v4.keep = []; data.v4.pending = [];
     try { localStorage.setItem('tt_coop_' + RL.id, JSON.stringify(data)); } catch (e) {}
   },
@@ -242,8 +244,9 @@ const Net = {
       Object.assign(z, { id: st[0], img: st[1], name: st[2], lvl: st[3], scale: st[4] / 100, r: st[5], maxHp: st[6], elite: !!st[7], boss: !!st[8], upright: !!st[9], mini: !!st[10], goblin: !!st[11],
         net: true, dead: false, dying: 0, rise: 0, walkT: z.walkT || 0, hitT: 0, lunge: 0, slow: 0, burn: 0, poison: 0, stun: 0, kx: 0, ky: 0, bossState: 'walk', t: ARCHE.walker, x: z.x ?? st[12], y: z.y ?? st[13] });
     }
+    let unknown = 0;
     for (const q of s.z || []) {
-      const z = this.zmap.get(q[0]); if (!z) continue;
+      const z = this.zmap.get(q[0]); if (!z) { unknown++; continue; }
       seen.add(q[0]);
       z.tx = q[1]; z.ty = q[2]; z.ta = q[3] / 100;
       if (z.x == null || Math.hypot(z.x - z.tx, z.y - z.ty) > 300) { z.x = z.tx; z.y = z.ty; z.angle = z.ta; }
@@ -251,6 +254,7 @@ const Net = {
       z.hp = z.hpNet = q[4];
       const f = q[5]; z.burn = f & 1 ? 1 : 0; z.slow = f & 2 ? 1 : 0; z.poison = f & 4 ? 2 : 0; z.bossState = f & 8 ? 'windup' : 'walk'; z.state = f & 16 ? 'chase' : 'wander';
     }
+    if (unknown && performance.now() - (this.resyncT || 0) > 1500) { this.resyncT = performance.now(); this.ev.push(['req', 'resync']); }
     for (let i = G.zombies.length - 1; i >= 0; i--) { const z = G.zombies[i]; if (!seen.has(z.id) && !z.dead) { G.zombies.splice(i, 1); this.zmap.delete(z.id); if (G.boss === z) { G.boss = null; UI.boss(null); } } }
     // allies of the host (companions, shadows, merchants, civilians)
     const aseen = new Set();
@@ -363,6 +367,7 @@ const Net = {
     else if (k === 'exit') { if (World.mode === 'dungeon') G.exitDungeon(); }
     else if (k === 'stairs') { if (World.mode === 'dungeon') G.descend(); }
     else if (k === 'civ') { const a = G.allies.find(o => o.nid === e[2]); if (a && a.kind === 'civ' && !a.rescued) G.rescueCiv(a); }
+    else if (k === 'resync') { if (c) c.known = new Set(); }
     else if (k === 'mimic') { const p = this.findProp(e[2]); if (p && !p.dead) G.mimicAwake(p); }
   },
   applyDungeon(e) {
@@ -484,7 +489,7 @@ const Net = {
     for (const r of G.remotes) players.push([r.pid, r.x | 0, r.y | 0, Math.round(r.angle * 100), r.spr, r.hp, r.maxHp, r.name, (r.dead ? 1 : 0) | (r.sw > 0 ? 2 : 0) | (r.mz > 0 ? 4 : 0), r.pet, 0, r.lvl]);
     for (const a of G.allies) if (!a.nid) a.nid = ++this.allyId;
     for (const c of this.conns) {
-      if (!c.open || !c.rem) continue;
+      if (!c.open || !c.rem || !c.ready) continue;
       const g = c.rem, near = (x, y, R0) => Math.abs(x - g.x) < R0 && Math.abs(y - g.y) < R0;
       const z = [], zs = [], known = new Set();
       for (const o of G.zombies) {
@@ -556,6 +561,7 @@ G.guestUpdate = function (dt) {
   this.updateHazards(dt);
   if (this.frame % 20 === 0) this.biomeTick();
   this.guestV4(dt);
+  this.v5Tick(dt);
   if (this.boss && (this.boss.dead || dist(this.boss.x, this.boss.y, P.x, P.y) > 900)) UI.boss(null); else if (this.boss) UI.boss(this.boss);
   Bullets.update(dt); Throws.update(dt); Particles.update(dt); Items.update(dt); Floaters.update(dt); FX.update(dt);
   for (let i = this.flashes.length - 1; i >= 0; i--) { this.flashes[i].life -= dt; if (this.flashes[i].life <= 0) this.flashes.splice(i, 1); }

@@ -358,6 +358,7 @@ G.start = function (isNew) {
   _start.call(this, isNew);
   const T = TICKET[rk(RL.id)];
   if (isNew) setTimeout(() => this.toast(`🎴 Bạn có 10 ${T.name}! Mở ${GACHA_NAME[rk(RL.id)]} bằng nút 🎴 hoặc phím Y.`, 'quest'), 9000);
+  if (this.v5Hello) { this.v5Hello = false; setTimeout(() => this.toast(`🗺 Bản cập nhật: thế giới chia thành Vùng. Tìm ${ST_NAME[rk(RL.id)]} để hiện bản đồ, mở điểm dịch chuyển, xây Căn cứ (phím N / nút ☰)!`, 'quest'), 2500); }
   if (this.v4Gift) { this.v4Gift = false; setTimeout(() => this.toast(`🎁 Quà cập nhật: 10 ${T.name}, thú cưng, kỳ quan và sự kiện mới đang chờ bạn!`, 'quest'), 1500); }
 };
 

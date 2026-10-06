@@ -295,7 +295,7 @@ Object.assign(UI, {
         for (const it of worn) { const r = RARITY[it.rarity]; h += `<div class="srow worn" style="--rc:${r.color}"><img src="${IMG[Loot.iconOf(it)].src}" alt=""><div class="sinfo"><b style="color:${r.color}">${esc(it.name)}</b><small>ĐANG DÙNG • ${r.name} • Cấp ${it.ilvl}</small></div>${coin(Loot.price(it))}<button data-sellw="${it.uid}">BÁN</button></div>`; }
         h += '</div>';
       }
-      h += `<h3>Trang bị trong túi (${P.stash.length}/30)</h3><div class="srows">`;
+      h += `<h3>Trang bị trong túi (${P.stash.length}/${G.stashCap()})</h3><div class="srows">`;
       P.stash.forEach(it => {
         const r = RARITY[it.rarity];
         h += `<div class="srow" style="--rc:${r.color}"><img src="${IMG[Loot.iconOf(it)].src}" alt=""><div class="sinfo"><b style="color:${r.color}">${esc(it.name)}</b><small>${r.name} • Cấp ${it.ilvl}</small></div>${coin(Loot.price(it))}<button data-sellg="${it.uid}">BÁN</button></div>`;

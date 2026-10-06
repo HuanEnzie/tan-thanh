@@ -30,6 +30,7 @@ const G = {
 
   // ---------- setup ----------
   newGame(realm, seed, hero, gender) {
+    RL = REALMS[realm]; this.initV5();
     this.heartBuys = 0; this.lastTitle = null; this.biome = this.biomeAmb = null; this.dgTarget = null; this.transit = false;
     RL = REALMS[realm];
     seed = seed || (Math.random() * 1e9) | 0;
@@ -82,7 +83,7 @@ const G = {
       v: 2, realm: RL.id, seed: this.seed, clock: this.clock, day: this.day, time: this.time, uid: UID,
       p: { x: pos.x, y: pos.y, hp: P.hp, maxHp: P.maxHp, hunger: P.hunger, thirst: P.thirst, equip: P.equip, relics: P.relics, stash: P.stash, armor: P.armor, gold: P.gold, gearHp: P.gearHp, weapon: P.weapon, mags: P.mags, inv: P.inv, battery: P.battery, xp: P.xp, level: P.level, perks: P.perks, maxStam: P.maxStam, energy: P.energy },
       story: Story.serialize(), comps: this.companions.map(c => ({ aff: c.aff, stage: c.stage, joined: c.joined, lover: c.lover, sworn: c.sworn, scenePending: c.scenePending, reviveDay: c.reviveDay })),
-      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0, v4: this.v4Save(),
+      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0, v4: this.v4Save(), v5: this.v5,
     };
     try { localStorage.setItem('tt_save_v2', JSON.stringify(data)); } catch (e) {}
     return data;
@@ -94,6 +95,8 @@ const G = {
     try { d = JSON.parse(localStorage.getItem('tt_save_v2')); } catch (e) { return false; }
     if (!d) return false;
     RL = REALMS[d.realm];
+    this.initV5(d.v5); this.v5.st['0,0'] = { home: true };
+    if (!d.v5) this.v5Hello = true;
     this.seed = d.seed; this.realm = d.realm;
     World.init(d.seed);
     for (const [k, l, r, c] of d.delta || []) World.delta.set(k, { looted: new Set(l), removed: new Set(r), cleared: !!c });

@@ -23,7 +23,9 @@ const Touch = {
       b.addEventListener('touchstart', e => {
         e.preventDefault(); e.stopPropagation();
         const a = b.dataset.a;
-        if (a === 'pause') UI.pause(); else if (a === 'chat') UI.chatOpen(); else if (a === 'fs') this.fullscreen(); else UI.openPanel(a);
+        if (a === 'more') { const m = document.getElementById('tmore'); m.hidden = !m.hidden; return; }
+        document.getElementById('tmore').hidden = true;
+        if (a === 'pause') UI.pause(); else if (a === 'chat') UI.chatOpen(); else if (a === 'base') UI.openBase(); else if (a === 'gacha') UI.openGacha(); else if (a === 'fs') this.fullscreen(); else UI.openPanel(a);
       }, opt);
     });
     // attack button: hold to shoot / swing, auto-aims at the nearest zombie

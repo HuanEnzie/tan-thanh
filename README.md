@@ -51,6 +51,29 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 - **Lưu và tải file .json**: trong menu, chọn 💾 LƯU / TẢI FILE để xuất tiến độ ra file, sao chép mã, hoặc nạp lại từ file hay mã đã dán.
 - **Cửa nhà dễ thấy**: cửa vẽ trên mái, có ánh đèn hắt ra và mũi tên chỉ vào.
 
+## Bản v5: Vùng, Tượng Thần, dịch chuyển, Căn cứ
+
+- **Vùng**:
+  - Thế giới chia thành các vùng 6×6 khu. Mỗi vùng có tên, cấp quái và **% khám phá** riêng.
+  - Đạt 50% và 100% khám phá thì nhận vé và tiền.
+- **Tượng Thần**:
+  - Mỗi thế giới có tên riêng: Tận Thế là Đài Phát Sóng, Tu Tiên là Tượng Thần, Thợ Săn Cổng là Cột Hệ Thống.
+  - Mỗi vùng có một tượng. Đánh thức tượng thì **hiện toàn bộ bản đồ vùng**; vùng chưa đánh thức là sương mù, có dấu "?" gợi ý vị trí tượng.
+- **Điểm dịch chuyển**: mỗi vùng có 3 điểm. Mở khoá xong thì chạm ◆ / ✦ / ⌂ trên bản đồ để bay tới. Khi dịch chuyển, map cũ bị xoá và chỉ tải map ở chỗ đến.
+- **Linh Châu** (giống Thần Đồng): mỗi vùng giấu 8 viên. Dâng lên tượng để tăng máu hoặc thể lực tối đa và nhận vé.
+- **Căn cứ** (phím N, hoặc ☰ → 🏠):
+  - 6 công trình, mỗi công trình nâng tới cấp 5.
+  - **Lò Rèn**: cường hoá trang bị +1 đến +10.
+  - **Bếp**: món ăn tăng sát thương, tốc độ, hồi máu.
+  - **Vườn**: tự sinh vật phẩm theo thời gian thật, kể cả khi tắt game.
+  - **Kho**: túi đồ rộng hơn.
+  - **Giường**: ngủ để nhận buff kinh nghiệm.
+  - **Bảng Nhiệm Vụ**: nhiệm vụ đổi mới mỗi sáng, nhận thưởng tại căn cứ.
+  - Dân thường được cứu sẽ về sống ở căn cứ.
+- **Giao diện điện thoại**:
+  - Thanh trên chỉ còn 4 nút (II, 🗺, 🎒, ☰), các chức năng khác nằm trong ☰.
+  - Bản đồ nhỏ không bị che. Bản đồ lớn phủ kín màn hình, kéo để xem.
+
 ## Chơi cùng bạn bè (co-op 2–4 người)
 
 **Chủ phòng:**

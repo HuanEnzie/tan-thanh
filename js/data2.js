@@ -55,6 +55,7 @@ function itm(id) {
   const d = o ? Object.assign({}, base, o) : Object.assign({}, base);
   if (d.kind === 'ammo') d.name = RL.ammoNames[['ammo_pistol', 'ammo_shell', 'ammo_rifle'].indexOf(id)];
   if (id === 'gold') { d.name = cur().name; d.icon = cur().icon; }
+  if (id === 'orb') { d.name = ORB_NAME[rk(RL.id)]; d.icon = 'orb_' + rk(RL.id); }
   if (id === 'ticket') { const t = TICKET[rk(RL.id)]; d.name = t.name; d.icon = t.icon; }
   return d;
 }

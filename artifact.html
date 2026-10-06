@@ -22,8 +22,11 @@
 <button id="tDash"><span>LƯỚT</span></button>
 <button id="tSkill"><span>TUYỆT KỸ</span></button>
 <div id="tmenu">
-  <button data-a="pause">II</button><button data-a="fs">⛶</button><button data-a="map">Bản đồ</button><button data-a="craft">Chế tạo</button><button data-a="inv">Túi</button><button data-a="gacha" class="gbtn">🎴</button><button data-a="chat">💬</button>
-  <button data-k="KeyL" class="ico"><img src="assets/img/i_flashlight.png" alt="Đèn"></button><button data-k="KeyB" class="ico"><img src="assets/img/i_planks.png" alt="Rào"><i></i></button><button data-k="KeyT" class="ico"><img src="assets/img/i_scrap.png" alt="Bẫy"><i></i></button><button data-k="KeyU" class="ico"><img src="assets/img/ui_5.png" alt="Truyền tống"></button>
+  <button data-a="pause">II</button><button data-a="map">🗺</button><button data-a="inv">🎒</button><button data-a="more" id="tMoreBtn">☰</button>
+  <div id="tmore" hidden>
+    <button data-a="base">🏠<span>Căn cứ</span></button><button data-a="gacha" class="gbtn">🎴<span>Triệu hồi</span></button><button data-a="craft">⚒<span>Chế tạo</span></button><button data-a="chat">💬<span>Nhắn tin</span></button><button data-a="fs">⛶<span>Toàn màn hình</span></button>
+    <button data-k="KeyL" class="ico"><img src="assets/img/i_flashlight.png" alt=""><span>Đèn pin</span></button><button data-k="KeyB" class="ico"><img src="assets/img/i_planks.png" alt=""><span>Rào chắn</span><i></i></button><button data-k="KeyT" class="ico"><img src="assets/img/i_scrap.png" alt=""><span>Bẫy</span><i></i></button><button data-k="KeyU" class="ico"><img src="assets/img/ui_5.png" alt=""><span>Truyền tống</span></button>
+  </div>
 </div>
 <div id="fsHint" hidden></div>
 <div id="rotate">Xoay ngang điện thoại để chơi dễ hơn</div>
@@ -156,6 +159,7 @@
           <tr><td>C / Tab / M</td><td>Chế tạo / Túi đồ / Bản đồ</td></tr>
           <tr><td>U</td><td>Cuộn truyền tống: về nơi trú ẩn / thoát hầm ngục</td></tr>
           <tr><td>Y</td><td>Tế Đàn triệu hồi (gacha): thú cưng, trang bị, báu vật</td></tr>
+          <tr><td>N / M</td><td>Căn cứ / Bản đồ (chạm ◆ ✦ ⌂ để dịch chuyển)</td></tr>
           <tr><td>Enter</td><td>Nhắn tin cho đồng đội (khi chơi cùng bạn bè)</td></tr>
         </table>
         <h3>Điện thoại</h3>
@@ -249,6 +253,16 @@
   <div id="gAnim" class="ganim" hidden><div class="gsky"></div><div class="gstreak"></div><div class="gflash"></div><div id="gCards"></div><button id="gCont" hidden>TIẾP TỤC ▶</button></div>
 </div>
 
+<div id="base" class="screen hidden">
+  <div class="panel wide basep">
+    <button class="close" onclick="UI.closePanel()">✕</button>
+    <div class="bhead"><h2>🏠 CĂN CỨ <small id="bLvl"></small></h2><div id="bRes"></div></div>
+    <div class="tabs"><button data-btab="build">Công trình</button><button data-btab="forge">Lò rèn</button><button data-btab="kitchen">Bếp</button><button data-btab="bounty">Nhiệm vụ</button></div>
+    <div id="bAway" class="baway" hidden>Bạn đang ở xa Căn cứ — xem được nhưng phải về mới xây, rèn, nấu, nhận thưởng. <button id="bHome">⌂ DỊCH CHUYỂN VỀ CĂN CỨ</button></div>
+    <div id="baseBody"></div>
+  </div>
+</div>
+
 <div id="coop" class="screen hidden">
   <div class="panel wide coopp">
     <button class="close" onclick="UI.back()">✕</button>
@@ -289,7 +303,9 @@
   <div class="panel mapp">
     <button class="close" onclick="UI.closePanel()">✕</button>
     <h2>BẢN ĐỒ <small>[M] đóng</small></h2>
-    <canvas id="bigmap" width="800" height="800"></canvas>
+    <div class="mapwrap"><canvas id="bigmap" width="800" height="800"></canvas>
+      <div class="mapctl"><button id="mapZin">＋</button><button id="mapZout">－</button><button id="mapMe">◎</button></div></div>
+    <button id="mapTp" hidden></button>
     <div id="mapInfo" class="muted"></div>
   </div>
 </div>
@@ -336,6 +352,7 @@
 <script src="js/v3.js"></script>
 <script src="js/v4.js"></script>
 <script src="js/coop.js"></script>
+<script src="js/v5.js"></script>
 <script>
   try { G.lowGfx = !!localStorage.getItem('tt_low'); } catch (e) {}
   resize();

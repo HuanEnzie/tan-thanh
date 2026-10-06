@@ -375,7 +375,7 @@ const UI = {
       for (let i = 0; i < 3; i++) h += `<div class="geqs">${this.itemHtml(P.relics[i])}<small>Thánh vật ${i + 1}</small></div>`;
       for (const sl of ARMOR_SLOTS) h += `<div class="geqs">${this.itemHtml(P.armor[sl])}<small>${ARMOR_SLOT_LABEL[sl]}</small></div>`;
       h += `</div><p class="muted">Giáp: <b>${P.armorVal}</b> (giảm ${Math.round(P.armorVal / (P.armorVal + 100) * 100)}% sát thương) • ${esc(cur().name)}: <b style="color:${cur().col}">${P.gold}</b></p>`;
-      h += '<h3>Túi đồ (' + P.stash.length + '/30)</h3><div class="gstash">';
+      h += '<h3>Túi đồ (' + P.stash.length + '/' + G.stashCap() + ')</h3><div class="gstash">';
       for (const it of P.stash) h += this.itemHtml(it);
       if (!P.stash.length) h += '<p class="muted">Chưa có trang bị dự phòng. Hạ tinh anh, boss và mở rương báu để nhận đồ.</p>';
       h += '</div><div id="gdetail" class="gdetail"><p class="muted">Chạm vào một món đồ để xem chi tiết.</p></div>';

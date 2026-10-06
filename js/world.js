@@ -253,6 +253,7 @@ const World = {
     const forced = (typeof Story !== 'undefined') ? Story.poiAt(sx, sy) : null;
     if (sx === 0 && sy === 0) { this.genStart(bk); }
     else if (forced) this.genPOI(bk, forced, sb);
+    else if (this.v5Site && this.v5Site(sx, sy)) this.genV5Site(bk, sb);
     else if (this.wonderAt(sx, sy) != null) this.genWonder(bk, this.wonderAt(sx, sy), sb);
     else {
       const r = SR.f();

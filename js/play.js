@@ -344,6 +344,7 @@ G.update = function (dt) {
   this.updateHazards(dt);
   if (this.frame % 20 === 0) this.biomeTick();
   this.v4Tick(dt);
+  this.v5Tick(dt);
   if (this.boss && (this.boss.dead || dist(this.boss.x, this.boss.y, P.x, P.y) > 900)) UI.boss(null); else if (this.boss) UI.boss(this.boss);
   this.spawnTick(dt);
   Bullets.update(dt);
