@@ -114,7 +114,7 @@ const World = {
     });
     this.sbs.set(k, sb);
     if (!this.minis.has(this.mode + k)) this.buildMini(sb);
-    if (!(d && d.cleared)) for (const s of sb.spawns) this.pending.push(s);
+    if (!(d && d.cleared)) for (const s of sb.spawns) { s.sbk = sb.key; this.pending.push(s); }
     return sb;
   },
   sbDelta(p) {
@@ -147,6 +147,7 @@ const World = {
     }
     this.sbs.delete(sb.key);
     if (this._last === sb) this._last = null;
+    if (typeof G !== 'undefined' && G.zombies) G.zombies = G.zombies.filter(z => { if (z.sbk !== sb.key || z.story) return true; if (z === G.boss) { G.boss = null; UI.boss(null); } return false; });
   },
 
   // ---------- zones ----------

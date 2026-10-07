@@ -529,7 +529,7 @@ const G = {
   processPending() {
     while (World.pending.length) {
       const s = World.pending.shift();
-      if (s.kind === 'enemy') { const z = this.spawnEnemy(s.arche, s.x, s.y, { elite: s.elite, guard: s.guard }); if (s.gid) z.gid = s.gid; }
+      if (s.kind === 'enemy') { const z = this.spawnEnemy(s.arche, s.x, s.y, { elite: s.elite, guard: s.guard }); if (s.gid) z.gid = s.gid; if (s.sbk != null) z.sbk = s.sbk; }
       else if (s.kind === 'civ') this.allies.push(new Ally('civ', s.x, s.y, { img: RL.npc[s.sprite] }));
       else if (s.kind === 'elder' || s.kind === 'villager') { if (this.spawnCustom) this.spawnCustom(s); }
       else if (s.kind === 'merchant') { if (!this.allies.some(a => a.kind === 'merchant' && dist(a.x, a.y, s.x, s.y) < 40)) this.spawnMerchant(s.x, s.y); }
@@ -546,6 +546,7 @@ const G = {
         const z = this.spawnEnemy('boss', s.x, s.y, { lvl: lvl + (s.mini ? 1 : 0), name, story: s.story, hpMul, guard: true, bossDef: bd });
         z.dungeon = !!s.dungeon; z.mini = !!s.mini;
         if (s.gid) z.gid = s.gid;
+        if (s.sbk != null) z.sbk = s.sbk;
         if (s.noChest) z.noChest = true;
         if (s.lord) { z.lord = s.lord; z.maxHp *= 1.4; z.hp = z.maxHp; z.lvl += 2; const [lx, ly] = s.lord.split(',').map(Number); z.name = LORD_NAME[rk(RL.id)] + ' ' + World.regionInfo(lx, ly).name.split(' ').slice(-2).join(' ') + ' — ' + bd.def.name; }
 

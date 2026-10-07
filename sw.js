@@ -1,7 +1,7 @@
 // Service worker: lets the installed app start offline.
 // Code (html/js/css) is network-first so updates arrive as soon as you are online;
 // images and audio are cache-first and get cached the first time the game uses them.
-const VERSION = 'tt-v11';
+const VERSION = 'tt-v12';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css', 'css/v2.css',
   'js/util.js', 'js/data.js', 'js/realms.js', 'js/lore.js', 'js/lore_bond.js', 'js/assets.js', 'js/world.js', 'js/data2.js',

@@ -331,12 +331,16 @@ G.update = function (dt) {
   }
   this.flowT -= dt;
   if (this.flowT <= 0) { this.flowT = 0.3; this.computeFlow(); }
-  for (const z of this.zombies) z.update(dt);
+  // camp guards far from every player sleep (no AI) until someone comes back; they stay with their area
+  for (const z of this.zombies) {
+    if (z.sbk != null && World.mode === 'over' && !z.dead && (this.frame + (z.id | 0)) % 4 === 0) z.far = (this.nearestPlayerDist ? this.nearestPlayerDist(z.x, z.y) : dist(z.x, z.y, P.x, P.y)) > 1900;
+    if (!z.far) z.update(dt);
+  }
   for (let i = this.zombies.length - 1; i >= 0; i--) {
     const z = this.zombies[i];
     if (z.dead) { if (z.dying > 0.45) this.zombies.splice(i, 1); continue; }
     const d = this.nearestPlayerDist ? this.nearestPlayerDist(z.x, z.y) : dist(z.x, z.y, P.x, P.y);
-    if (World.mode === 'over' && ((d > 1500 && !z.guard) || (d > 2400 && !z.story))) { if (z === this.boss) { this.boss = null; UI.boss(null); } this.zombies.splice(i, 1); }
+    if (World.mode === 'over' && ((d > 1500 && !z.guard) || (d > 2400 && !z.story && z.sbk == null))) { if (z === this.boss) { this.boss = null; UI.boss(null); } this.zombies.splice(i, 1); }
   }
   for (const a of this.allies) a.update(dt);
   // drop civilians / merchants left far behind (they respawn with their area)
