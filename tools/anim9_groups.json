@@ -1,0 +1,321 @@
+{
+ "an_md_s0": {
+  "names": [
+   "z_walker",
+   "z_runner",
+   "z_brute",
+   "z_spitter"
+  ],
+  "kind": "walk"
+ },
+ "an_md_s1": {
+  "names": [
+   "z_police",
+   "z_boomer",
+   "z_hazmat",
+   "z_nurse"
+  ],
+  "kind": "walk"
+ },
+ "an_md_s2": {
+  "names": [
+   "md_bm_0",
+   "md_bm_1",
+   "md_bm_2",
+   "md_bm_3"
+  ],
+  "kind": "walk"
+ },
+ "an_md_s3": {
+  "names": [
+   "md_bm_4",
+   "md_bm_5",
+   "md_npc_0",
+   "md_npc_1"
+  ],
+  "kind": "walk"
+ },
+ "an_md_s4": {
+  "names": [
+   "md_npc_2",
+   "md_npc_3"
+  ],
+  "kind": "walk"
+ },
+ "an_md_b0": {
+  "names": [
+   "z_boss",
+   "md_b_0"
+  ],
+  "kind": "walk"
+ },
+ "an_md_b1": {
+  "names": [
+   "md_b_1",
+   "md_b_2"
+  ],
+  "kind": "walk"
+ },
+ "an_md_b2": {
+  "names": [
+   "md_b_3"
+  ],
+  "kind": "walk"
+ },
+ "an_md_h0": {
+  "names": [
+   "p_pistol",
+   "p_shotgun",
+   "p_rifle",
+   "p_bat"
+  ],
+  "kind": "hero"
+ },
+ "an_md_h1": {
+  "names": [
+   "md_o1_0",
+   "md_o1_1",
+   "md_o1_2",
+   "md_o1_3"
+  ],
+  "kind": "hero"
+ },
+ "an_md_h2": {
+  "names": [
+   "md_o2_0",
+   "md_o2_1",
+   "md_o2_2",
+   "md_o2_3"
+  ],
+  "kind": "hero"
+ },
+ "an_md_h3": {
+  "names": [
+   "md_o3_0",
+   "md_o3_1",
+   "md_o3_2",
+   "md_o3_3"
+  ],
+  "kind": "hero"
+ },
+ "an_tt_s0": {
+  "names": [
+   "tt_e_0",
+   "tt_e_1",
+   "tt_e_2",
+   "tt_e_3"
+  ],
+  "kind": "walk"
+ },
+ "an_tt_s1": {
+  "names": [
+   "tt_e_4",
+   "tt_e_5",
+   "tt_bm_0",
+   "tt_bm_1"
+  ],
+  "kind": "walk"
+ },
+ "an_tt_s2": {
+  "names": [
+   "tt_bm_2",
+   "tt_bm_3",
+   "tt_bm_4",
+   "tt_bm_5"
+  ],
+  "kind": "walk"
+ },
+ "an_tt_s3": {
+  "names": [
+   "tt_npc_0",
+   "tt_npc_1",
+   "tt_npc_2",
+   "tt_npc_3"
+  ],
+  "kind": "walk"
+ },
+ "an_tt_b0": {
+  "names": [
+   "tt_e_6",
+   "tt_b_0"
+  ],
+  "kind": "walk"
+ },
+ "an_tt_b1": {
+  "names": [
+   "tt_b_1",
+   "tt_b_2"
+  ],
+  "kind": "walk"
+ },
+ "an_tt_b2": {
+  "names": [
+   "tt_b_3"
+  ],
+  "kind": "walk"
+ },
+ "an_tt_h0": {
+  "names": [
+   "tt_hero_0",
+   "tt_hero_1",
+   "tt_hero_2",
+   "tt_hero_3"
+  ],
+  "kind": "hero"
+ },
+ "an_tt_h1": {
+  "names": [
+   "tt_o1_0",
+   "tt_o1_1",
+   "tt_o1_2",
+   "tt_o1_3"
+  ],
+  "kind": "hero"
+ },
+ "an_tt_h2": {
+  "names": [
+   "tt_o2_0",
+   "tt_o2_1",
+   "tt_o2_2",
+   "tt_o2_3"
+  ],
+  "kind": "hero"
+ },
+ "an_tt_h3": {
+  "names": [
+   "tt_o3_0",
+   "tt_o3_1",
+   "tt_o3_2",
+   "tt_o3_3"
+  ],
+  "kind": "hero"
+ },
+ "an_sl_s0": {
+  "names": [
+   "sl_e_0",
+   "sl_e_1",
+   "sl_e_2",
+   "sl_e_3"
+  ],
+  "kind": "walk"
+ },
+ "an_sl_s1": {
+  "names": [
+   "sl_e_4",
+   "sl_e_5",
+   "sl_bm_0",
+   "sl_bm_1"
+  ],
+  "kind": "walk"
+ },
+ "an_sl_s2": {
+  "names": [
+   "sl_bm_2",
+   "sl_bm_3",
+   "sl_bm_4",
+   "sl_bm_5"
+  ],
+  "kind": "walk"
+ },
+ "an_sl_s3": {
+  "names": [
+   "sl_npc_0",
+   "sl_npc_1",
+   "sl_npc_2",
+   "sl_npc_3"
+  ],
+  "kind": "walk"
+ },
+ "an_sl_b0": {
+  "names": [
+   "sl_e_6",
+   "sl_b_0"
+  ],
+  "kind": "walk"
+ },
+ "an_sl_b1": {
+  "names": [
+   "sl_b_1",
+   "sl_b_2"
+  ],
+  "kind": "walk"
+ },
+ "an_sl_b2": {
+  "names": [
+   "sl_b_3"
+  ],
+  "kind": "walk"
+ },
+ "an_sl_h0": {
+  "names": [
+   "sl_hero_0",
+   "sl_hero_1",
+   "sl_hero_2",
+   "sl_hero_3"
+  ],
+  "kind": "hero"
+ },
+ "an_sl_h1": {
+  "names": [
+   "sl_o1_0",
+   "sl_o1_1",
+   "sl_o1_2",
+   "sl_o1_3"
+  ],
+  "kind": "hero"
+ },
+ "an_sl_h2": {
+  "names": [
+   "sl_o2_0",
+   "sl_o2_1",
+   "sl_o2_2",
+   "sl_o2_3"
+  ],
+  "kind": "hero"
+ },
+ "an_sl_h3": {
+  "names": [
+   "sl_o3_0",
+   "sl_o3_1",
+   "sl_o3_2",
+   "sl_o3_3"
+  ],
+  "kind": "hero"
+ },
+ "an_pet0": {
+  "names": [
+   "pet_0",
+   "pet_1",
+   "pet_2",
+   "pet_3"
+  ],
+  "kind": "pet"
+ },
+ "an_pet1": {
+  "names": [
+   "pet_4",
+   "pet_5",
+   "pet_6",
+   "pet_7"
+  ],
+  "kind": "pet"
+ },
+ "an_mnt0": {
+  "names": [
+   "mount_0",
+   "mount_1",
+   "mount_2",
+   "mount_3"
+  ],
+  "kind": "mount"
+ },
+ "an_mnt1": {
+  "names": [
+   "mount_4",
+   "mount_5",
+   "mount_6",
+   "mount_7"
+  ],
+  "kind": "mount"
+ }
+}

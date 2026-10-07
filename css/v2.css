@@ -382,3 +382,5 @@ body.touch .mapp { position: relative; }
 #tSkill .tic { position: absolute; inset: 9px; width: calc(100% - 18px); height: calc(100% - 18px); object-fit: contain; image-rendering: pixelated; border-radius: 50%; pointer-events: none; opacity: 0.9; }
 #tSkill span { position: relative; z-index: 1; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000; }
 #tSkill { position: fixed; overflow: hidden; }
+body.touch .brow .bar { height: 13px; border-width: 3px 7px; }
+body.touch .brow .bar .fill { min-height: 5px; }
