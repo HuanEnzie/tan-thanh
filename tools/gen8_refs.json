@@ -1,0 +1,20 @@
+{
+ "fx_a": [],
+ "fx_b": [],
+ "fx_c": [],
+ "fx_d": [],
+ "fx_e": [],
+ "fx_f": [],
+ "projectiles": [],
+ "mon_md": [
+  "ref_enemy_md"
+ ],
+ "mon_tt": [
+  "ref_enemy_tt"
+ ],
+ "mon_sl": [
+  "ref_enemy_sl"
+ ],
+ "icons": [],
+ "ui_kit": []
+}

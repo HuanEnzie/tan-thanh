@@ -363,3 +363,22 @@ body.touch .mapp { position: relative; }
 .btn6 { font: 16px VT323, monospace; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
 .btn6.ok { color: #6dff7a; } .btn6.bad { color: #ff6a5a; }
 #tMount.on { border-color: #ffd65a; box-shadow: 0 0 12px rgba(255,214,90,0.7); background: rgba(90,60,10,0.85); }
+
+/* v7: pixel UI frames (ui_panel / ui_btn / ui_bar) + icon buttons */
+.panel { border: 26px solid transparent; border-image: url(../assets/img/ui_panel.png) 40 fill / 26px stretch; background: none; box-shadow: 0 20px 60px rgba(0,0,0,0.7); padding: 12px 18px; }
+.panel .close { z-index: 3; }
+.panel > h2, .panel h2 { text-shadow: 2px 2px 0 #000; }
+.menu button, .panel button:not(.close):not(.tic-btn) { border: 10px solid transparent; border-image: url(../assets/img/ui_btn.png) 26 40 fill / 10px 16px stretch; background: none; box-shadow: none; }
+.menu button:hover:not(:disabled), .panel button:not(.close):hover:not(:disabled) { background: none; filter: brightness(1.25); }
+.panel button.dim { filter: grayscale(0.6); }
+.brow .bar { border: 5px solid transparent; border-image: url(../assets/img/ui_bar.png) 14 30 fill / 5px 12px stretch; background: none; height: 22px; box-sizing: border-box; }
+.brow .bar .fill { border-radius: 2px; }
+#tmenu button.hasic { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 2px; }
+#tmenu button .tic, #tmore button .tic { width: 26px; height: 26px; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+#tmore button.hasic { flex-direction: column; gap: 2px; }
+#tmore button.hasic .tic { width: 34px; height: 34px; }
+#tDash .tic { width: 30px; height: 30px; image-rendering: pixelated; pointer-events: none; display: block; margin: 0 auto -2px; }
+#tDash { flex-direction: column; font-size: 11px; }
+#tSkill .tic { position: absolute; inset: 9px; width: calc(100% - 18px); height: calc(100% - 18px); object-fit: contain; image-rendering: pixelated; border-radius: 50%; pointer-events: none; opacity: 0.9; }
+#tSkill span { position: relative; z-index: 1; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000; }
+#tSkill { position: fixed; overflow: hidden; }
