@@ -670,7 +670,7 @@ class Ally {
     if (this.hurtT > 0 && this.kind !== 'shadow') { ctx.globalAlpha = 0.6; ctx.drawImage(G.whiteOf(this.img, '#ff4040'), px, -h / 2, w, h); }
     ctx.restore(); ctx.globalAlpha = 1;
     if (this.kind === 'shadow') {
-      ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = 'rgba(80,140,255,0.9)';
+      ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = typeof SM === 'function' ? SM().eye : 'rgba(80,140,255,0.9)';
       ctx.beginPath(); ctx.arc(this.x + Math.cos(this.angle) * 4, this.y + Math.sin(this.angle) * 4, 2.5, 0, TAU); ctx.fill();
       ctx.globalCompositeOperation = 'source-over';
     }

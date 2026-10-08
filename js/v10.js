@@ -16,15 +16,12 @@ const SH_TIER = {
 };
 const SH_ORDER = ['boss', 'mini', 'elite', 'normal'];
 // random recruits
-const RC_CLASS = {
-  md: { melee: 'Chiến binh', ranged: 'Xạ thủ', healer: 'Y tá', mage: 'Kỹ sư điện' },
-  tt: { melee: 'Kiếm tu', ranged: 'Cung tu', healer: 'Đan sư', mage: 'Pháp tu' },
-  sl: { melee: 'Thợ săn cận chiến', ranged: 'Thợ săn tầm xa', healer: 'Trị liệu sư', mage: 'Pháp sư' },
-};
 const RC_ROLE = {
-  melee: { hp: 1.35, atk: 1.1, def: 1.5, spd: 150 }, ranged: { hp: 0.95, atk: 1.15, def: 1, spd: 140 },
+  warrior: { hp: 1.4, atk: 1.05, def: 1.6, spd: 145 }, assassin: { hp: 0.95, atk: 1.35, def: 0.9, spd: 165 }, ranger: { hp: 0.95, atk: 1.15, def: 1, spd: 140 },
   healer: { hp: 1, atk: 0.65, def: 1, spd: 135 }, mage: { hp: 0.85, atk: 1.4, def: 0.8, spd: 130 },
 };
+const OLD_ROLE = { melee: 'warrior', ranged: 'ranger' };
+const roleOf = r => OLD_ROLE[r.role] || r.role;
 const RC_NAMES = {
   md: { fam: ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Võ', 'Đặng', 'Bùi', 'Đỗ', 'Hồ', 'Dương', 'Lý'], m: ['Minh', 'Hùng', 'Quân', 'Khoa', 'Bảo', 'Tuấn', 'Long', 'Phát', 'Duy', 'Tài', 'Nam', 'Sơn'], f: ['Lan', 'Vy', 'Trang', 'Ngân', 'Thảo', 'Mai', 'Hà', 'Linh', 'Quỳnh', 'My', 'Yến', 'Nhi'] },
   tt: { fam: ['Lâm', 'Mộ Dung', 'Tiêu', 'Lý', 'Vân', 'Bạch', 'Hàn', 'Diệp', 'Tô', 'Liễu', 'Thượng Quan', 'Đông Phương'], m: ['Phong', 'Thanh Vân', 'Hàn', 'Kiếm Minh', 'Trường Không', 'Dật', 'Viêm', 'Lăng', 'Thiên Hành', 'Bất Phàm', 'Vô Kỵ', 'Trần'], f: ['Tuyết', 'Nguyệt', 'Dao', 'Linh Nhi', 'Thanh Y', 'Uyển', 'Như Yên', 'Mộng', 'Hà', 'Tử Yên', 'Băng', 'Vũ Điệp'] },
@@ -41,7 +38,32 @@ const RANK_COL = { E: '#b0b0b0', D: '#6ee06e', C: '#4da6ff', B: '#b46bff', A: '#
 
 const manaName = () => MANA_NAME[rk(RL.id)];
 const attrName = k => ATTR_NAME[rk(RL.id)][k];
-const isArise = () => RL && RL.skill && RL.skill.id === 'arise';
+// summoning the fallen exists in every world, under its own name
+const SUMMON = {
+  md: { skill: 'Khống Thi', unit: 'xác sống', army: 'Đội xác sống', col: '#8cff5a', tint: 'rgba(28,66,14,0.74)', eye: 'rgba(255,80,60,0.95)', icon: '☣' },
+  tt: { skill: 'Ngự Quỷ', unit: 'quỷ', army: 'Bách Quỷ', col: '#5affd8', tint: 'rgba(16,86,92,0.72)', eye: 'rgba(170,255,240,0.95)', icon: '👻', ghost: true },
+  sl: { skill: 'Trỗi Dậy', unit: 'bóng', army: 'Binh đoàn bóng tối', col: '#8a7bff', tint: 'rgba(30,20,70,0.78)', eye: 'rgba(80,140,255,0.9)', icon: '🌑' },
+};
+const SM = () => SUMMON[rk(RL.id)];
+const isArise = () => !!RL;
+// classes: stat weights, passives and dash variants live in v11
+const CLASS_KEYS = ['warrior', 'assassin', 'ranger', 'mage', 'healer'];
+const CLASS_NAME = {
+  md: { warrior: 'Chiến Binh', assassin: 'Sát Thủ', ranger: 'Xạ Thủ', mage: 'Kỹ Sư', healer: 'Bác Sĩ' },
+  tt: { warrior: 'Kiếm Tu', assassin: 'Thích Khách', ranger: 'Phù Sư', mage: 'Pháp Tu', healer: 'Đan Sư' },
+  sl: { warrior: 'Chiến Binh', assassin: 'Sát Thủ', ranger: 'Cung Thủ', mage: 'Pháp Sư', healer: 'Trị Liệu Sư' },
+};
+// per point: hp from VIT, weapon % from STR, speed % from AGI, mana and skill % from INT
+const CLASS_W = {
+  warrior: { prim: 'str', hp: 18, str: 0.04, agi: 0.01, mana: 6, skill: 0.03 },
+  assassin: { prim: 'agi', hp: 12, str: 0.035, agi: 0.015, mana: 6, skill: 0.03 },
+  ranger: { prim: 'str', hp: 12, str: 0.04, agi: 0.012, mana: 6, skill: 0.03 },
+  mage: { prim: 'int', hp: 10, str: 0.03, agi: 0.01, mana: 12, skill: 0.05 },
+  healer: { prim: 'int', hp: 14, str: 0.03, agi: 0.01, mana: 8, skill: 0.04 },
+  none: { prim: null, hp: 12, str: 0.03, agi: 0.01, mana: 6, skill: 0.03 },
+};
+const clsW = () => CLASS_W[(G.v10 && G.v10.cls) || 'none'] || CLASS_W.none;
+const clsName = (k, r) => (CLASS_NAME[rk(r || RL.id)] || CLASS_NAME.md)[k] || '';
 const gateKey = (x, y) => Math.round(x / 16) + ',' + Math.round(y / 16);
 
 Object.assign(G, {
@@ -51,13 +73,13 @@ Object.assign(G, {
     this.manaCd = 0;
   },
   attr(k) { return (this.v10 && this.v10.attr[k]) || 0; },
-  maxMana() { const P = this.player; return Math.round(60 + this.attr('int') * 6 + (P ? P.level : 1) * 2); },
+  maxMana() { const P = this.player; return Math.round(60 + this.attr('int') * clsW().mana + (P ? P.level : 1) * 2); },
   // ---------- attributes ----------
   addAttr(k, n) {
     const v = this.v10, P = this.player;
     n = Math.min(n, v.pts); if (n <= 0) return;
     v.attr[k] += n; v.pts -= n;
-    if (k === 'vit') { P.maxHp += 12 * n; P.hp += 12 * n; }
+    if (k === 'vit') { const h = clsW().hp * n; P.maxHp += h; P.hp += h; }
     if (k === 'agi') { P.maxStam += 2 * n; }
     UI.dirty = true;
   },
@@ -81,38 +103,39 @@ Object.assign(G, {
     const a = new Ally('shadow', P.x + R.range(-50, 50), P.y + R.range(20, 60), { img: s.img, hp: st.hp, dmg: st.dmg, r: s.r, scale: s.scale });
     a.life = 1e9; a.sid = s.id; a.upright = !!s.upright; a.sname = s.name; a.stier = s.tier;
     this.allies.push(a);
-    FX.pillar(a.x, a.y, '#6b5bff', 0.9, 20); Particles.burst(a.x, a.y, 12, '#6b5bff', 150);
+    FX.pillar(a.x, a.y, SM().col, 0.9, 20); Particles.burst(a.x, a.y, 12, SM().col, 150);
+    if (SM().ghost) a.fade = 0.82;
     return 'ok';
   },
   summonAll() {
     if (!isArise()) return;
-    if (typeof Net !== 'undefined' && Net.active && Net.guest) { this.toast('Khi vào phòng của bạn bè, binh đoàn bóng tối chỉ gọi được ở thế giới của bạn.', 'info'); return; }
+    if (typeof Net !== 'undefined' && Net.active && Net.guest) { this.toast(`Khi vào phòng của bạn bè, ${SM().army} chỉ gọi được ở thế giới của bạn.`, 'info'); return; }
     const v = this.v10, P = this.player;
     if (P.dead) return;
-    if (!v.shadows.length) { this.toast('Binh đoàn bóng tối trống. Hạ kẻ địch rồi đứng cạnh xác, nhấn [E] để lưu bóng.', 'info'); return; }
+    if (!v.shadows.length) { this.toast(`${SM().army} còn trống. Hạ kẻ địch rồi đứng cạnh xác, nhấn [E] để thu phục.`, 'info'); return; }
     let n = 0, lack = false;
     for (const t of SH_ORDER) for (const s of v.shadows) { if (s.tier !== t) continue; const r = this.summonShadow(s); if (r === 'ok') n++; else if (r === 'mana') lack = true; }
-    if (n) { UI.skillFlash('TRỖI DẬY!', '#6b5bff'); Sound.play('sfx_shadow', 0.8); this.toast(`🌑 ${n} bóng tối đã được triệu hồi${lack ? ` — hết ${manaName()} cho số còn lại` : ''}.`, 'quest'); }
-    else this.toast(lack ? `Không đủ ${manaName()} để gọi bóng.` : 'Mọi bóng tối đã ở bên bạn (hoặc đang hồi phục).', 'info');
+    if (n) { UI.skillFlash(SM().skill.toUpperCase() + '!', SM().col); Sound.play('sfx_shadow', 0.8); this.toast(`${SM().icon} Đã gọi ${n} ${SM().unit}${lack ? ` — hết ${manaName()} cho số còn lại` : ''}.`, 'quest'); }
+    else this.toast(lack ? `Không đủ ${manaName()} để gọi ${SM().unit}.` : `Mọi ${SM().unit} rảnh đã ở bên bạn (số còn lại đang hồi phục, làm việc hoặc khám phá).`, 'info');
   },
-  recallShadow(s) { const a = this.shadowAlly(s); if (a) { a.recalled = true; a.dead = true; Particles.burst(a.x, a.y, 10, '#6b5bff', 120); } },
+  recallShadow(s) { const a = this.shadowAlly(s); if (a) { a.recalled = true; a.dead = true; Particles.burst(a.x, a.y, 10, SM().col, 120); } },
   extractShadow(c) {
     const v = this.v10, T = SH_TIER[c.tier], unique = c.tier === 'boss' || c.tier === 'mini';
-    if (unique && v.shadows.some(s => s.key === c.key)) { this.toast(`Bóng của ${c.name} đã có trong binh đoàn — mỗi boss chỉ có một bóng.`, 'info'); return; }
-    if (v.shadows.length >= this.shadowCap()) { this.toast(`Binh đoàn đã đầy (${v.shadows.length}/${this.shadowCap()}). Lên cấp để chứa thêm, hoặc giải phóng bớt trong Túi đồ > Bóng tối.`, 'warn'); return; }
-    if (v.mana < T.mana) { this.toast(`Cần ${T.mana} ${manaName()} để lưu bóng.`, 'warn'); return; }
+    if (unique && v.shadows.some(s => s.key === c.key)) { this.toast(`${c.name} đã có trong ${SM().army} — mỗi loại boss chỉ thu phục được một.`, 'info'); return; }
+    if (v.shadows.length >= this.shadowCap()) { this.toast(`${SM().army} đã đầy (${v.shadows.length}/${this.shadowCap()}). Lên cấp để chứa thêm, hoặc giải phóng bớt trong Túi đồ > ${SM().army}.`, 'warn'); return; }
+    if (v.mana < T.mana) { this.toast(`Cần ${T.mana} ${manaName()} để thu phục.`, 'warn'); return; }
     v.mana -= T.mana;
     const i = this.corpses.indexOf(c); if (i >= 0) this.corpses.splice(i, 1);
-    UI.skillFlash('TRỖI DẬY!', '#6b5bff'); Sound.play('sfx_shadow', 0.9); FX.pillar(c.x, c.y, '#6b5bff', 1, 22); Particles.burst(c.x, c.y, 16, '#6b5bff', 160);
+    UI.skillFlash(SM().skill.toUpperCase() + '!', SM().col); Sound.play('sfx_shadow', 0.9); FX.pillar(c.x, c.y, SM().col, 1, 22); Particles.burst(c.x, c.y, 16, SM().col, 160);
     if (Math.random() < this.extractChance(c)) {
       const s = { id: v.sid++, name: c.name, tier: c.tier, img: c.img, scale: c.scale || 1, r: c.r || 12, upright: !!c.upright, key: unique ? c.key : null, lvl: c.lvl || 1, kills: 0, cd: 0 };
       v.shadows.push(s);
       const P = this.player, a0 = { x: P.x, y: P.y }; P.x = c.x; P.y = c.y; this.summonShadow(s, true); P.x = a0.x; P.y = a0.y;
-      this.toast(`🌑 Lưu bóng thành công: ${s.name} (${T.name}) • binh đoàn ${v.shadows.length}/${this.shadowCap()}`, 'quest');
+      this.toast(`${SM().icon} ${SM().skill} thành công: ${s.name} (${T.name}) • ${v.shadows.length}/${this.shadowCap()}`, 'quest');
     } else {
       const a = new Ally('shadow', c.x, c.y, { img: c.img, hp: T.hp * 0.6, dmg: T.dmg * (1 + this.player.level * 0.05), r: c.r, scale: c.scale });
       a.life = 30; a.upright = !!c.upright; this.allies.push(a);
-      this.toast(`Lưu bóng thất bại — ${c.name} chỉ trỗi dậy tạm thời rồi sẽ tan biến.`, 'warn');
+      this.toast(`${SM().skill} thất bại — ${c.name} chỉ đứng dậy tạm thời rồi sẽ tan biến.`, 'warn');
     }
     UI.dirty = true;
   },
@@ -136,17 +159,18 @@ Object.assign(G, {
   maxFollow() { return Math.min(4, 1 + Math.floor(this.player.level / 10)); },
   followCount() { return this.companions.filter((c, i) => c.joined && this.v10.follow[i]).length + this.v10.recruits.filter(r => r.follow).length; },
   rcStats(r) {
-    const R0 = RC_ROLE[r.role], k = 1 + 0.15 * (r.star - 1);
+    const R0 = RC_ROLE[roleOf(r)], k = 1 + 0.15 * (r.star - 1);
     return { hp: Math.round((130 + r.lvl * 14) * R0.hp * k), atk: Math.round((14 + r.lvl * 2.6) * R0.atk * k), def: Math.round((2 + r.lvl * 0.7) * R0.def), spd: R0.spd };
   },
   makeRecruit(rnd, lvl) {
     const k = rk(RL.id), N = RC_NAMES[k], g = rnd() < 0.5 ? 'm' : 'f';
     const pick = a => a[Math.floor(rnd() * a.length)];
-    const role = pick(['melee', 'ranged', 'healer', 'mage']);
+    const role = pick(CLASS_KEYS);
     const u = rnd(), star = u < 0.5 ? 1 : u < 0.8 ? 2 : u < 0.95 ? 3 : 4;
     return { name: pick(N.fam) + ' ' + pick(N[g]), g, role, star, lvl: Math.max(1, lvl), xp: 0, sprite: Math.floor(rnd() * RL.npc.length), follow: false, hurtUntil: 0 };
   },
-  rcClass(r) { return RC_CLASS[rk(RL.id)][r.role]; },
+  rcSprite(r) { const n = `${rk(RL.id)}_cls_${roleOf(r)}_${r.g || 'm'}`; return IMG[n] ? n : RL.npc[r.sprite] || RL.npc[0]; },
+  rcClass(r) { return clsName(roleOf(r)); },
   hire(spec, cost) {
     const v = this.v10, P = this.player;
     if (cost && P.gold < cost) { this.toast(`Cần ${cost} ${cur().name}.`, 'warn'); return false; }
@@ -179,7 +203,7 @@ Object.assign(G, {
       if (!a && want !== 'none') {
         const home = want === 'home', hx = home ? bp.x - 220 + (i % 6) * 80 : P.x + R.range(-50, 50), hy = home ? bp.y + 230 + Math.floor(i / 6) * 50 : P.y + R.range(20, 60);
         const st = this.rcStats(r);
-        a = new Ally('merc', hx, hy, { img: RL.npc[r.sprite] || RL.npc[0] });
+        a = new Ally('merc', hx, hy, { img: G.rcSprite(r) });
         a.rc = r; a.maxHp = a.hp = st.hp; a.dmg = st.atk; a.name = r.name;
         if (home) { a.home = { x: hx, y: hy }; a.hp = a.maxHp; } else a.speak(R.pick(RC_LINES.follow), 2.5);
         this.allies.push(a);
@@ -242,7 +266,7 @@ Object.assign(G, {
     v.mana = Math.min(mm, v.mana + dt * (2 + this.attr('int') * 0.1 + P.level * 0.04) * fast);
     if (UI.dialogOpen || G.state !== 'playing') return;
     if (Input.hit('KeyV')) this.castMana();
-    if (Input.hit('KeyX')) this.summonAll();
+    if (Input.hit('KeyK')) this.summonAll();
     // in co-op the host simulates every ally, so a guest keeps their party and shadows at home
     if (typeof Net !== 'undefined' && Net.active && Net.guest) return;
     if (this.frame % 20 === 0) this.partySync();
@@ -252,7 +276,7 @@ Object.assign(G, {
         const c = this.shelterCands(sh);
         c.list.forEach((r, i) => {
           if (c.taken.includes(i) || this.allies.some(a => a.ckey === sh.key && a.ci === i && !a.dead)) return;
-          const a = new Ally('cand', sh.x - 120 + i * 120, sh.y + 120, { img: RL.npc[r.sprite] || RL.npc[0] });
+          const a = new Ally('cand', sh.x - 120 + i * 120, sh.y + 120, { img: this.rcSprite(r) });
           a.home = { x: a.x, y: a.y }; a.cand = r; a.ckey = sh.key; a.ci = i; a.name = r.name; a.sayT = R.range(3, 12);
           this.allies.push(a);
         });
@@ -287,7 +311,7 @@ Object.assign(G, {
     UI.v10Hud();
     if (!v.hello) {
       v.hello = 1;
-      setTimeout(() => this.toast(`✨ Mới: thanh ${manaName()}, điểm tiềm năng khi lên cấp (Túi đồ > Nhân vật), đồng đội chiêu mộ ở khu trú ẩn ⛺, Cổng hiện trên bản đồ và dịch chuyển được.${isArise() ? ' Đứng cạnh xác kẻ địch, nhấn [E] để lưu bóng; [X] gọi binh đoàn.' : ''}`, 'quest'), isNew ? 20000 : 4000);
+      setTimeout(() => this.toast(`✨ Mới: thanh ${manaName()}, điểm tiềm năng khi lên cấp (Túi đồ > Nhân vật), đồng đội chiêu mộ ở khu trú ẩn ⛺, Cổng hiện trên bản đồ và dịch chuyển được.${isArise() ? ' Đứng cạnh xác kẻ địch, nhấn [E] để thu phục; [K] gọi đội quân.' : ''}`, 'quest'), isNew ? 20000 : 4000);
     }
   };
   const tick = G.v5Tick;
@@ -308,13 +332,13 @@ Object.assign(G, {
   const he = G.hitEnemy;
   G.hitEnemy = function (z, dmg, kx, ky, src, ang, wp) {
     if (this.v10) {
-      if (src === 'gun' || src === 'melee') dmg *= 1 + this.attr('str') * 0.03;
-      else if (src === 'skill') dmg *= 1 + this.attr('int') * 0.03;
+      if (src === 'gun' || src === 'melee') dmg *= 1 + this.attr('str') * clsW().str;
+      else if (src === 'skill') dmg *= 1 + this.attr('int') * clsW().skill;
     }
     return he.call(this, z, dmg, kx, ky, src, ang, wp);
   };
   const sm = Player.prototype.speedMul;
-  Player.prototype.speedMul = function () { return sm.call(this) * (1 + Math.min(0.5, G.attr('agi') * 0.01)); };
+  Player.prototype.speedMul = function () { return sm.call(this) * (1 + Math.min(0.6, G.attr('agi') * clsW().agi)); };
 
   // kills: corpse details for shadow extraction, shadow / recruit growth, mini-boss respawn timers
   const ke = G.killEnemy;
@@ -382,7 +406,7 @@ Object.assign(G, {
       const o = best && (best.prop || best.ally), db = o ? dist(o.x, o.y, P.x, P.y) : 1e9;
       let bc = null, bd = 60;
       for (const c of this.corpses) { if (!c.tier || this.time - c.t > 120) continue; const d = dist(c.x, c.y, P.x, P.y); if (d < bd) { bd = d; bc = c; } }
-      if (bc && (!best || bd <= db + 8)) { const T = SH_TIER[bc.tier]; return { corpse: bc, kind: 'corpse', label: `Trỗi dậy — lưu bóng ${bc.name} (${T.name}) • ${Math.round(this.extractChance(bc) * 100)}% • ${T.mana} ${manaName()}` }; }
+      if (bc && (!best || bd <= db + 8)) { const T = SH_TIER[bc.tier]; return { corpse: bc, kind: 'corpse', label: `${SM().skill} — thu phục ${bc.name} (${T.name}) • ${Math.round(this.extractChance(bc) * 100)}% • ${T.mana} ${manaName()}` }; }
     }
     const o = best && (best.prop || best.ally), db = o ? dist(o.x, o.y, P.x, P.y) : best ? 0 : 1e9;
     for (const a of this.allies) if (a.kind === 'cand' && !a.dead && dist(a.x, a.y, P.x, P.y) < Math.min(55, db)) return { ally: a, kind: 'cand', label: `Trò chuyện: ${a.cand.name} (${this.rcClass(a.cand)} ${'★'.repeat(a.cand.star)})` };
@@ -440,7 +464,7 @@ Object.assign(G, {
     if (this.sid && this.dead && !this.recalled && !this.gone) {
       this.gone = true;
       const s = G.v10.shadows.find(q => q.id === this.sid);
-      if (s) { s.cd = G.time + SHADOW_CD; G.toast(`🌑 Bóng ${s.name} tan rã — hồi phục sau ${SHADOW_CD}s.`, 'info'); }
+      if (s) { s.cd = G.time + SHADOW_CD; G.toast(`${SM().icon} ${s.name} tan rã — hồi phục sau ${SHADOW_CD}s.`, 'info'); }
     }
   };
   const ad = Ally.prototype.draw;
@@ -451,9 +475,9 @@ Object.assign(G, {
       ctx.globalAlpha = Math.max(0, this.fade);
       ctx.save(); ctx.translate(this.x + Math.cos(this.angle) * this.lunge * 6, this.y); ctx.scale(fl, 1);
       ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore(); ctx.globalAlpha = 1;
-      if (this.hp < this.maxHp) { ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(this.x - 16, this.y - h / 2 - 6, 32, 3); ctx.fillStyle = '#6b5bff'; ctx.fillRect(this.x - 16, this.y - h / 2 - 6, 32 * Math.max(0, this.hp / this.maxHp), 3); }
+      if (this.hp < this.maxHp) { ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(this.x - 16, this.y - h / 2 - 6, 32, 3); ctx.fillStyle = SM().col; ctx.fillRect(this.x - 16, this.y - h / 2 - 6, 32 * Math.max(0, this.hp / this.maxHp), 3); }
     } else ad.call(this, ctx);
-    if (this.sname && (this.stier === 'boss' || this.stier === 'mini')) { ctx.font = '8px VT323, monospace'; ctx.textAlign = 'center'; ctx.fillStyle = '#b9a8ff'; ctx.fillText('🌑 ' + this.sname, this.x, this.y - (this.upright ? 34 : 24)); }
+    if (this.sname && (this.stier === 'boss' || this.stier === 'mini')) { ctx.font = '8px VT323, monospace'; ctx.textAlign = 'center'; ctx.fillStyle = SM().col; ctx.fillText(this.sname, this.x, this.y - (this.upright ? 34 : 24)); }
     if (this.kind === 'merc' || this.kind === 'cand') {
       const r = this.rc || this.cand;
       ctx.font = '8px VT323, monospace'; ctx.textAlign = 'center'; ctx.fillStyle = this.kind === 'cand' ? '#ffe28a' : '#9fe8ff';
@@ -464,7 +488,7 @@ Object.assign(G, {
 })();
 
 function mercUpdate(a, dt) {
-  const P = G.player, r = a.rc, st = G.rcStats(r);
+  const P = G.player, r = a.rc, st = G.rcStats(r), role = roleOf(r), melee = role === 'warrior' || role === 'assassin';
   a.hurtT -= dt; a.cool -= dt;
   if (a.say) { a.say.t -= dt; if (a.say.t <= 0) a.say = null; }
   if (a.home) {
@@ -477,29 +501,30 @@ function mercUpdate(a, dt) {
   }
   const lead = P.car || P, dp = dist(a.x, a.y, lead.x, lead.y);
   if (dp > 700) { a.x = lead.x - 40 + R.range(-20, 20); a.y = lead.y + 30; }
-  const tgt = a.nearestEnemy(r.role === 'melee' ? 380 : 340);
+  const tgt = a.nearestEnemy(melee ? 380 : 340);
   let mx = 0, my = 0, speed = st.spd;
   const follow = () => { if (dp > 85) { mx = (lead.x - a.x) / dp; my = (lead.y - a.y) / dp; speed = dp > 220 ? st.spd + 60 : st.spd; } };
   if (tgt) {
     const d = dist(a.x, a.y, tgt.x, tgt.y), ang = Math.atan2(tgt.y - a.y, tgt.x - a.x);
     a.angle = ang;
-    if (r.role === 'melee') {
+    if (melee) {
       if (d > a.r + tgt.r + 6) { mx = (tgt.x - a.x) / d; my = (tgt.y - a.y) / d; }
       else if (a.cool <= 0) {
-        a.cool = 0.6; a.lunge = 1;
-        G._atk = a; G.hitEnemy(tgt, st.atk, Math.cos(ang) * 110, Math.sin(ang) * 110, 'ally', ang); G._atk = null;
+        a.cool = role === 'assassin' ? 0.42 : 0.6; a.lunge = 1;
+        const crit = role === 'assassin' && Math.random() < 0.3;
+        G._atk = a; G.hitEnemy(tgt, st.atk * (crit ? 2 : 1), Math.cos(ang) * 110, Math.sin(ang) * 110, 'ally', ang); G._atk = null;
         FX.slash(a.x, a.y, ang, 30, 1.5, 'rgba(255,230,180,0.85)', 0.14); Sound.at('sfx_blade_hit', a.x, a.y, 0.25, 1.1);
       }
     } else {
       follow();
       if (a.cool <= 0) {
-        if (r.role === 'mage') {
+        if (role === 'mage') {
           a.cool = 1.3;
           FX.bolt(a.x, a.y, tgt.x, tgt.y, RL.projColor || '#9fd8ff'); FX.ring(tgt.x, tgt.y, 6, 70, RL.projColor || '#9fd8ff', 0.35, 5);
           for (const z of G.zgrid.query(tgt.x, tgt.y, 70)) if (!z.dead && dist(z.x, z.y, tgt.x, tgt.y) < 70) G.hitEnemy(z, st.atk, 0, 0, 'ally');
           Sound.at('sfx_electric', a.x, a.y, 0.2, 1.3);
         } else {
-          a.cool = r.role === 'healer' ? 1.1 : 0.5;
+          a.cool = role === 'healer' ? 1.1 : 0.5;
           const W = RL.weapons.r1;
           Bullets.fire(a.x + Math.cos(ang) * 14, a.y + Math.sin(ang) * 14, ang + R.range(-0.05, 0.05), { speed: 900, knock: 40, proj: W.proj || 'bullet', color: W.color, homing: W.homing }, st.atk, { ally: true, src: 'ally' });
           Sound.at(W.sfx, a.x, a.y, 0.18, 1.15);
@@ -509,7 +534,7 @@ function mercUpdate(a, dt) {
     if (Math.random() < dt * 0.04) a.speak(R.pick(RC_LINES.fight), 2);
   } else { follow(); if (Math.hypot(a.vx, a.vy) > 10) a.angle = Math.atan2(a.vy, a.vx); }
   // healers mend the player and the party
-  if (r.role === 'healer') {
+  if (role === 'healer') {
     a.healT = (a.healT || 0) - dt;
     if (a.healT <= 0) {
       a.healT = 2.2;

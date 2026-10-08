@@ -1,0 +1,57 @@
+{
+ "fem_md_0": [
+  "ref_f_md_0"
+ ],
+ "fem_md_1": [
+  "ref_f_md_1"
+ ],
+ "fem_md_2": [
+  "ref_f_md_2"
+ ],
+ "fem_md_3": [
+  "ref_f_md_3"
+ ],
+ "fem_tt_0": [
+  "ref_f_tt_0"
+ ],
+ "fem_tt_1": [
+  "ref_f_tt_1"
+ ],
+ "fem_tt_2": [
+  "ref_f_tt_2"
+ ],
+ "fem_tt_3": [
+  "ref_f_tt_3"
+ ],
+ "fem_sl_0": [
+  "ref_f_sl_0"
+ ],
+ "fem_sl_1": [
+  "ref_f_sl_1"
+ ],
+ "fem_sl_2": [
+  "ref_f_sl_2"
+ ],
+ "fem_sl_3": [
+  "ref_f_sl_3"
+ ],
+ "cls_md_m": [
+  "ref_cls_md"
+ ],
+ "cls_md_f": [
+  "ref_cls_md"
+ ],
+ "cls_tt_m": [
+  "ref_cls_tt"
+ ],
+ "cls_tt_f": [
+  "ref_cls_tt"
+ ],
+ "cls_sl_m": [
+  "ref_cls_sl"
+ ],
+ "cls_sl_f": [
+  "ref_cls_sl"
+ ],
+ "cls_icons": []
+}

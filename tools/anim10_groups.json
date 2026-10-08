@@ -1,0 +1,185 @@
+{
+ "an10_md_f0": {
+  "names": [
+   "md_f0_0",
+   "md_f0_1",
+   "md_f0_2",
+   "md_f0_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_md_f1": {
+  "names": [
+   "md_f1_0",
+   "md_f1_1",
+   "md_f1_2",
+   "md_f1_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_md_f2": {
+  "names": [
+   "md_f2_0",
+   "md_f2_1",
+   "md_f2_2",
+   "md_f2_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_md_f3": {
+  "names": [
+   "md_f3_0",
+   "md_f3_1",
+   "md_f3_2",
+   "md_f3_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_md_c0": {
+  "names": [
+   "md_cls_warrior_m",
+   "md_cls_assassin_m",
+   "md_cls_ranger_m",
+   "md_cls_mage_m"
+  ],
+  "kind": "walk"
+ },
+ "an10_md_c1": {
+  "names": [
+   "md_cls_healer_m",
+   "md_cls_warrior_f",
+   "md_cls_assassin_f",
+   "md_cls_ranger_f"
+  ],
+  "kind": "walk"
+ },
+ "an10_md_c2": {
+  "names": [
+   "md_cls_mage_f",
+   "md_cls_healer_f"
+  ],
+  "kind": "walk"
+ },
+ "an10_tt_f0": {
+  "names": [
+   "tt_f0_0",
+   "tt_f0_1",
+   "tt_f0_2",
+   "tt_f0_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_tt_f1": {
+  "names": [
+   "tt_f1_0",
+   "tt_f1_1",
+   "tt_f1_2",
+   "tt_f1_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_tt_f2": {
+  "names": [
+   "tt_f2_0",
+   "tt_f2_1",
+   "tt_f2_2",
+   "tt_f2_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_tt_f3": {
+  "names": [
+   "tt_f3_0",
+   "tt_f3_1",
+   "tt_f3_2",
+   "tt_f3_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_tt_c0": {
+  "names": [
+   "tt_cls_warrior_m",
+   "tt_cls_assassin_m",
+   "tt_cls_ranger_m",
+   "tt_cls_mage_m"
+  ],
+  "kind": "walk"
+ },
+ "an10_tt_c1": {
+  "names": [
+   "tt_cls_healer_m",
+   "tt_cls_warrior_f",
+   "tt_cls_assassin_f",
+   "tt_cls_ranger_f"
+  ],
+  "kind": "walk"
+ },
+ "an10_tt_c2": {
+  "names": [
+   "tt_cls_mage_f",
+   "tt_cls_healer_f"
+  ],
+  "kind": "walk"
+ },
+ "an10_sl_f0": {
+  "names": [
+   "sl_f0_0",
+   "sl_f0_1",
+   "sl_f0_2",
+   "sl_f0_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_sl_f1": {
+  "names": [
+   "sl_f1_0",
+   "sl_f1_1",
+   "sl_f1_2",
+   "sl_f1_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_sl_f2": {
+  "names": [
+   "sl_f2_0",
+   "sl_f2_1",
+   "sl_f2_2",
+   "sl_f2_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_sl_f3": {
+  "names": [
+   "sl_f3_0",
+   "sl_f3_1",
+   "sl_f3_2",
+   "sl_f3_3"
+  ],
+  "kind": "hero"
+ },
+ "an10_sl_c0": {
+  "names": [
+   "sl_cls_warrior_m",
+   "sl_cls_assassin_m",
+   "sl_cls_ranger_m",
+   "sl_cls_mage_m"
+  ],
+  "kind": "walk"
+ },
+ "an10_sl_c1": {
+  "names": [
+   "sl_cls_healer_m",
+   "sl_cls_warrior_f",
+   "sl_cls_assassin_f",
+   "sl_cls_ranger_f"
+  ],
+  "kind": "walk"
+ },
+ "an10_sl_c2": {
+  "names": [
+   "sl_cls_mage_f",
+   "sl_cls_healer_f"
+  ],
+  "kind": "walk"
+ }
+}
