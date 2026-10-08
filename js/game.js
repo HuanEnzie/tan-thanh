@@ -83,7 +83,7 @@ const G = {
       v: 2, realm: RL.id, seed: this.seed, clock: this.clock, day: this.day, time: this.time, uid: UID,
       p: { x: pos.x, y: pos.y, hp: P.hp, maxHp: P.maxHp, hunger: P.hunger, thirst: P.thirst, equip: P.equip, relics: P.relics, stash: P.stash, armor: P.armor, gold: P.gold, gearHp: P.gearHp, weapon: P.weapon, mags: P.mags, inv: P.inv, battery: P.battery, xp: P.xp, level: P.level, perks: P.perks, maxStam: P.maxStam, energy: P.energy },
       story: Story.serialize(), comps: this.companions.map(c => ({ aff: c.aff, stage: c.stage, joined: c.joined, lover: c.lover, sworn: c.sworn, scenePending: c.scenePending, reviveDay: c.reviveDay })),
-      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0, v4: this.v4Save(), v5: this.v5, v6: this.v6,
+      stats: this.stats, ach: this.achieved, delta, explored: [...World.explored].slice(-4000), heartBuys: this.heartBuys || 0, v4: this.v4Save(), v5: this.v5, v6: this.v6, v10: this.v10,
     };
     try { localStorage.setItem('tt_save_v2', JSON.stringify(data)); } catch (e) {}
     return data;

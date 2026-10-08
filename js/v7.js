@@ -172,7 +172,7 @@ const loopK = (name, t) => ((t / ANIM[name].dur) % 1 + 1) % 1;
     applyIcons();
     const ic = document.getElementById('tSkillIc');
     if (ic && G.v6 && RL) {
-      const e = G.v6.skEq, n = e != null && e >= 0 && G.v6.skills[e] ? 'sk_' + e : ULT_ICON[rk(RL.id)];
+      const n = ULT_ICON[rk(RL.id)];
       const src = IMG[n] && IMG[n].src; if (src && ic.src !== src) ic.src = src;
     }
   }, 500);

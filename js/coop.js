@@ -217,7 +217,7 @@ const Net = {
     if (ch && ch.p) return ch;
     let solo = null;
     try { solo = JSON.parse(localStorage.getItem('tt_save_v2')); } catch (e) {}
-    if (solo && solo.realm === realm && solo.p) { const p = Object.assign({}, solo.p); delete p.x; delete p.y; return { p, v4: solo.v4, v6: solo.v6, uid: solo.uid, name: solo.story && solo.story.names.hero, stats: solo.stats, ach: solo.ach, heartBuys: solo.heartBuys }; }
+    if (solo && solo.realm === realm && solo.p) { const p = Object.assign({}, solo.p); delete p.x; delete p.y; return { p, v4: solo.v4, v6: solo.v6, v10: solo.v10, uid: solo.uid, name: solo.story && solo.story.names.hero, stats: solo.stats, ach: solo.ach, heartBuys: solo.heartBuys }; }
     // brand-new hero for this world
     RL = REALMS[realm];
     const eq = { melee: Loot.weapon('melee', 1, 1, -1), r1: Loot.weapon('r1', 1, 0), r2: null, r3: null };
@@ -227,7 +227,7 @@ const Net = {
     const P = G.player; if (!P || !this.guest) return;
     const p = {};
     for (const k of ['hp', 'maxHp', 'hunger', 'thirst', 'equip', 'relics', 'stash', 'armor', 'gold', 'gearHp', 'weapon', 'mags', 'inv', 'battery', 'xp', 'level', 'perks', 'maxStam', 'energy']) p[k] = P[k];
-    const data = { p, v4: G.v4Save(), v5: G.v5, v6: G.v6, uid: UID, name: this.myName, stats: G.stats, ach: G.achieved, heartBuys: G.heartBuys || 0, t: Date.now() };
+    const data = { p, v4: G.v4Save(), v5: G.v5, v6: G.v6, v10: G.v10, uid: UID, name: this.myName, stats: G.stats, ach: G.achieved, heartBuys: G.heartBuys || 0, t: Date.now() };
     data.v4.keep = []; data.v4.pending = [];
     try { localStorage.setItem('tt_coop_' + RL.id, JSON.stringify(data)); } catch (e) {}
   },

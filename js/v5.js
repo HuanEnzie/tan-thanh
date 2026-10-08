@@ -722,7 +722,7 @@ Object.assign(UI, {
   const move = e => { if (!drag || !UI.mapC) return; const [x, y] = pos(e); const S = c.width / (UI.mapZoom * SB); if (Math.hypot(x - drag.x, y - drag.y) > 6) drag.moved = true; UI.mapC.x = drag.mx - (x - drag.x) / S; UI.mapC.y = drag.my - (y - drag.y) / S; UI.drawBigMap(); e.preventDefault(); };
   const up = e => {
     if (!drag) return;
-    if (!drag.moved) { const [x, y] = pos(e); let best = null, bd = 26 * (UI.mapK || 1); for (const h of UI.mapHits) { if (!h.tp) continue; const d = Math.hypot(h.x - x, h.y - y); if (d < bd) { bd = d; best = h; } } UI.mapSel = best ? { tp: best.tp, mx: best.x, my: best.y } : null; UI.drawBigMap(); }
+    if (!drag.moved) { const [x, y] = pos(e); let best = null, bd = 40 * (UI.mapK || 1); for (const h of UI.mapHits) { if (!h.tp) continue; const d = Math.hypot(h.x - x, h.y - y); if (d < bd) { bd = d; best = h; } } UI.mapSel = best ? { tp: best.tp, mx: best.x, my: best.y } : null; UI.drawBigMap(); }
     drag = null;
   };
   c.addEventListener('mousedown', down); window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);

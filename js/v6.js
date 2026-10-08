@@ -584,6 +584,11 @@ Object.assign(G, {
       this.companions.forEach((c, i) => {
         if (!c.joined) return;
         if (c.ally && c.ally.leaving) return;
+        if (this.v10 && this.v10.follow[i]) {
+          if (c.ally && c.ally.home) { const j = this.allies.indexOf(c.ally); if (j >= 0) this.allies.splice(j, 1); c.ally = null; }
+          if (!c.ally) { const a = new Ally('comp', P.x + R.range(-40, 40), P.y + R.range(20, 50), { img: c.data.sprite, comp: Object.assign(c.data, { ref: c }) }); c.ally = a; this.allies.push(a); }
+          return;
+        }
         if (c.ally && (!home || !c.ally.home)) { const j = this.allies.indexOf(c.ally); if (j >= 0) this.allies.splice(j, 1); c.ally = null; }
         if (home && !c.ally) {
           const hx = bp.x + (i ? 110 : -110), hy = bp.y + 150;
@@ -975,7 +980,7 @@ function drawV6World() {
       const st = v.skills[i];
       h += `<div class="petc ${st ? '' : 'locked'} ${eq === i ? 'on' : ''}" style="--pc:${s.col}"><img src="${IMG['sk_' + i].src}" alt=""><b>${st ? esc(skName(s)) : '???'}</b><span class="pst">${'★'.repeat(s.star)}${st ? ` • Bậc ${st}/5` : ''}</span><small>${esc(s.desc)}${st ? ` • +${(st - 1) * 15}% sức mạnh` : ''}</small>${st ? `<button data-sk="${i}">${eq === i ? 'ĐANG DÙNG' : 'DÙNG'}</button>` : `<small class="muted">Triệu hồi ở ${esc(GACHA_NAME[rk(RL.id)])}</small>`}</div>`;
     });
-    $('invBody').innerHTML = h + '</div><p class="muted">Kỹ năng được trang bị thay cho tuyệt kỹ [Q]. Trùng kỹ năng sẽ tăng bậc (tối đa 5), mỗi bậc +15% sức mạnh.</p>';
+    $('invBody').innerHTML = h + '</div><p class="muted">Kỹ năng được trang bị dùng bằng [V] / nút PHÁP, tốn mana (linh khí / năng lượng); [Q] vẫn là tuyệt kỹ. Trùng kỹ năng sẽ tăng bậc (tối đa 5), mỗi bậc +15% sức mạnh.</p>';
     $('invBody').querySelectorAll('[data-sk]').forEach(b => { this.bindBtn(b); b.onclick = () => { v.skEq = +b.dataset.sk; UI.dirty = true; this.buildInv(); }; });
   };
   const bp = UI.buildPets;
