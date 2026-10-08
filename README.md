@@ -1,7 +1,7 @@
 # TÀN THÀNH: VẠN GIỚI
 
 Game hành động 2D pixel, góc nhìn từ trên xuống. Có 3 thế giới đang mở, bản đồ vô hạn với 12 vùng địa hình, và cốt truyện ngẫu nhiên. Chạy được trên trình duyệt máy tính lẫn điện thoại.  
-  
+   
 Có ba cách chơi: 
 - **Cài như app (PWA)** từ https://huanenzie.github.io/tan-thanh/:
   - Android / máy tính: mở bằng Chrome, bấm **📲 CÀI ĐẶT APP** trên màn hình chính của game (hoặc menu ⋮ → "Cài đặt ứng dụng").
