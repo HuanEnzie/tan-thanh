@@ -1,11 +1,11 @@
 // Service worker: lets the installed app start offline.
 // Code (html/js/css) is network-first so updates arrive as soon as you are online;
 // images and audio are cache-first and get cached the first time the game uses them.
-const VERSION = 'tt-v14';
+const VERSION = 'tt-v15';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css', 'css/v2.css',
   'js/util.js', 'js/data.js', 'js/realms.js', 'js/lore.js', 'js/lore_bond.js', 'js/assets.js', 'js/world.js', 'js/data2.js',
-  'js/fx.js', 'js/loot.js', 'js/entities.js', 'js/game.js', 'js/story.js', 'js/ui.js', 'js/play.js', 'js/touch.js', 'js/v3.js', 'js/v4.js', 'js/coop.js', 'js/v5.js', 'js/atlas6.js', 'js/v6.js', 'js/atlas8.js', 'js/v7.js', 'js/atlas9.js', 'js/v8.js',
+  'js/fx.js', 'js/loot.js', 'js/entities.js', 'js/game.js', 'js/story.js', 'js/ui.js', 'js/gl2d.js', 'js/play.js', 'js/touch.js', 'js/v3.js', 'js/v4.js', 'js/coop.js', 'js/v5.js', 'js/atlas6.js', 'js/v6.js', 'js/atlas8.js', 'js/v7.js', 'js/atlas9.js', 'js/v8.js', 'js/perf.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon-32.png',
 ];
 

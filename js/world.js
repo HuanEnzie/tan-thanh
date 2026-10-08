@@ -889,7 +889,7 @@ const World = {
       let arr = this.decals.get(k); if (!arr) this.decals.set(k, arr = []);
       arr.push(d); if (arr.length > 70) arr.shift();
       const c = this.cache.get(k);
-      if (c) this.drawDecal(c.ctx, d);
+      if (c) { this.drawDecal(c.ctx, d); if (ctx.dirty) ctx.dirty(c.canvas); }
     }
   },
   drawDecal(ctx, d) {
@@ -902,7 +902,7 @@ const World = {
   },
   paintSplat(x, y, color, size) {
     const c = this.cache.get(nkey(Math.floor(x / CHPX), Math.floor(y / CHPX)));
-    if (c) { c.ctx.fillStyle = color; c.ctx.fillRect(Math.round(x), Math.round(y), size, size); }
+    if (c) { c.ctx.fillStyle = color; c.ctx.fillRect(Math.round(x), Math.round(y), size, size); if (ctx.dirty) ctx.dirty(c.canvas); }
   },
 
   // ---------- chunk rendering ----------

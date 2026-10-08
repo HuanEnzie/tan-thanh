@@ -3,3 +3,9 @@ tools/logs/
 __pycache__/
 *.pyc
 .claude/
+app/www/
+app/desktop/node_modules/
+app/desktop/dist/
+app/android/node_modules/
+app/android/android/
+app/desktop/www/

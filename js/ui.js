@@ -25,6 +25,10 @@ const UI = {
     $('btnWorldBack').onclick = () => this.showScreen('title');
     $('lowGfx').checked = !!G.lowGfx;
     $('lowGfx').onchange = e => { G.lowGfx = e.target.checked; try { localStorage.setItem('tt_low', G.lowGfx ? '1' : ''); } catch (er) {} if (World.cache) World.cache.clear(); resize(); };
+    $('optGL').checked = !!ctx.beginFrame;
+    $('optGL').onchange = e => { try { localStorage.setItem('tt_gl', e.target.checked ? '1' : '0'); } catch (er) {} this.toast(e.target.checked ? 'Đã bật WebGL. Mở lại game để áp dụng.' : 'Đã tắt WebGL. Mở lại game để áp dụng.', 'info'); };
+    $('optFps').checked = PerfMeter.on();
+    $('optFps').onchange = e => PerfMeter.set(e.target.checked);
     document.querySelectorAll('.back').forEach(b => b.onclick = () => this.back());
     for (const k of ['master', 'music', 'sfx']) {
       const el = $('vol_' + k);
@@ -490,37 +494,42 @@ const UI = {
   update(dt) {
     if (!['playing', 'paused', 'menu', 'levelup', 'dialog'].includes(G.state)) return;
     const P = G.player;
-    const bar = (id, v, max) => { $(id).style.width = clamp(v / max * 100, 0, 100) + '%'; };
-    bar('hpFill', P.hp, P.maxHp); $('hpTxt').textContent = Math.ceil(Math.max(0, P.hp)) + '/' + Math.round(P.maxHp) + (P.shield > 1 ? ' +' + Math.round(P.shield) : '');
-    bar('foodFill', P.hunger, 100); $('foodTxt').textContent = Math.ceil(P.hunger);
-    bar('waterFill', P.thirst, 100); $('waterTxt').textContent = Math.ceil(P.thirst);
-    bar('stamFill', P.stamina, P.maxStam); $('stamTxt').textContent = Math.ceil(P.stamina);
-    bar('enFill', P.energy, 100); $('enTxt').textContent = P.energy >= 100 ? G.skillName() + ' [Q]' : Math.floor(P.energy) + '%';
-    $('enRow').classList.toggle('ready', P.energy >= 100);
-    $('bars').classList.toggle('lowhp', P.hp < P.maxHp * 0.3);
+    // DOM writes only when a value changes (writing every frame forced style + layout each frame); the memo resets each second
+    const DW = (G.frame % 60 === 0 || !this._dw) ? (this._dw = {}) : this._dw;
+    const txt = (id, v) => { v = String(v); if (DW[id] !== v) { DW[id] = v; $(id).textContent = v; } };
+    const css = (id, k, v) => { const m = id + '.' + k; if (DW[m] !== v) { DW[m] = v; $(id).style[k] = v; } };
+    const cls = (id, c, on) => { const m = id + '#' + c; if (DW[m] !== on) { DW[m] = on; $(id).classList.toggle(c, on); } };
+    const html = (id, v) => { const m = id + '<'; if (DW[m] !== v) { DW[m] = v; $(id).innerHTML = v; } };
+    const pct = k => (Math.round(clamp(k, 0, 1) * 200) / 2) + '%';
+    const bar = (id, v, max) => css(id, 'width', pct(v / max));
+    bar('hpFill', P.hp, P.maxHp); txt('hpTxt', Math.ceil(Math.max(0, P.hp)) + '/' + Math.round(P.maxHp) + (P.shield > 1 ? ' +' + Math.round(P.shield) : ''));
+    bar('foodFill', P.hunger, 100); txt('foodTxt', Math.ceil(P.hunger));
+    bar('waterFill', P.thirst, 100); txt('waterTxt', Math.ceil(P.thirst));
+    bar('stamFill', P.stamina, P.maxStam); txt('stamTxt', Math.ceil(P.stamina));
+    bar('enFill', P.energy, 100); txt('enTxt', P.energy >= 100 ? G.skillName() + ' [Q]' : Math.floor(P.energy) + '%');
+    cls('enRow', 'ready', P.energy >= 100);
+    cls('bars', 'lowhp', P.hp < P.maxHp * 0.3);
     const h = Math.floor(G.clock), mi = Math.floor((G.clock - h) * 60);
-    $('clock').textContent = World.mode === 'dungeon' ? `Tầng ${World.dg.floor}/${World.dg.floors}` : String(h).padStart(2, '0') + ':' + String(mi).padStart(2, '0');
-    $('dayN').textContent = World.mode === 'dungeon' ? 'CỔNG ' + World.dg.rank : 'NGÀY ' + G.day;
-    $('dayicon').textContent = World.mode === 'dungeon' ? '⛩' : G.night ? '☾' : (G.clock < 7 || G.clock > 18) ? '◐' : '☀';
-    $('weather').textContent = G.raining && World.mode === 'over' ? '☂' : '';
+    txt('clock', World.mode === 'dungeon' ? `Tầng ${World.dg.floor}/${World.dg.floors}` : String(h).padStart(2, '0') + ':' + String(mi).padStart(2, '0'));
+    txt('dayN', World.mode === 'dungeon' ? 'CỔNG ' + World.dg.rank : 'NGÀY ' + G.day);
+    txt('dayicon', World.mode === 'dungeon' ? '⛩' : G.night ? '☾' : (G.clock < 7 || G.clock > 18) ? '◐' : '☀');
+    txt('weather', G.raining && World.mode === 'over' ? '☂' : '');
     const goal = World.mode === 'dungeon' ? (World.dg.cleared ? 'Mở rương báu và rời Cổng' : 'Tìm và tiêu diệt Chủ Hầm Ngục') : Story.goal();
     if ($('objText').textContent !== goal) { $('objText').textContent = goal; $('objective').classList.remove('pulse'); void $('objective').offsetWidth; $('objective').classList.add('pulse'); }
-    $('xpfill').style.width = (P.xp / G.xpNeed(P.level) * 100) + '%';
-    $('lvl').textContent = `CẤP ${P.level} • ${G.rankTitle()}${G.btBlocked && G.btBlocked() ? ' • BÌNH CẢNH' : ''}`;
-    $('kills').textContent = '☠ ' + G.stats.kills;
-    $('combo').style.opacity = G.combo >= 5 ? 1 : 0;
-    if (G.combo >= 5) $('combo').textContent = 'x' + G.combo + ' COMBO';
-    const it = G.interactTarget, pr = $('prompt');
-    if (G.action) pr.style.display = 'none';
-    else if (it && !P.dead) { pr.style.display = 'block'; pr.innerHTML = `<span class="key">E</span> ${esc(it.label)}`; }
-    else pr.style.display = 'none';
-    const ab = $('actionbar');
-    if (G.action) { ab.style.display = 'block'; $('actionfill').style.width = (G.action.t / G.action.dur * 100) + '%'; $('actionlabel').textContent = G.action.label; }
-    else ab.style.display = 'none';
-    const ch = $('carhud');
-    if (P.car) { ch.style.display = 'block'; ch.innerHTML = `${Math.round(Math.abs(P.car.speed) * 0.4)} km/h<div class="mini"><span>XĂNG</span><i style="width:${P.car.fuel}%;background:#e6b422"></i></div><div class="mini"><span>XE</span><i style="width:${Math.max(0, P.car.hp)}%;background:#c62828"></i></div>`; }
-    else ch.style.display = 'none';
-    if (this.bossZ) $('bossfill').style.width = Math.max(0, this.bossZ.hp / this.bossZ.maxHp * 100) + '%';
+    css('xpfill', 'width', pct(P.xp / G.xpNeed(P.level)));
+    txt('lvl', `CẤP ${P.level} • ${G.rankTitle()}${G.btBlocked && G.btBlocked() ? ' • BÌNH CẢNH' : ''}`);
+    txt('kills', '☠ ' + G.stats.kills);
+    css('combo', 'opacity', G.combo >= 5 ? '1' : '0');
+    if (G.combo >= 5) txt('combo', 'x' + G.combo + ' COMBO');
+    const it = G.interactTarget;
+    if (G.action) css('prompt', 'display', 'none');
+    else if (it && !P.dead) { css('prompt', 'display', 'block'); html('prompt', `<span class="key">E</span> ${esc(it.label)}`); }
+    else css('prompt', 'display', 'none');
+    if (G.action) { css('actionbar', 'display', 'block'); css('actionfill', 'width', pct(G.action.t / G.action.dur)); txt('actionlabel', G.action.label); }
+    else css('actionbar', 'display', 'none');
+    if (P.car) { css('carhud', 'display', 'block'); html('carhud', `${Math.round(Math.abs(P.car.speed) * 0.4)} km/h<div class="mini"><span>XĂNG</span><i style="width:${Math.round(P.car.fuel)}%;background:#e6b422"></i></div><div class="mini"><span>XE</span><i style="width:${Math.round(Math.max(0, P.car.hp))}%;background:#c62828"></i></div>`); }
+    else css('carhud', 'display', 'none');
+    if (this.bossZ) css('bossfill', 'width', pct(this.bossZ.hp / this.bossZ.maxHp));
     if (G.frame % 10 === 0 || this.dirty) {
       const sig = P.weapon + JSON.stringify(P.inv) + JSON.stringify(P.mags) + Object.values(P.equip).map(e => e ? e.uid : 0).join() + (P.reloading > 0) + G.companions.map(c => c.joined + ':' + Math.round(c.aff) + ':' + c.scenePending + (c.ally ? Math.round(c.ally.hp / 10) + '' + c.ally.downed : '')).join();
       if (sig !== this.lastSig || this.dirty) { this.lastSig = sig; this.dirty = false; this.buildHotbar(); }

@@ -1,7 +1,7 @@
 // ===== Per-frame update, rendering, main loop =====
 const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-const lightC = document.createElement('canvas');
+const ctx = GL2D.create(canvas) || canvas.getContext('2d');  // batched WebGL2 when available (?gl=0 turns it off)
+const lightC = document.createElement('canvas'); lightC._dynamic = true;
 const lctx = lightC.getContext('2d');
 let VW = 0, VH = 0;
 
@@ -686,7 +686,9 @@ function loop(now) {
   if (G.state === 'playing' || (typeof Net !== 'undefined' && Net.active && G.player && ['paused', 'menu', 'dialog', 'levelup'].includes(G.state))) G.update(dt);
   if (G.player && ['playing', 'paused', 'menu', 'levelup', 'dead', 'dialog'].includes(G.state)) {
     if (G.state === 'dead' || G.state === 'dialog') { Particles.update(dt); FX.update(dt); }
+    if (ctx.beginFrame) ctx.beginFrame();
     G.render();
+    if (ctx.endFrame) ctx.endFrame();
     UI.update(dt);
   }
   Sound.update(dt);

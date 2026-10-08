@@ -1,0 +1,11 @@
+{
+  "appId": "vn.huanenzie.tanthanh",
+  "appName": "Tàn Thành",
+  "webDir": "../www",
+  "android": {
+    "backgroundColor": "#0b0c0e"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

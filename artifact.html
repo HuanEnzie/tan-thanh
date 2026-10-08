@@ -200,6 +200,8 @@
     <label>Nhạc nền <input type="range" id="vol_music" min="0" max="100"></label>
     <label>Hiệu ứng <input type="range" id="vol_sfx" min="0" max="100"></label>
     <label>Chế độ nhẹ (máy yếu) <input type="checkbox" id="lowGfx"></label>
+    <label>Vẽ bằng WebGL (mở lại game để áp dụng) <input type="checkbox" id="optGL"></label>
+    <label>Hiện FPS <input type="checkbox" id="optFps"></label>
     <button id="btnOffline" hidden>📥 TẢI DỮ LIỆU ĐỂ CHƠI OFFLINE</button>
     <button class="back">◀ QUAY LẠI</button>
   </div>
@@ -348,6 +350,7 @@
 <script src="js/game.js"></script>
 <script src="js/story.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/gl2d.js"></script>
 <script src="js/play.js"></script>
 <script src="js/touch.js"></script>
 <script src="js/v3.js"></script>
@@ -360,6 +363,7 @@
 <script src="js/v7.js"></script>
 <script src="js/atlas9.js"></script>
 <script src="js/v8.js"></script>
+<script src="js/perf.js"></script>
 <script>
   try { G.lowGfx = !!localStorage.getItem('tt_low'); } catch (e) {}
   resize();
