@@ -8,12 +8,12 @@ const SEA = {
   sl: ['Lươn vực thẳm', 'Cua giáp hắc', 'Sứa neon', 'Cá mập bóng', 'Leviathan', 'Hiệp sĩ chết đuối'],
 };
 const SEA_DEF = [
-  { hp: 55, dmg: 13, spd: 150, r: 14, sc: 1.0, sh: 1, dp: 1, w: 4, pearl: 0.5 },
-  { hp: 150, dmg: 17, spd: 62, r: 18, sc: 1.0, sh: 1, dp: 0, w: 3, pearl: 0.7, armor: 0.3 },
-  { hp: 70, dmg: 9, spd: 52, r: 20, sc: 1.0, sh: 0, dp: 1, w: 3, pearl: 0.6, slow: 1 },
-  { hp: 190, dmg: 26, spd: 132, r: 24, sc: 1.0, sh: 0, dp: 1, w: 2, pearl: 1 },
-  { hp: 1500, dmg: 42, spd: 88, r: 56, sc: 1.0, sh: 0, dp: 1, w: 0, boss: 1 },
-  { hp: 120, dmg: 18, spd: 82, r: 16, sc: 1.0, sh: 1, dp: 1, w: 2, pearl: 0.8 },
+  { hp: 55, dmg: 13, spd: 150, r: 14, sc: 0.52, sh: 1, dp: 1, w: 4, pearl: 0.5 },
+  { hp: 150, dmg: 17, spd: 62, r: 18, sc: 0.6, sh: 1, dp: 0, w: 3, pearl: 0.7, armor: 0.3 },
+  { hp: 70, dmg: 9, spd: 52, r: 20, sc: 0.58, sh: 0, dp: 1, w: 3, pearl: 0.6, slow: 1 },
+  { hp: 190, dmg: 26, spd: 132, r: 24, sc: 0.62, sh: 0, dp: 1, w: 2, pearl: 1 },
+  { hp: 1500, dmg: 42, spd: 88, r: 48, sc: 0.56, sh: 0, dp: 1, w: 0, boss: 1 },
+  { hp: 120, dmg: 18, spd: 82, r: 16, sc: 0.72, sh: 1, dp: 1, w: 2, pearl: 0.8 },
 ];
 
 const _ri17 = realmImages;

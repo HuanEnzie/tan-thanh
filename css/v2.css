@@ -738,3 +738,23 @@ body.touch #cutin .ci-hero { height: 90vh; }
 .pci small.aq { color: #7fd8ff; display: block; font-size: 16px; }
 .shl .shact .pbtn.rid { align-items: center; }
 .shl .shact .pbtn.rid button.on { border-color: #ffe14a; color: #fff2a8; }
+
+/* ===== v20: gates, demon generals, journal ===== */
+.dkp { margin-bottom: 14px; }
+.dkp .dkintro { font-size: 18px; line-height: 1.25; color: #c9c2d8; margin: 4px 0 8px; }
+.dkp .dkbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+.dkp .dkbar div { background: rgba(20,14,34,0.7); border: 1px solid #3a2a60; padding: 4px 6px; text-align: center; }
+.dkp .dkbar b { display: block; font-size: 26px; color: #ffd24a; line-height: 1; }
+.dkp .dkbar small { font-size: 14px; color: #9d96b4; }
+.dkp .dkking { border: 1px solid #5a2a2a; background: rgba(60,10,16,0.55); padding: 6px 8px; font-size: 18px; margin-bottom: 8px; }
+.dkp .dkking.open { border-color: #ff5a5a; background: rgba(90,14,22,0.7); }
+.dkp .dkl { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
+.dkp .dkr { display: flex; gap: 8px; align-items: center; border: 1px solid var(--c, #444); border-left-width: 4px; background: rgba(14,10,24,0.75); padding: 5px 7px; min-width: 0; }
+.dkp .dkr.dead { opacity: 0.85; }
+.dkp .dkr .dki { font-size: 26px; color: var(--c, #fff); flex: 0 0 auto; }
+.dkp .dkr .dkt { min-width: 0; flex: 1; }
+.dkp .dkr .dkt b { display: block; font-size: 19px; color: #fff; line-height: 1.05; }
+.dkp .dkr .dkt small { display: block; font-size: 15px; color: #a79fc0; line-height: 1.1; }
+.dkp .dkr .dkt small.dkrel { color: var(--c, #ccc); }
+.dkp .dkr button { flex: 0 0 auto; min-width: 0; width: auto; font-size: 15px; padding: 2px 6px; letter-spacing: 0; white-space: nowrap; box-shadow: none; }
+.dkp .dkr button.on { border-color: #ffe14a; color: #fff2a8; }

@@ -160,7 +160,7 @@
   UI.buildMapList = function () {
     const box = $('mapList'); if (!box) return;
     const P = G.player;
-    const F = { all: () => true, base: t => t.kind === 'base' || t.kind === 'statue' || t.kind === 'wp', gate: t => t.kind === 'gate', shelter: t => t.kind === 'shelter' };
+    const F = { all: () => true, base: t => t.kind === 'base' || t.kind === 'statue' || t.kind === 'wp', gate: t => t.kind === 'gate' || t.kind === 'lair', shelter: t => t.kind === 'shelter' };
     const list = G.tpAll().filter(F[this.mapFilter]).map(t => Object.assign({ d: dist(P.x, P.y, t.x, t.y) }, t)).sort((a, b) => a.d - b.d);
     this.mapList = list;
     document.querySelectorAll('#mapChips [data-mf]').forEach(b => b.classList.toggle('on', b.dataset.mf === this.mapFilter));

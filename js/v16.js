@@ -162,7 +162,7 @@ Object.assign(G, {
     return true;
   },
   castRespawnMet() {
-    const P = this.player;
+    const P = this.player; if (World.mode !== 'over') return;
     for (const n of this.castList()) {
       if (n.state !== 'met' || !n.at || this.castAlly(n)) continue;
       if (dist(n.at.x, n.at.y, P.x, P.y) < 1100) this.castSpawnNear(n, n.at.x, n.at.y);

@@ -122,10 +122,10 @@ const World = {
     this._gen = prevGen; this._last = prevLast;
     // finalize
     for (let i = 0; i < SB * SB; i++) if (this.isSolidT(sb.tiles[i])) sb.block[i] = 1;
-    const d = this.mode === 'over' ? this.delta.get(k) : null;
+    const d = this.deltaMap().get(k);
     sb.props.forEach((p, idx) => {
       p.id = k + ':' + idx;
-      if (d && d.removed && d.removed.has(idx)) { p.dead = true; return; }
+      if ((d && d.removed && d.removed.has(idx)) || p.cull) { p.dead = true; return; }
       if (d && d.looted && d.looted.has(idx)) { p.looted = true; if (p.container === 'chest') { p.img = 'chest_' + p.data.tier + 'o'; const im = IMG[p.img]; if (im) { p.w = im.width / 2; p.h = im.height / 2; } } }
       this.gridAdd(p);
       this.markBlock(p, 1, sb);
@@ -138,12 +138,14 @@ const World = {
   },
   sbDelta(p) {
     const [k, idx] = p.id.split(':');
-    let d = this.delta.get(+k); if (!d) this.delta.set(+k, d = { looted: new Set(), removed: new Set() });
+    const dm = this.deltaMap(); let d = dm.get(+k); if (!d) dm.set(+k, d = { looted: new Set(), removed: new Set() });
     return [d, +idx];
   },
-  markLooted(p) { p.looted = true; if (this.mode === 'over' && p.id && !p.placed) { const [d, i] = this.sbDelta(p); d.looted.add(i); } },
-  markRemoved(p) { if (this.mode === 'over' && p.id && !p.placed) { const [d, i] = this.sbDelta(p); d.removed.add(i); } },
-  markCleared(sb) { if (this.mode !== 'over') return; let d = this.delta.get(sb.key); if (!d) this.delta.set(sb.key, d = { looted: new Set(), removed: new Set() }); d.cleared = true; },
+  // the overworld keeps one delta map; every dungeon floor keeps its own for as long as the run lasts
+  deltaMap() { if (this.mode === 'over' || !this.dg) return this.delta; const d = this.dg.deltas || (this.dg.deltas = {}); return d[this.dg.floor] || (d[this.dg.floor] = new Map()); },
+  markLooted(p) { p.looted = true; if (p.id && !p.placed) { const [d, i] = this.sbDelta(p); d.looted.add(i); } },
+  markRemoved(p) { if (p.id && !p.placed) { const [d, i] = this.sbDelta(p); d.removed.add(i); } },
+  markCleared(sb) { const dm = this.deltaMap(); let d = dm.get(sb.key); if (!d) dm.set(sb.key, d = { looted: new Set(), removed: new Set() }); d.cleared = true; },
 
   // keep the area around the player generated, drop far areas
   update(px, py) {
@@ -295,7 +297,7 @@ const World = {
     else if (sb.wet > 0.1) this.genWild(bk);
     else {
       const r = SR.f();
-      const gateP = R.gatesCommon ? 0.09 : 0.045;
+      const gateP = (typeof Net !== 'undefined' && Net.active) ? (R.gatesCommon ? 0.09 : 0.045) : 0; // solo: gates open over time (v20)
       if (r < gateP) this.genPOI(bk, { kind: 'gate', rank: this.gateRank(sx, sy) }, sb);
       else if (r < gateP + 0.05) this.genPOI(bk, { kind: 'cache' }, sb);
       else if (r < gateP + 0.10) this.genPOI(bk, { kind: 'rescue' }, sb);
@@ -1118,7 +1120,6 @@ const World = {
     for (const p of sb.props) {
       const x = Math.floor(p.x / TILE) - sb.tx0, y = Math.floor(p.y / TILE) - sb.ty0;
       if (p.canopy) dot(x - 1, y - 1, 3, [30, 60, 25]);
-      if (p.kind === 'gate') dot(x - 2, y - 2, 5, p.img === 'fx_1' ? [255, 59, 59] : [77, 166, 255]);
     }
     for (const b of sb.buildings) for (const [x, y] of b.doors || []) dot(x - sb.tx0, y - sb.ty0, 1, [255, 214, 90]);
     if (sb.poi && sb.poi.kind === 'ruins') dot(14, 14, 4, [190, 90, 255]);

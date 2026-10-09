@@ -1,16 +1,18 @@
 // ===== v19: sea creatures can be saved as shadows (summoned only at sea), and any big enough shadow can be ridden instead of a pet =====
 const RIDE_MIN_R = 15; // collision radius needed to carry a rider
+const RIDE_MIN_W = 60; // or a sprite this wide on screen (px)
 const rideK = s => Math.max(1.05, Math.min(2.5, 0.95 + (s.spd || 90) / 100)) * (1 + 0.015 * (G.shStats(s).slv - 1));
 
 Object.assign(G, {
   inSea() { const P = this.player; if (!P || World.mode !== 'over') return false; if (P.boat) return true; const t = World.get(Math.floor(P.x / TILE), Math.floor(P.y / TILE)); return t === T.WATER || t === T.DEEP; },
   rideShadowOf(id) { return id != null ? this.shById(id) : null; },
-  canRide(s) { return !!(s && s.ride); },
+  // judged by size every time, so older shadows and big-but-low-hitbox species are covered
+  canRide(s) { if (!s) return false; const im = IMG[s.img], vis = im ? im.width / 2 * (s.scale || 1) : 30; return s.ride = (s.rr || s.r || 12) * (s.scale || 1) >= RIDE_MIN_R || vis >= RIDE_MIN_W; },
   // ---------- mounting ----------
   rideShadow(s) {
     const P = this.player;
     if (!s || P.dead || P.car || P.boat) return false;
-    if (!s.ride) { this.toast(`${s.nick || s.name} quá nhỏ để cưỡi.`, 'warn'); return false; }
+    if (!this.canRide(s)) { this.toast(`${s.nick || s.name} quá nhỏ để cưỡi.`, 'warn'); return false; }
     if (this.shBusy(s)) { this.toast(`${s.nick || s.name} đang bận — gọi về trước.`, 'warn'); return false; }
     if (s.aqua && !this.inSea()) { this.toast('Thủy tộc chỉ cưỡi được khi bạn đang ở dưới nước.', 'warn'); return false; }
     if (!s.aqua && World.mode === 'over' && this.inSea()) { this.toast('Thú cưỡi trên cạn không bơi được.', 'warn'); return false; }
@@ -54,7 +56,7 @@ Object.assign(G, {
   G.extractShadow = function (c) {
     const n0 = this.v10.shadows.length, a0 = this.allies.length, r = ex.call(this, c);
     const s = this.v10.shadows.length > n0 ? this.v10.shadows[this.v10.shadows.length - 1] : null;
-    if (s) { s.aqua = !!c.aqua; s.sea = c.sea; s.spd = c.spd || 60; s.rr = c.rr || 12; s.ride = s.rr >= RIDE_MIN_R; if (s.ride) this.toast(`🐎 ${s.name} đủ lớn để cưỡi (×${rideK(s).toFixed(1)} tốc độ).`, 'info'); if (s.aqua) this.toast('🌊 Bóng thủy tộc chỉ gọi được khi bạn ở dưới nước hoặc trên thuyền.', 'info'); }
+    if (s) { s.aqua = !!c.aqua; s.sea = c.sea; s.spd = c.spd || 60; s.rr = c.rr || 12; this.canRide(s); if (s.ride) this.toast(`🐎 ${s.name} đủ lớn để cưỡi (×${rideK(s).toFixed(1)} tốc độ).`, 'info'); if (s.aqua) this.toast('🌊 Bóng thủy tộc chỉ gọi được khi bạn ở dưới nước hoặc trên thuyền.', 'info'); }
     for (let i = a0; i < this.allies.length; i++) { const a = this.allies[i]; if (a.kind === 'shadow') a.aqua = !!c.aqua; }
     return r;
   };
@@ -63,7 +65,7 @@ Object.assign(G, {
   G.summonShadow = function (s, free) {
     if (s && s.aqua && !free && !this.inSea()) { this._landN = (this._landN || 0) + 1; return 'land'; }
     const r = ss.call(this, s, free);
-    if (r === 'ok' && s.aqua) { const a = this.shadowAlly(s); if (a) a.aqua = true; }
+    if (r === 'ok' && s.aqua) { const a = this.shadowAlly(s); if (a) { a.aqua = true; if (s.sea != null && SEA_DEF[s.sea]) a.scale = SEA_DEF[s.sea].sc; } }
     return r;
   };
   const sa = G.summonAll;
@@ -145,7 +147,7 @@ Object.assign(G, {
         act.querySelectorAll('[data-sm$=":loot"],[data-sm$=":wood"]').forEach(b => b.remove());
       }
       let row = '';
-      if (s.ride) {
+      if (G.canRide(s)) {
         const mine = G.v10.mountId === s.id, riding = G.player.shRide && G.player.shRide.id === s.id;
         row = `<div class="pbtn rid"><button data-rd="${s.id}" class="${riding ? 'on' : ''}">🐎 ${riding ? 'Đang cưỡi — xuống' : 'Cưỡi ngay'} (×${rideK(s).toFixed(1)})</button><button data-rm="${s.id}" class="${mine ? 'on' : 'ghost'}">${mine ? '★ Thú cưỡi chính (Z)' : '☆ Đặt làm thú cưỡi (Z)'}</button></div>`;
       } else row = `<div class="pbtn rid"><small class="muted">Quá nhỏ để cưỡi</small></div>`;

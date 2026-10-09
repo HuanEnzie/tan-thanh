@@ -829,13 +829,13 @@ const G = {
     UI.fade(() => {
       this.dgTarget = null;
       this.transit = false;
-      const dg = { rank, floor: 1, floors: RANK_FLOORS[rank], level: Math.max(RANK_LVL[rank], World.levelAt(p.x, p.y)), seed: p.data.seed, story: p.data.story };
+      const dg = { rank, floor: 1, floors: p.data.floors || RANK_FLOORS[rank], level: p.data.level || Math.max(RANK_LVL[rank], World.levelAt(p.x, p.y)), seed: p.data.seed, story: p.data.story, king: !!p.data.king };
       this.saveOver = { delta: World.delta, explored: World.explored, minis: World.minis };
       World.enterDungeon(dg);
       this.zombies = []; this.cars = []; Items.list = []; this.hazards = []; Bullets.list = []; Throws.fires = []; Throws.acids = []; Throws.traps = [];
       World.update(16 * TILE, 16 * TILE);
       P.x = World.startPos.x; P.y = World.startPos.y; P.car = null;
-      this.allies = this.allies.filter(a => a.kind !== 'civ' && a.kind !== 'merchant');
+      this.allies = this.allies.filter(a => a.kind !== 'civ' && a.kind !== 'merchant' && a.kind !== 'cast' && a.kind !== 'cand' && a.kind !== 'villager' && a.kind !== 'elder'); // people who live outside stay outside
       for (const a of this.allies) { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
       this.camera.x = P.x; this.camera.y = P.y;
       this.flowT = 0;

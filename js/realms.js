@@ -145,7 +145,8 @@ const REALMS = {
   },
 };
 // Neon 2099 (cy) and Cổ Trang (ct) are switched off for now; their data stays for later.
-const REALM_ORDER = ['md', 'tt', 'sl'];
+// Only Thợ Săn Cổng is open while the shared gameplay is built; the other worlds keep their data and come back later with new art and scripts.
+const REALM_ORDER = ['sl'];
 let RL = REALMS.md; // current realm
 
 // image names each realm needs (beyond the shared set)
