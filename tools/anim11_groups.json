@@ -1,0 +1,542 @@
+{
+ "an11_md_warrior_ma": {
+  "names": [
+   "md_K_warrior_ma_0",
+   "md_K_warrior_ma_1",
+   "md_K_warrior_ma_2",
+   "md_K_warrior_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_warrior_mb": {
+  "names": [
+   "md_K_warrior_mb_0",
+   "md_K_warrior_mb_1",
+   "md_K_warrior_mb_2",
+   "md_K_warrior_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_warrior_fa": {
+  "names": [
+   "md_K_warrior_fa_0",
+   "md_K_warrior_fa_1",
+   "md_K_warrior_fa_2",
+   "md_K_warrior_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_warrior_fb": {
+  "names": [
+   "md_K_warrior_fb_0",
+   "md_K_warrior_fb_1",
+   "md_K_warrior_fb_2",
+   "md_K_warrior_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_assassin_ma": {
+  "names": [
+   "md_K_assassin_ma_0",
+   "md_K_assassin_ma_1",
+   "md_K_assassin_ma_2",
+   "md_K_assassin_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_assassin_mb": {
+  "names": [
+   "md_K_assassin_mb_0",
+   "md_K_assassin_mb_1",
+   "md_K_assassin_mb_2",
+   "md_K_assassin_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_assassin_fa": {
+  "names": [
+   "md_K_assassin_fa_0",
+   "md_K_assassin_fa_1",
+   "md_K_assassin_fa_2",
+   "md_K_assassin_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_assassin_fb": {
+  "names": [
+   "md_K_assassin_fb_0",
+   "md_K_assassin_fb_1",
+   "md_K_assassin_fb_2",
+   "md_K_assassin_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_ranger_ma": {
+  "names": [
+   "md_K_ranger_ma_0",
+   "md_K_ranger_ma_1",
+   "md_K_ranger_ma_2",
+   "md_K_ranger_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_ranger_mb": {
+  "names": [
+   "md_K_ranger_mb_0",
+   "md_K_ranger_mb_1",
+   "md_K_ranger_mb_2",
+   "md_K_ranger_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_ranger_fa": {
+  "names": [
+   "md_K_ranger_fa_0",
+   "md_K_ranger_fa_1",
+   "md_K_ranger_fa_2",
+   "md_K_ranger_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_ranger_fb": {
+  "names": [
+   "md_K_ranger_fb_0",
+   "md_K_ranger_fb_1",
+   "md_K_ranger_fb_2",
+   "md_K_ranger_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_mage_ma": {
+  "names": [
+   "md_K_mage_ma_0",
+   "md_K_mage_ma_1",
+   "md_K_mage_ma_2",
+   "md_K_mage_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_mage_mb": {
+  "names": [
+   "md_K_mage_mb_0",
+   "md_K_mage_mb_1",
+   "md_K_mage_mb_2",
+   "md_K_mage_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_mage_fa": {
+  "names": [
+   "md_K_mage_fa_0",
+   "md_K_mage_fa_1",
+   "md_K_mage_fa_2",
+   "md_K_mage_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_mage_fb": {
+  "names": [
+   "md_K_mage_fb_0",
+   "md_K_mage_fb_1",
+   "md_K_mage_fb_2",
+   "md_K_mage_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_healer_ma": {
+  "names": [
+   "md_K_healer_ma_0",
+   "md_K_healer_ma_1",
+   "md_K_healer_ma_2",
+   "md_K_healer_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_healer_mb": {
+  "names": [
+   "md_K_healer_mb_0",
+   "md_K_healer_mb_1",
+   "md_K_healer_mb_2",
+   "md_K_healer_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_healer_fa": {
+  "names": [
+   "md_K_healer_fa_0",
+   "md_K_healer_fa_1",
+   "md_K_healer_fa_2",
+   "md_K_healer_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_md_healer_fb": {
+  "names": [
+   "md_K_healer_fb_0",
+   "md_K_healer_fb_1",
+   "md_K_healer_fb_2",
+   "md_K_healer_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_warrior_ma": {
+  "names": [
+   "tt_K_warrior_ma_0",
+   "tt_K_warrior_ma_1",
+   "tt_K_warrior_ma_2",
+   "tt_K_warrior_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_warrior_mb": {
+  "names": [
+   "tt_K_warrior_mb_0",
+   "tt_K_warrior_mb_1",
+   "tt_K_warrior_mb_2",
+   "tt_K_warrior_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_warrior_fa": {
+  "names": [
+   "tt_K_warrior_fa_0",
+   "tt_K_warrior_fa_1",
+   "tt_K_warrior_fa_2",
+   "tt_K_warrior_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_warrior_fb": {
+  "names": [
+   "tt_K_warrior_fb_0",
+   "tt_K_warrior_fb_1",
+   "tt_K_warrior_fb_2",
+   "tt_K_warrior_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_assassin_ma": {
+  "names": [
+   "tt_K_assassin_ma_0",
+   "tt_K_assassin_ma_1",
+   "tt_K_assassin_ma_2",
+   "tt_K_assassin_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_assassin_mb": {
+  "names": [
+   "tt_K_assassin_mb_0",
+   "tt_K_assassin_mb_1",
+   "tt_K_assassin_mb_2",
+   "tt_K_assassin_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_assassin_fa": {
+  "names": [
+   "tt_K_assassin_fa_0",
+   "tt_K_assassin_fa_1",
+   "tt_K_assassin_fa_2",
+   "tt_K_assassin_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_assassin_fb": {
+  "names": [
+   "tt_K_assassin_fb_0",
+   "tt_K_assassin_fb_1",
+   "tt_K_assassin_fb_2",
+   "tt_K_assassin_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_ranger_ma": {
+  "names": [
+   "tt_K_ranger_ma_0",
+   "tt_K_ranger_ma_1",
+   "tt_K_ranger_ma_2",
+   "tt_K_ranger_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_ranger_mb": {
+  "names": [
+   "tt_K_ranger_mb_0",
+   "tt_K_ranger_mb_1",
+   "tt_K_ranger_mb_2",
+   "tt_K_ranger_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_ranger_fa": {
+  "names": [
+   "tt_K_ranger_fa_0",
+   "tt_K_ranger_fa_1",
+   "tt_K_ranger_fa_2",
+   "tt_K_ranger_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_ranger_fb": {
+  "names": [
+   "tt_K_ranger_fb_0",
+   "tt_K_ranger_fb_1",
+   "tt_K_ranger_fb_2",
+   "tt_K_ranger_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_mage_ma": {
+  "names": [
+   "tt_K_mage_ma_0",
+   "tt_K_mage_ma_1",
+   "tt_K_mage_ma_2",
+   "tt_K_mage_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_mage_mb": {
+  "names": [
+   "tt_K_mage_mb_0",
+   "tt_K_mage_mb_1",
+   "tt_K_mage_mb_2",
+   "tt_K_mage_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_mage_fa": {
+  "names": [
+   "tt_K_mage_fa_0",
+   "tt_K_mage_fa_1",
+   "tt_K_mage_fa_2",
+   "tt_K_mage_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_mage_fb": {
+  "names": [
+   "tt_K_mage_fb_0",
+   "tt_K_mage_fb_1",
+   "tt_K_mage_fb_2",
+   "tt_K_mage_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_healer_ma": {
+  "names": [
+   "tt_K_healer_ma_0",
+   "tt_K_healer_ma_1",
+   "tt_K_healer_ma_2",
+   "tt_K_healer_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_healer_mb": {
+  "names": [
+   "tt_K_healer_mb_0",
+   "tt_K_healer_mb_1",
+   "tt_K_healer_mb_2",
+   "tt_K_healer_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_healer_fa": {
+  "names": [
+   "tt_K_healer_fa_0",
+   "tt_K_healer_fa_1",
+   "tt_K_healer_fa_2",
+   "tt_K_healer_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_tt_healer_fb": {
+  "names": [
+   "tt_K_healer_fb_0",
+   "tt_K_healer_fb_1",
+   "tt_K_healer_fb_2",
+   "tt_K_healer_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_warrior_ma": {
+  "names": [
+   "sl_K_warrior_ma_0",
+   "sl_K_warrior_ma_1",
+   "sl_K_warrior_ma_2",
+   "sl_K_warrior_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_warrior_mb": {
+  "names": [
+   "sl_K_warrior_mb_0",
+   "sl_K_warrior_mb_1",
+   "sl_K_warrior_mb_2",
+   "sl_K_warrior_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_warrior_fa": {
+  "names": [
+   "sl_K_warrior_fa_0",
+   "sl_K_warrior_fa_1",
+   "sl_K_warrior_fa_2",
+   "sl_K_warrior_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_warrior_fb": {
+  "names": [
+   "sl_K_warrior_fb_0",
+   "sl_K_warrior_fb_1",
+   "sl_K_warrior_fb_2",
+   "sl_K_warrior_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_assassin_ma": {
+  "names": [
+   "sl_K_assassin_ma_0",
+   "sl_K_assassin_ma_1",
+   "sl_K_assassin_ma_2",
+   "sl_K_assassin_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_assassin_mb": {
+  "names": [
+   "sl_K_assassin_mb_0",
+   "sl_K_assassin_mb_1",
+   "sl_K_assassin_mb_2",
+   "sl_K_assassin_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_assassin_fa": {
+  "names": [
+   "sl_K_assassin_fa_0",
+   "sl_K_assassin_fa_1",
+   "sl_K_assassin_fa_2",
+   "sl_K_assassin_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_assassin_fb": {
+  "names": [
+   "sl_K_assassin_fb_0",
+   "sl_K_assassin_fb_1",
+   "sl_K_assassin_fb_2",
+   "sl_K_assassin_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_ranger_ma": {
+  "names": [
+   "sl_K_ranger_ma_0",
+   "sl_K_ranger_ma_1",
+   "sl_K_ranger_ma_2",
+   "sl_K_ranger_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_ranger_mb": {
+  "names": [
+   "sl_K_ranger_mb_0",
+   "sl_K_ranger_mb_1",
+   "sl_K_ranger_mb_2",
+   "sl_K_ranger_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_ranger_fa": {
+  "names": [
+   "sl_K_ranger_fa_0",
+   "sl_K_ranger_fa_1",
+   "sl_K_ranger_fa_2",
+   "sl_K_ranger_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_ranger_fb": {
+  "names": [
+   "sl_K_ranger_fb_0",
+   "sl_K_ranger_fb_1",
+   "sl_K_ranger_fb_2",
+   "sl_K_ranger_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_mage_ma": {
+  "names": [
+   "sl_K_mage_ma_0",
+   "sl_K_mage_ma_1",
+   "sl_K_mage_ma_2",
+   "sl_K_mage_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_mage_mb": {
+  "names": [
+   "sl_K_mage_mb_0",
+   "sl_K_mage_mb_1",
+   "sl_K_mage_mb_2",
+   "sl_K_mage_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_mage_fa": {
+  "names": [
+   "sl_K_mage_fa_0",
+   "sl_K_mage_fa_1",
+   "sl_K_mage_fa_2",
+   "sl_K_mage_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_mage_fb": {
+  "names": [
+   "sl_K_mage_fb_0",
+   "sl_K_mage_fb_1",
+   "sl_K_mage_fb_2",
+   "sl_K_mage_fb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_healer_ma": {
+  "names": [
+   "sl_K_healer_ma_0",
+   "sl_K_healer_ma_1",
+   "sl_K_healer_ma_2",
+   "sl_K_healer_ma_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_healer_mb": {
+  "names": [
+   "sl_K_healer_mb_0",
+   "sl_K_healer_mb_1",
+   "sl_K_healer_mb_2",
+   "sl_K_healer_mb_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_healer_fa": {
+  "names": [
+   "sl_K_healer_fa_0",
+   "sl_K_healer_fa_1",
+   "sl_K_healer_fa_2",
+   "sl_K_healer_fa_3"
+  ],
+  "kind": "hero"
+ },
+ "an11_sl_healer_fb": {
+  "names": [
+   "sl_K_healer_fb_0",
+   "sl_K_healer_fb_1",
+   "sl_K_healer_fb_2",
+   "sl_K_healer_fb_3"
+  ],
+  "kind": "hero"
+ }
+}

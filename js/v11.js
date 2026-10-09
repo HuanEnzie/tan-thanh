@@ -38,6 +38,15 @@ Object.assign(G, {
       options: CLASS_KEYS.map(c => ({ text: `${clsName(c)} — ${CLASS_INFO[c].dash.split(' — ')[0]}`, act: () => this.setClass(c) })).concat(first ? [] : [{ text: 'Thôi', act: () => {} }]),
     });
   },
+  // story companions get a class from their role text
+  compClass(c) {
+    const t = ((c.data && c.data.role) || '').toLowerCase();
+    if (/sát thủ|ám|thích khách|trộm|ninja/.test(t)) return 'assassin';
+    if (/y |y sĩ|y tá|bác sĩ|dược|đan|trị liệu|thánh nữ|mục sư|chữa/.test(t)) return 'healer';
+    if (/pháp|thuật|kỹ sư|hacker|phù|trận|ma /.test(t)) return 'mage';
+    if (/kiếm|chiến|võ|đao|thương|vệ|lính|đấu/.test(t)) return 'warrior';
+    return 'ranger';
+  },
   classCost() { return 200 + this.player.level * 30; },
   // ---------- summons: jobs ----------
   shById(id) { return this.v10.shadows.find(s => s.id === id); },
@@ -272,11 +281,14 @@ Object.assign(G, {
   // female heroes: {realm}_f{tier}_{pose}
   const os = G.outfitSprite;
   G.outfitSprite = function (base, t) {
-    if (Story.gender === 'f') { const i = RL.hero.indexOf(base); if (i >= 0) { const n = `${rk(RL.id)}_f${t || 0}_${i}`; if (IMG[n]) return n; } }
+    const i = RL.hero.indexOf(base);
+    // class outfit first (basic for common/uncommon body armour, elite from rare up), then the plain female set
+    if (i >= 0 && cls()) { const n = `${rk(RL.id)}_K_${cls()}_${Story.gender === 'f' ? 'f' : 'm'}${(t || 0) >= 2 ? 'b' : 'a'}_${i}`; if (IMG[n]) return n; }
+    if (Story.gender === 'f' && i >= 0) { const n = `${rk(RL.id)}_f${t || 0}_${i}`; if (IMG[n]) return n; }
     return os.call(this, base, t);
   };
   const ri = realmImages;
-  realmImages = function (r) { const out = ri(r); out.push('atlas10_' + rk(r)); return out; };
+  realmImages = function (r) { const out = ri(r); out.push('atlas10_' + rk(r), 'atlas11_' + rk(r)); return out; };
 })();
 
 function lootStep(a, dt) {

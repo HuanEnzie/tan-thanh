@@ -728,7 +728,7 @@ Object.assign(G, {
     configurable: true,
     get() {
       const c = wd.get.call(this);
-      if (!/_[of]\d_\d$/.test(c.sprite)) c._base = c.sprite;
+      if (!/_[of]\d_\d$|_K_/.test(c.sprite)) c._base = c.sprite;
       c.sprite = G.outfitSprite(c._base || c.sprite, G.outfitTier(this));
       return c;
     },

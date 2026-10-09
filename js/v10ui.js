@@ -71,7 +71,7 @@
       if (!c.joined) return;
       const on = !!v.follow[i], hp = Math.round(140 + P.level * 12), atk = Math.round(16 + P.level * 2.2);
       const status = c.ally && c.ally.downed ? '🩸 Gục ngã — đến gần nhấn [E] để cứu' : on ? '➤ Đang đi theo' : '⌂ Ở căn cứ';
-      h += card(`assets/img/${c.data.portrait}.jpg`, true, H(c.data.name) + ' <i class="heart">♥</i>', H(c.data.role) + ` • thân mật ${Math.round(c.aff)}`, `<span>Cấp ${P.level}</span><span>Máu ${hp}</span><span>Công ${atk}</span>`, status,
+      h += card(`assets/img/${c.data.portrait}.jpg`, true, H(c.data.name) + ' <i class="heart">♥</i>', (typeof G.compClass === 'function' ? H(clsName(G.compClass(c))) + ' • ' : '') + H(c.data.role) + ` • thân mật ${Math.round(c.aff)}`, `<span>Cấp ${P.level}</span><span>Máu ${hp}</span><span>Công ${atk}</span>`, status,
         `<button data-cf="${i}" data-on="${on ? 0 : 1}">${on ? '⌂ Về căn cứ' : '➤ Đi theo'}</button>`, on ? 'on' : '');
     });
     for (const r of v.recruits) {

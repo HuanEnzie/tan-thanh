@@ -1,0 +1,242 @@
+{
+ "k11_md_warrior_m_a": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_warrior_m"
+ ],
+ "k11_md_warrior_m_b": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_warrior_m"
+ ],
+ "k11_md_assassin_m_a": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_assassin_m"
+ ],
+ "k11_md_assassin_m_b": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_assassin_m"
+ ],
+ "k11_md_ranger_m_a": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_ranger_m"
+ ],
+ "k11_md_ranger_m_b": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_ranger_m"
+ ],
+ "k11_md_mage_m_a": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_mage_m"
+ ],
+ "k11_md_mage_m_b": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_mage_m"
+ ],
+ "k11_md_healer_m_a": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_healer_m"
+ ],
+ "k11_md_healer_m_b": [
+  "ref11_pose_md_m",
+  "ref11_cls_md_healer_m"
+ ],
+ "k11_md_warrior_f_a": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_warrior_f"
+ ],
+ "k11_md_warrior_f_b": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_warrior_f"
+ ],
+ "k11_md_assassin_f_a": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_assassin_f"
+ ],
+ "k11_md_assassin_f_b": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_assassin_f"
+ ],
+ "k11_md_ranger_f_a": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_ranger_f"
+ ],
+ "k11_md_ranger_f_b": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_ranger_f"
+ ],
+ "k11_md_mage_f_a": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_mage_f"
+ ],
+ "k11_md_mage_f_b": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_mage_f"
+ ],
+ "k11_md_healer_f_a": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_healer_f"
+ ],
+ "k11_md_healer_f_b": [
+  "ref11_pose_md_f",
+  "ref11_cls_md_healer_f"
+ ],
+ "k11_tt_warrior_m_a": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_warrior_m"
+ ],
+ "k11_tt_warrior_m_b": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_warrior_m"
+ ],
+ "k11_tt_assassin_m_a": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_assassin_m"
+ ],
+ "k11_tt_assassin_m_b": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_assassin_m"
+ ],
+ "k11_tt_ranger_m_a": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_ranger_m"
+ ],
+ "k11_tt_ranger_m_b": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_ranger_m"
+ ],
+ "k11_tt_mage_m_a": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_mage_m"
+ ],
+ "k11_tt_mage_m_b": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_mage_m"
+ ],
+ "k11_tt_healer_m_a": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_healer_m"
+ ],
+ "k11_tt_healer_m_b": [
+  "ref11_pose_tt_m",
+  "ref11_cls_tt_healer_m"
+ ],
+ "k11_tt_warrior_f_a": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_warrior_f"
+ ],
+ "k11_tt_warrior_f_b": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_warrior_f"
+ ],
+ "k11_tt_assassin_f_a": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_assassin_f"
+ ],
+ "k11_tt_assassin_f_b": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_assassin_f"
+ ],
+ "k11_tt_ranger_f_a": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_ranger_f"
+ ],
+ "k11_tt_ranger_f_b": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_ranger_f"
+ ],
+ "k11_tt_mage_f_a": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_mage_f"
+ ],
+ "k11_tt_mage_f_b": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_mage_f"
+ ],
+ "k11_tt_healer_f_a": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_healer_f"
+ ],
+ "k11_tt_healer_f_b": [
+  "ref11_pose_tt_f",
+  "ref11_cls_tt_healer_f"
+ ],
+ "k11_sl_warrior_m_a": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_warrior_m"
+ ],
+ "k11_sl_warrior_m_b": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_warrior_m"
+ ],
+ "k11_sl_assassin_m_a": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_assassin_m"
+ ],
+ "k11_sl_assassin_m_b": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_assassin_m"
+ ],
+ "k11_sl_ranger_m_a": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_ranger_m"
+ ],
+ "k11_sl_ranger_m_b": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_ranger_m"
+ ],
+ "k11_sl_mage_m_a": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_mage_m"
+ ],
+ "k11_sl_mage_m_b": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_mage_m"
+ ],
+ "k11_sl_healer_m_a": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_healer_m"
+ ],
+ "k11_sl_healer_m_b": [
+  "ref11_pose_sl_m",
+  "ref11_cls_sl_healer_m"
+ ],
+ "k11_sl_warrior_f_a": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_warrior_f"
+ ],
+ "k11_sl_warrior_f_b": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_warrior_f"
+ ],
+ "k11_sl_assassin_f_a": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_assassin_f"
+ ],
+ "k11_sl_assassin_f_b": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_assassin_f"
+ ],
+ "k11_sl_ranger_f_a": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_ranger_f"
+ ],
+ "k11_sl_ranger_f_b": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_ranger_f"
+ ],
+ "k11_sl_mage_f_a": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_mage_f"
+ ],
+ "k11_sl_mage_f_b": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_mage_f"
+ ],
+ "k11_sl_healer_f_a": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_healer_f"
+ ],
+ "k11_sl_healer_f_b": [
+  "ref11_pose_sl_f",
+  "ref11_cls_sl_healer_f"
+ ]
+}
