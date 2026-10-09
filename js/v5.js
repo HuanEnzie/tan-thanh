@@ -420,7 +420,7 @@ Object.assign(G, {
     if (best && (best.ally || ['loot', 'gate', 'exit', 'stairs', 'cage'].includes(best.kind))) return best;
     const P = this.player; if (P.car) return best;
     for (const p of World.propsNear(P.x, P.y, 90, this._iq || (this._iq = []))) {
-      if (p.dead) continue;
+      if (p.dead || (this._ixSkip && this._ixSkip.has(p))) continue;
       const d = dist(P.x, P.y, p.x, p.y);
       if (p.kind === 'statue' && d < 80) { const k = World.rkey(p.data.rx, p.data.ry); return { prop: p, kind: 'statue', label: this.v5.st[k] && !p.data.home || p.data.home ? `${ST_NAME[rk(RL.id)]} — dâng ${ORB_NAME[rk(RL.id)]} / dịch chuyển` : `Đánh thức ${ST_NAME[rk(RL.id)]}` }; }
       if (p.kind === 'waypoint' && d < 60) { const k = World.rkey(p.data.rx, p.data.ry) + ':' + p.data.i; return { prop: p, kind: 'waypoint', label: this.v5.wp[k] ? 'Mở bản đồ dịch chuyển' : `Mở khoá ${WP_NAME[rk(RL.id)]}` }; }

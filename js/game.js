@@ -670,7 +670,9 @@ const G = {
     const P = this.player;
     if (P.car) return { label: 'Xuống xe', kind: 'exitcar' };
     let best = null, bd = 60;
+    const skip = this._ixSkip;
     for (const a of this.allies) {
+      if (skip && skip.has(a)) continue;
       const d = dist(P.x, P.y, a.x, a.y);
       if (d > (a.kind === 'merchant' ? 60 : 50) || (best && d > bd && !(a.kind === 'comp' && a.downed))) continue;
       if (a.kind === 'comp') { best = { ally: a, kind: a.downed ? 'revive' : 'talk', label: a.downed ? `Cứu ${a.comp.name}` : (a.comp.ref.scenePending ? `♥ Trò chuyện với ${a.comp.name}` : `${a.comp.name} ♥${Math.round(a.comp.ref.aff)}`) }; bd = d; }
@@ -680,7 +682,7 @@ const G = {
     if (best && best.kind !== 'shop') return best;
     bd = best ? Math.min(bd, 30) : 52;
     for (const p of World.propsNear(P.x, P.y, 90)) {
-      if (p.dead) continue;
+      if (p.dead || (skip && skip.has(p))) continue;
       let d = 1e9;
       for (const c of p.circles.length ? p.circles : [{ x: p.x, y: p.y, r: Math.min(p.w, p.h) * 0.4 }]) d = Math.min(d, dist(P.x, P.y, c.x, c.y) - c.r);
       if (d > bd) continue;
@@ -994,7 +996,10 @@ const G = {
         break;
       }
       case 'arise': {
-        const pool = this.corpses.filter(c => dist(c.x, c.y, P.x, P.y) < 500).slice(-(5 + Math.floor(P.level / 6)));
+        // temporary soldiers: 5 at level 1, +1 per level (the ones already standing count)
+        const room = Math.max(0, (this.tempCap ? this.tempCap() : 5 + Math.floor(P.level / 6)) - this.allies.filter(a => a.kind === 'shadow' && !a.sid && !a.dead).length);
+        const pool = room ? this.corpses.filter(c => dist(c.x, c.y, P.x, P.y) < 500).slice(-room) : [];
+        if (!pool.length && room === 0) { this.toast('Đã đủ số lính tạm thời. Lên cấp để gọi thêm.', 'info'); P.energy = 60; return; }
         if (!pool.length) { this.toast('Không có xác kẻ địch nào gần đây để hồi sinh...', 'info'); P.energy = 60; return; }
         UI.skillFlash('TRỖI DẬY!', '#6b5bff');
         Sound.play('sfx_shadow', 0.9);

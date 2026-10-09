@@ -508,3 +508,55 @@ body.touch #worldPick .pcl img { width: 44px; height: 30px; }
 .prof12 .pg > div.cur { border-color: #4da6ff; box-shadow: inset 0 0 0 1px #4da6ff; }
 .prof12 .pg > div.bad span { color: #ff8a7a; }
 .prof12 .pg > div.good span { color: #8aff9a; }
+
+/* ===== v14: interaction chooser, close buttons, name box, talents, mastery, roomy shadow cards ===== */
+#ixList { position: fixed; left: 50%; bottom: 26%; transform: translateX(-50%); z-index: 70; width: min(440px, 92vw); display: flex; flex-direction: column; gap: 6px; background: rgba(10,12,20,0.94); border: 2px solid #6fd0ff; padding: 8px; box-shadow: 0 0 24px rgba(0,0,0,0.7); }
+#ixList[hidden] { display: none; }
+#ixList .ixh { display: flex; justify-content: space-between; align-items: center; color: #9fe8ff; font-size: 20px; }
+#ixList .ixb { display: flex; align-items: center; gap: 10px; text-align: left; min-width: 0; width: 100%; padding: 6px 10px; font-size: 20px; line-height: 1.1; letter-spacing: 0; }
+#ixList .ixb b { flex: 0 0 26px; height: 26px; line-height: 26px; text-align: center; background: #243a58; border: 1px solid #6fd0ff; font-weight: normal; }
+#ixList .ixb span { flex: 1; min-width: 0; }
+body.touch #ixList { bottom: 34%; }
+body.touch #ixList .ixb { font-size: 22px; padding: 10px 12px; }
+.closex { position: absolute; top: 6px; right: 6px; z-index: 5; min-width: 0; width: 38px; height: 38px; padding: 0; font-size: 22px; line-height: 1; letter-spacing: 0; background: rgba(20,24,36,0.9); border: 2px solid #7a8199; color: #fff; cursor: pointer; }
+#ixList .closex, #ixList .ixx { position: static; width: 34px; height: 34px; }
+#ixList .ixx { min-width: 0; padding: 0; font-size: 20px; letter-spacing: 0; }
+#dialog .closex { top: 10px; right: 10px; }
+.closex[hidden] { display: none; }
+#askBox { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
+#askBox[hidden] { display: none; }
+#askBox .askp { position: relative; background: #12182a; border: 2px solid #6fd0ff; padding: 18px 20px; width: min(380px, 90vw); display: flex; flex-direction: column; gap: 10px; }
+#askBox h3 { margin: 0; font-weight: normal; font-size: 24px; color: #dff3ff; padding-right: 40px; }
+#askBox input { font: inherit; font-size: 26px; padding: 6px 10px; background: #060810; color: #fff; border: 2px solid #46526e; }
+#askBox .askb { display: flex; gap: 8px; } #askBox .askb button { flex: 1; min-width: 0; letter-spacing: 0; }
+.card.major { border-color: #ffd65a; box-shadow: 0 0 22px rgba(255,214,90,0.45); }
+.card .pk { display: block; margin-top: 6px; color: #ffd65a; font-size: 17px; }
+.card .pk2 { display: block; color: var(--muted); font-size: 15px; }
+.perk14 { margin-top: 12px; }
+.pk14 { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 5px 8px; margin: 4px 0; }
+.pk14.maj { border-color: #ffd65a; }
+.pk14 img { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
+.pk14 b { font-weight: normal; font-size: 20px; color: #ffe6a0; display: block; line-height: 1; }
+.pk14 small { color: var(--muted); font-size: 16px; line-height: 1.1; }
+.mast { grid-column: 1 / -1; position: relative; margin-top: 6px; padding: 3px 0 7px; font-size: 15px; line-height: 1.1; }
+.mast span { display: block; color: #9fe8ff; }
+.mast small { display: block; color: var(--muted); font-size: 13px; }
+.mast i { position: absolute; left: 0; bottom: 0; height: 4px; background: linear-gradient(90deg, #4da6ff, #9fe8ff); }
+.mast::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,0.1); z-index: -1; }
+/* shadow cards: big enough to read on a phone */
+.party10.shl { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+.shl .pc10 { flex-wrap: wrap; padding: 10px; gap: 10px 12px; }
+.shl .pc10 img { width: 92px; height: 92px; }
+.shl .pci { flex: 1 1 200px; }
+.shl .pci b { font-size: 28px; display: flex; align-items: center; gap: 8px; line-height: 1.05; }
+.shl .pci b .ren { min-width: 0; width: 34px; height: 30px; padding: 0; font-size: 18px; letter-spacing: 0; flex-shrink: 0; }
+.shl .pci small { font-size: 18px; }
+.shl .pst { font-size: 19px; gap: 2px 14px; }
+.shl .pstat { font-size: 18px; margin: 4px 0 0; }
+.shl .shact { flex: 1 1 100%; display: flex; flex-direction: column; gap: 6px; }
+.shl .shact .pbtn { flex-wrap: wrap; }
+.shl .shact .pbtn button { flex: 1 1 0; min-width: 0; font-size: 18px; padding: 4px 4px; height: 40px; line-height: 1; white-space: nowrap; }
+.shl .pbtn button.on { border-color: #7dffb0; color: #b8ffd0; }
+.shl .pbtn.modes button { min-width: 0; }
+body.touch .party10.shl { grid-template-columns: 1fr; }
+body.touch .shl .pci b { font-size: 26px; }

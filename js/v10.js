@@ -68,7 +68,7 @@ const gateKey = (x, y) => Math.round(x / 16) + ',' + Math.round(y / 16);
 
 Object.assign(G, {
   initV10(d) {
-    this.v10 = Object.assign({ attr: { str: 0, vit: 0, agi: 0, int: 0 }, pts: null, mana: null, shadows: [], sid: 1, recruits: [], rid: 1, follow: {}, miniDead: {}, gates: {}, gatesDone: {}, cands: {}, hello: 0 }, d || {});
+    this.v10 = Object.assign({ attr: { str: 0, vit: 0, agi: 0, int: 0 }, pts: null, mana: null, shadows: [], sid: 1, recruits: [], rid: 1, follow: {}, plants: [], sk: {}, miniDead: {}, gates: {}, gatesDone: {}, cands: {}, hello: 0 }, d || {});
     this.v10.attr = Object.assign({ str: 0, vit: 0, agi: 0, int: 0 }, this.v10.attr);
     this.manaCd = 0;
   },
@@ -405,11 +405,11 @@ Object.assign(G, {
     if (isArise() && this.v10 && !(typeof Net !== 'undefined' && Net.active && Net.guest)) {
       const o = best && (best.prop || best.ally), db = o ? dist(o.x, o.y, P.x, P.y) : 1e9;
       let bc = null, bd = 60;
-      for (const c of this.corpses) { if (!c.tier || this.time - c.t > 120) continue; const d = dist(c.x, c.y, P.x, P.y); if (d < bd) { bd = d; bc = c; } }
+      for (const c of this.corpses) { if (!c.tier || this.time - c.t > 120 || (this._ixSkip && this._ixSkip.has(c))) continue; const d = dist(c.x, c.y, P.x, P.y); if (d < bd) { bd = d; bc = c; } }
       if (bc && (!best || bd <= db + 8)) { const T = SH_TIER[bc.tier]; return { corpse: bc, kind: 'corpse', label: `${SM().skill} — thu phục ${bc.name} (${T.name}) • ${Math.round(this.extractChance(bc) * 100)}% • ${T.mana} ${manaName()}` }; }
     }
     const o = best && (best.prop || best.ally), db = o ? dist(o.x, o.y, P.x, P.y) : best ? 0 : 1e9;
-    for (const a of this.allies) if (a.kind === 'cand' && !a.dead && dist(a.x, a.y, P.x, P.y) < Math.min(55, db)) return { ally: a, kind: 'cand', label: `Trò chuyện: ${a.cand.name} (${this.rcClass(a.cand)} ${'★'.repeat(a.cand.star)})` };
+    for (const a of this.allies) if (a.kind === 'cand' && !a.dead && !(this._ixSkip && this._ixSkip.has(a)) && dist(a.x, a.y, P.x, P.y) < Math.min(55, db)) return { ally: a, kind: 'cand', label: `Trò chuyện: ${a.cand.name} (${this.rcClass(a.cand)} ${'★'.repeat(a.cand.star)})` };
     return best;
   };
   const ia = G.interact;
@@ -477,7 +477,6 @@ Object.assign(G, {
       ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore(); ctx.globalAlpha = 1;
       if (this.hp < this.maxHp) { ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(this.x - 16, this.y - h / 2 - 6, 32, 3); ctx.fillStyle = SM().col; ctx.fillRect(this.x - 16, this.y - h / 2 - 6, 32 * Math.max(0, this.hp / this.maxHp), 3); }
     } else ad.call(this, ctx);
-    if (this.sname && (this.stier === 'boss' || this.stier === 'mini')) { ctx.font = '8px VT323, monospace'; ctx.textAlign = 'center'; ctx.fillStyle = SM().col; ctx.fillText(this.sname, this.x, this.y - (this.upright ? 34 : 24)); }
     if (this.kind === 'merc' || this.kind === 'cand') {
       const r = this.rc || this.cand;
       ctx.font = '8px VT323, monospace'; ctx.textAlign = 'center'; ctx.fillStyle = this.kind === 'cand' ? '#ffe28a' : '#9fe8ff';

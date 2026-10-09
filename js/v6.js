@@ -824,7 +824,7 @@ Object.assign(G, {
     const P = this.player;
     if (best && best.kind !== 'loot') return best;
     for (const a of this.allies) {
-      if ((a.kind !== 'elder' && a.kind !== 'villager') || a.dead) continue;
+      if ((a.kind !== 'elder' && a.kind !== 'villager') || a.dead || (this._ixSkip && this._ixSkip.has(a))) continue;
       if (dist(a.x, a.y, P.x, P.y) < 50) return { ally: a, kind: a.kind, label: a.kind === 'elder' ? `Nói chuyện với ${a.name}` : 'Trò chuyện' };
     }
     return best;
