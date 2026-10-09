@@ -187,7 +187,7 @@ Object.assign(G, {
     const v = this.v10;
     if (on && this.followCount() >= this.maxFollow()) { this.toast(`Chỉ dẫn theo được ${this.maxFollow()} người (cấp 10, 20, 30 mở thêm chỗ).`, 'warn'); return; }
     if (kind === 'c') v.follow[i] = !!on;
-    else { const r = v.recruits.find(x => x.id === i); if (r) { r.follow = !!on; const a = this.allies.find(x => x.rc === r && !x.dead); if (a) a.speak(R.pick(on ? RC_LINES.follow : RC_LINES.home), 3); } }
+    else { const r = v.recruits.find(x => x.id === i); if (r) { r.follow = !!on; const a = this.allies.find(x => x.rc === r && !x.dead); if (a) a.speak(G.rcLine(r, on ? 'follow' : 'home'), 3); } }
     this.partySync(true);
   },
   // spawn / remove companions and recruits to match their orders
@@ -205,7 +205,7 @@ Object.assign(G, {
         const st = this.rcStats(r);
         a = new Ally('merc', hx, hy, { img: G.rcSprite(r) });
         a.rc = r; a.maxHp = a.hp = st.hp; a.dmg = st.atk; a.name = r.name;
-        if (home) { a.home = { x: hx, y: hy }; a.hp = a.maxHp; } else a.speak(R.pick(RC_LINES.follow), 2.5);
+        if (home) { a.home = { x: hx, y: hy }; a.hp = a.maxHp; } else a.speak(G.rcLine(r, 'follow'), 2.5);
         this.allies.push(a);
       }
     });
@@ -452,7 +452,7 @@ Object.assign(G, {
       if (this.dead) return;
       const st = G.rcStats(this.rc);
       this.hp -= d * 100 / (100 + st.def * 3); this.hurtT = 0.2;
-      if (Math.random() < 0.1) this.speak(R.pick(RC_LINES.hurt), 2);
+      if (Math.random() < 0.1) this.speak(G.rcLine(this.rc, 'hurt'), 2);
       if (this.hp <= 0) {
         this.dead = true; this.rc.hurtUntil = G.time + 180;
         Particles.burst(this.x, this.y, 12, '#ff6a6a', 120);
@@ -530,7 +530,7 @@ function mercUpdate(a, dt) {
         }
       }
     }
-    if (Math.random() < dt * 0.04) a.speak(R.pick(RC_LINES.fight), 2);
+    if (Math.random() < dt * 0.04) a.speak(G.rcLine(a.rc, 'fight'), 2);
   } else { follow(); if (Math.hypot(a.vx, a.vy) > 10) a.angle = Math.atan2(a.vy, a.vx); }
   // healers mend the player and the party
   if (role === 'healer') {

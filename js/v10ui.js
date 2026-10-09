@@ -66,7 +66,7 @@
   UI.buildParty = function () {
     const P = G.player, v = G.v10, box = $('invBody');
     let h = `<h3>Đồng đội <small>đang đi theo ${G.followCount()}/${G.maxFollow()} • cấp 10, 20, 30 mở thêm chỗ</small></h3><div class="party10">`;
-    const card = (img, port, name, sub, stats, status, btns, cls) => `<div class="pc10 ${cls || ''}"><img class="${port ? 'port' : 'spr'}" src="${img}" alt=""><div class="pci"><b>${name}</b><small>${sub}</small><div class="pst">${stats}</div><div class="pstat">${status}</div><div class="pbtn">${btns}</div></div></div>`;
+    const card = (img, port, name, sub, stats, status, btns, cls) => `<div class="pc10 ${cls || ''}">${String(img).startsWith('<') ? img : `<img class="${port ? 'port' : 'spr'}" src="${img}" alt="">`}<div class="pci"><b>${name}</b><small>${sub}</small><div class="pst">${stats}</div><div class="pstat">${status}</div><div class="pbtn">${btns}</div></div></div>`;
     G.companions.forEach((c, i) => {
       if (!c.joined) return;
       const on = !!v.follow[i], hp = Math.round(140 + P.level * 12), atk = Math.round(16 + P.level * 2.2);
@@ -78,9 +78,10 @@
       const st = G.rcStats(r), hurt = r.hurtUntil > G.time, on = r.follow;
       const im = IMG[RL.npc[r.sprite]] || IMG[RL.npc[0]];
       const status = hurt ? `🩸 Dưỡng thương ${Math.ceil((r.hurtUntil - G.time) / 60)} phút` : on ? '➤ Đang đi theo' : '⌂ Ở căn cứ';
-      h += card(im ? im.src : '', false, `${H(r.name)} <i class="star">${'★'.repeat(r.star)}</i>`, `${H(G.rcClass(r))} • kinh nghiệm ${Math.floor(r.xp)}/${40 + r.lvl * 30}`,
+      const cn = r.cast ? G.castBy(r.cast) : null;
+      h += card(r.look ? Face.html(r.look, RL.id, 'pface') : im ? im.src : '', !!r.look, `${H(r.name)} <i class="star">${'★'.repeat(r.star)}</i>${cn ? ` <i class="rel" style="color:${REL[cn.rel].col}">${REL[cn.rel].icon}</i>` : ''}`, `${H(G.rcClass(r))}${cn ? ' • ' + H(relName(cn.rel)) + ' • ' + H(traitOf(cn.trait).name) : ''} • kinh nghiệm ${Math.floor(r.xp)}/${40 + r.lvl * 30}`,
         `<span>Cấp ${r.lvl}</span><span>Máu ${st.hp}</span><span>Công ${st.atk}</span><span>Thủ ${st.def}</span><span>Tốc ${st.spd}</span>`, status,
-        `<button data-rf="${r.id}" data-on="${on ? 0 : 1}">${on ? '⌂ Về căn cứ' : '➤ Đi theo'}</button><button class="ghost" data-rx="${r.id}">Giải tán</button>`, on ? 'on' : '');
+        `<button data-rf="${r.id}" data-on="${on ? 0 : 1}">${on ? '⌂ Về căn cứ' : '➤ Đi theo'}</button>${cn ? `<button class="ghost" data-rn="${cn.id}">Hồ sơ</button>` : ''}<button class="ghost" data-rx="${r.id}">${cn ? 'Cho về' : 'Giải tán'}</button>`, on ? 'on' : '');
     }
     if (!v.recruits.length && !G.companions.some(c => c.joined)) h += '<p class="muted">Chưa có đồng đội.</p>';
     h += '</div><p class="muted">Chiêu mộ thêm người ở <b>khu trú ẩn ⛺</b> (danh sách đổi mỗi 3 ngày) hoặc khi giải cứu dân thường. Người ở căn cứ an toàn tuyệt đối; người đi theo cùng chiến đấu, lên cấp theo trận. Trọng thương sẽ tự về căn cứ dưỡng thương.</p>';
@@ -88,8 +89,9 @@
     box.querySelectorAll('button').forEach(b => this.bindBtn(b));
     box.querySelectorAll('[data-cf]').forEach(b => b.onclick = () => { G.setFollow('c', +b.dataset.cf, b.dataset.on === '1'); this.buildInv(); });
     box.querySelectorAll('[data-rf]').forEach(b => b.onclick = () => { G.setFollow('r', +b.dataset.rf, b.dataset.on === '1'); this.buildInv(); });
+    box.querySelectorAll('[data-rn]').forEach(b => b.onclick = () => { const n = G.castBy(+b.dataset.rn); if (n) UI.openCast(n, true); });
     box.querySelectorAll('[data-rx]').forEach(b => b.onclick = () => {
-      if (b.dataset.sure) { const i = v.recruits.findIndex(r => r.id === +b.dataset.rx); if (i >= 0) { const r = v.recruits.splice(i, 1)[0]; G.toast(`${r.name} đã rời đội.`, 'info'); G.partySync(true); } this.buildInv(); }
+      if (b.dataset.sure) { const i = v.recruits.findIndex(r => r.id === +b.dataset.rx); if (i >= 0) { const rr = v.recruits[i]; if (rr.cast) { const cn = G.castBy(rr.cast); if (cn) { G.castLeave(cn); this.buildInv(); return; } } const r = v.recruits.splice(i, 1)[0]; G.toast(`${r.name} đã rời đội.`, 'info'); G.partySync(true); } this.buildInv(); }
       else { b.dataset.sure = 1; b.textContent = 'Chắc chắn?'; }
     });
   };

@@ -261,9 +261,9 @@ const UI = {
     $('dPort').style.display = who === 'npc' && P ? '' : 'none';
     if (P) {
       let pt = P;
-      if (who === 'npc' && EXPR_PORTS.has(P)) { let e = line.e || guessExpr(line.text, d.romance !== false); if (e === 'blush' && d.romance === false) e = 'happy'; if (e && e !== 'normal') pt = P + '_' + e; }
-      const src = 'assets/img/' + pt + '.jpg';
-      if (!$('dPort').src.endsWith(src)) { $('dPort').src = src; $('dPort').classList.remove('pop'); void $('dPort').offsetWidth; $('dPort').classList.add('pop'); }
+      if (who === 'npc' && !String(P).startsWith('data:') && EXPR_PORTS.has(P)) { let e = line.e || guessExpr(line.text, d.romance !== false); if (e === 'blush' && d.romance === false) e = 'happy'; if (e && e !== 'normal') pt = P + '_' + e; }
+      const src = String(pt).startsWith('data:') ? pt : 'assets/img/' + pt + '.jpg';
+      if ($('dPort').getAttribute('src') !== src && !$('dPort').src.endsWith(src)) { $('dPort').src = src; $('dPort').classList.remove('pop'); void $('dPort').offsetWidth; $('dPort').classList.add('pop'); }
     }
     $('dName').textContent = who === 'npc' ? (d.name || '') : who === 'hero' ? Story.names.hero : '';
     $('dName').style.display = who === 'sys' ? 'none' : '';
