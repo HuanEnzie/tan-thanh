@@ -67,7 +67,7 @@ Object.assign(G, {
       if (J.gold) v.stock.gold = (v.stock.gold || 0) + J.gold * pw * (1 + P.level * 0.05);
       for (const [id, q] of J.out || []) v.stock[id] = (v.stock[id] || 0) + q * pw;
     }
-    if (this.atBase && this.atBase() && this.frame % 60 === 0) {
+    if (World.mode === 'over' && this.frame % 60 === 0) {
       const got = [];
       for (const id in v.stock) {
         const n = Math.floor(v.stock[id]); if (n < 1) continue;

@@ -205,7 +205,7 @@ Object.assign(G, {
     const opts = [];
     if (n) opts.push({ text: `Dâng ${n} ${ORB_NAME[rk(RL.id)]}`, act: () => this.offerOrbs() });
     opts.push({ text: 'Mở bản đồ — dịch chuyển', act: () => setTimeout(() => UI.openPanel('map'), 50) });
-    if (this.atBase()) opts.push({ text: 'Quản lý căn cứ', act: () => setTimeout(() => UI.openBase('build'), 50) });
+    opts.push({ text: 'Quản lý căn cứ', act: () => setTimeout(() => UI.openBase('build'), 50) });
     opts.push({ text: 'Rời đi', act: () => {} });
     UI.menuDialog({ name: ST_NAME[rk(RL.id)], portrait: null, text: `Ân huệ cấp ${L} • đã dâng ${this.v5.off} ${ORB_NAME[rk(RL.id)]} (${this.v5.off % 5}/5 tới cấp tiếp). Mỗi cấp: +15 máu hoặc thể lực tối đa và 2 vé triệu hồi.`, options: opts });
   },
@@ -255,12 +255,11 @@ Object.assign(G, {
     const v = this.v5; if (!v) return;
     for (const b of v.bounties) if (b.t === t && !b.done) {
       b.c = Math.min(b.n, b.c + n);
-      if (b.c >= b.n) { b.done = true; this.toast(`📜 Hoàn thành nhiệm vụ: ${BOUNTY_TYPES.find(x => x.t === b.t).label(b.n)} — về Căn cứ nhận thưởng!`, 'quest'); Sound.play('sfx_achievement', 0.5, 1.3); }
+      if (b.c >= b.n) { b.done = true; this.toast(`📜 Hoàn thành nhiệm vụ: ${BOUNTY_TYPES.find(x => x.t === b.t).label(b.n)} — nhấn [N] mở Hệ thống để nhận thưởng!`, 'quest'); Sound.play('sfx_achievement', 0.5, 1.3); }
     }
   },
   claimBounty(b) {
     if (!b.done || b.claimed) return;
-    if (!this.atBase()) { this.toast('Về Căn cứ (Bảng Nhiệm Vụ) để nhận thưởng.', 'warn'); return; }
     b.claimed = true; this.player.gold += b.gold; this.giveTickets(b.tk, null); this.give('scrap', 3);
     Sound.play('sfx_coin', 0.7);
     if (this.v5.bounties.every(x => x.claimed)) { this.toast('Đã xong mọi nhiệm vụ hôm nay — bảng mới sẽ có vào sáng mai.', 'good'); }
@@ -273,7 +272,6 @@ Object.assign(G, {
   upgrade(id) {
     const v = this.v5, L = v.base[id];
     if (L >= 5) return;
-    if (!this.atBase()) { this.toast('Phải ở Căn cứ mới xây được.', 'warn'); return; }
     const c = this.upCost(id, L);
     if (!this.canPay(c)) { this.toast('Không đủ nguyên liệu.', 'warn'); return; }
     this.player.gold -= c.gold; this.take('scrap', c.scrap); this.take('planks', c.planks);
@@ -313,7 +311,6 @@ Object.assign(G, {
   cook(m) {
     const L = this.v5.base.kitchen, P = this.player;
     if (!L) return;
-    if (!this.atBase()) { this.toast('Phải ở Căn cứ mới nấu được.', 'warn'); return; }
     const gold = 25 + P.level * 4;
     if (!this.has('food', 2) || !this.has('water', 1) || P.gold < gold) { this.toast(`Cần 2 ${itm('food').name}, 1 ${itm('water').name} và ${gold} ${cur().name}.`, 'warn'); return; }
     this.take('food', 2); this.take('water', 1); P.gold -= gold;
@@ -327,7 +324,7 @@ Object.assign(G, {
   enhChance(it) { return [1, 1, 1, 1, 1, 0.9, 0.8, 0.65, 0.5, 0.4][it.plus || 0] || 0.3; },
   enhance(it) {
     const P = this.player, L = this.v5.base.forge;
-    if (!L || !this.atBase()) { this.toast('Cần Lò Rèn ở Căn cứ.', 'warn'); return; }
+    if (!L) { this.toast('Cần xây Lò Rèn trước.', 'warn'); return; }
     const p = it.plus || 0;
     if (p >= Math.min(10, L * 2)) { this.toast('Nâng cấp Lò Rèn để cường hoá cao hơn.', 'info'); return; }
     const c = this.enhCost(it);
@@ -658,7 +655,7 @@ Object.assign(UI, {
     this.buildBase(); this.showScreen('base');
   },
   buildBase() {
-    const P = G.player, v = G.v5, here = G.atBase();
+    const P = G.player, v = G.v5, here = true; // the System answers anywhere
     document.querySelectorAll('#base [data-btab]').forEach(t => t.classList.toggle('on', t.dataset.btab === this.baseTab));
     const lv = BASE_ORDER.reduce((s, b) => s + v.base[b], 0);
     $('bLvl').textContent = `cấp ${lv}/30 • ${v.residents} cư dân`;
@@ -695,7 +692,7 @@ Object.assign(UI, {
         h += '</div>';
       }
     } else {
-      h += `<p class="muted">Nhiệm vụ đổi mới mỗi sáng. Hoàn thành ở bất cứ đâu, nhận thưởng tại Căn cứ.</p><div class="srows">`;
+      h += `<p class="muted">Nhiệm vụ đổi mới mỗi sáng. Hoàn thành và nhận thưởng ở bất cứ đâu (phím N).</p><div class="srows">`;
       for (const [i, b] of v.bounties.entries()) {
         const T0 = BOUNTY_TYPES.find(x => x.t === b.t);
         h += `<div class="srow ${b.claimed ? 'claimed' : ''}"><div class="sinfo"><b>📜 ${esc(T0.label(b.n))}</b><small>${b.c}/${b.n} • thưởng ${b.gold} ${esc(cur().name)}, ${b.tk} vé, 3 ${esc(itm('scrap').name)}</small><i class="bprog"><u style="width:${b.c / b.n * 100}%"></u></i></div>${b.claimed ? '<span class="muted">✔</span>' : `<button data-claim="${i}" ${b.done && here ? '' : 'class="dim"'}>NHẬN</button>`}</div>`;

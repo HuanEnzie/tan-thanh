@@ -24,7 +24,7 @@
     const c = cls(), box = $('invBody');
     let h = '<div class="clscard">';
     if (c) {
-      const I = CLASS_INFO[c], here = G.atBase && G.atBase();
+      const I = CLASS_INFO[c], here = true;
       h += `<img src="${cIcon(c)}" alt=""><div><b style="color:${I.col}">${H(clsName(c))}</b><p>${H(I.pass)}</p><p>Lướt [Space]: ${H(I.dash)}</p><p class="muted">Nên cộng: ${I.build.map(attrName).join(' + ')} • Hợp: ${H(I.gear)} (đồ rơi nghiêng về loại này)</p>`
         + `<button id="clsChange" ${here ? '' : 'disabled'}>Đổi chức nghiệp (${G.classCost()} ${H(cur().name)})${here ? '' : ' — ở căn cứ'}</button></div>`;
     } else h += '<div><b>Chưa chọn chức nghiệp</b><p><button id="clsChange">Chọn chức nghiệp</button></p></div>';

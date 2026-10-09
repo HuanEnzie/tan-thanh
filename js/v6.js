@@ -286,7 +286,7 @@ Object.assign(G, {
     const t = this.player.level / 5, q = this.btReq(t);
     this.toast(`⚠ BÌNH CẢNH! Đã chạm đỉnh ${this.rankTitle()}. Cần ${q.a} ${itm('bt_a').name}, ${q.b} ${itm('bt_b').name}${q.c ? `, ${q.c} ${itm('bt_c').name}` : ''} để đột phá (Căn cứ › Đột phá hoặc tại ${ST_NAME[rk(RL.id)]}).`, 'quest');
   },
-  btWhere() { return this.atBase() || (this.statueT || -99) > this.time; },
+  btWhere() { return true; }, // breakthrough through the System, anywhere
   breakthrough() {
     const P = this.player;
     if (!this.btBlocked()) return;

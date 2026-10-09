@@ -829,7 +829,8 @@ const G = {
     UI.fade(() => {
       this.dgTarget = null;
       this.transit = false;
-      const dg = { rank, floor: 1, floors: p.data.floors || RANK_FLOORS[rank], level: p.data.level || Math.max(RANK_LVL[rank], World.levelAt(p.x, p.y)), seed: p.data.seed, story: p.data.story, king: !!p.data.king };
+      const rec = this.gateRec, run = rec && this._runs && this._runs[rec.id], f0 = (rec && rec.floor) || 1; // leaving a gate early keeps the floor you reached
+      const dg = run && run.rank === rank && !run.cleared ? run : { rank, floor: f0, floors: p.data.floors || RANK_FLOORS[rank], level: (p.data.level || Math.max(RANK_LVL[rank], World.levelAt(p.x, p.y))) + 2 * (f0 - 1), seed: p.data.seed, story: p.data.story, king: !!p.data.king };
       this.saveOver = { delta: World.delta, explored: World.explored, minis: World.minis };
       World.enterDungeon(dg);
       this.zombies = []; this.cars = []; Items.list = []; this.hazards = []; Bullets.list = []; Throws.fires = []; Throws.acids = []; Throws.traps = [];
@@ -839,7 +840,7 @@ const G = {
       for (const a of this.allies) { a.x = P.x + R.range(-30, 30); a.y = P.y + R.range(10, 40); }
       this.camera.x = P.x; this.camera.y = P.y;
       this.flowT = 0;
-      UI.banner(`CỔNG HẠNG ${rank}`, `${RL.dungeon.name} • Tầng 1/${dg.floors} • Cấp quái ~${dg.level}`, RANK_COLOR[rank]);
+      UI.banner(`CỔNG HẠNG ${rank}`, `${RL.dungeon.name} • Tầng ${dg.floor}/${dg.floors} • Cấp quái ~${dg.level}${dg.floor > 1 ? ' • tiếp tục tiến độ' : ''}`, RANK_COLOR[rank]);
       if (RL.id === 'sl') UI.radio(['[HỆ THỐNG] Bạn đã tiến vào Cổng hạng ' + rank + '.', '[HỆ THỐNG] Nhiệm vụ: tiêu diệt Chủ Hầm Ngục ở tầng cuối.']);
     });
   },

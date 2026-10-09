@@ -296,3 +296,39 @@ const HOLLOW = { normal: 0.30, elite: 0.20, mini: 0.12, boss: 0.06 };
     if (G.dkTpList) for (const t of G.dkTpList()) if (t.rank !== '✔') mark(t.gx, t.gy, t.col, t.rank === '♛' ? '♛' : '☠');
   };
 })();
+
+// ---------- leaving a gate early keeps your floor; the exit asks first ----------
+(function () {
+  G._runs = {};
+  const ed = World.enterDungeon;
+  World.enterDungeon = function (dg) {
+    const r = ed.call(this, dg), rec = G.gateRec;
+    if (rec && !dg.king) { rec.floor = dg.floor; G._runs[rec.id] = dg; }
+    return r;
+  };
+  const ia = G.interact;
+  G.interact = function (it) {
+    if (it && it.kind === 'exit' && World.mode === 'dungeon' && World.dg && !World.dg.cleared && !this._exitOK) {
+      const dg = World.dg;
+      UI.menuDialog({ name: 'Rời hầm ngục?', portrait: null, text: `Cổng hạng ${dg.rank} chưa đóng. Nếu rời đi, lần sau bạn vào lại sẽ tiếp tục từ tầng ${dg.floor}/${dg.floors}${this.gateRec ? '' : ' (hầm ngục này không nhớ tiến độ)'}. Quái từ Cổng vẫn tiếp tục tràn ra ngoài.`, options: [{ text: 'Rời đi', act: () => { this._exitOK = true; try { ia.call(this, it); } finally { this._exitOK = false; } } }, { text: 'Ở lại', act: () => {} }] });
+      return;
+    }
+    return ia.call(this, it);
+  };
+})();
+
+// ---------- shadows are an army, not a boss killer: bosses shrug most of it off and hit them harder ----------
+const ALLY_VS = { boss: 0.28, mini: 0.4, top: 0.2, elite: 0.8 };   // share of damage from shadows / allies that lands
+const BOSS_VS_ALLY = { boss: 1.7, mini: 1.4 };                       // how much harder bosses hit shadows and allies
+(function () {
+  const he = G.hitEnemy;
+  G.hitEnemy = function (z, dmg, kx, ky, src, ang, wp) {
+    if (src === 'ally') dmg *= z.king || z.gen != null ? ALLY_VS.top : z.boss ? (z.mini || z.lord ? ALLY_VS.mini : ALLY_VS.boss) : z.elite ? ALLY_VS.elite : 1;
+    return he.call(this, z, dmg, kx, ky, src, ang, wp);
+  };
+  const ht = G.hurtTarget;
+  G.hurtTarget = function (t, dmg, src) {
+    if (t && t.kind && src && src.boss && t !== this.player) dmg *= src.mini || src.lord ? BOSS_VS_ALLY.mini : BOSS_VS_ALLY.boss;
+    return ht.call(this, t, dmg, src);
+  };
+})();
