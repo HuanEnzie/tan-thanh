@@ -173,7 +173,7 @@ function seaUpdate(z, dt) {
     tk.call(this, dt);
     const P = this.player; if (!P || P.dead || !this.v10) return;
     const over = World.mode === 'over', t = over ? World.get(Math.floor(P.x / TILE), Math.floor(P.y / TILE)) : -1;
-    P.inWater = over && WATER_T(t) && !P.boat; P.deep = P.inWater && t === T.DEEP;
+    P.inWater = over && WATER_T(t) && !P.boat && !P.shRide; P.deep = P.inWater && t === T.DEEP;
     if (P.slowT > 0) P.slowT -= dt;
     // keep the boat under the hero
     if (P.boat) {

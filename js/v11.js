@@ -294,6 +294,7 @@ Object.assign(G, {
 
 function lootStep(a, dt) {
   const P = G.player;
+  if (a.aqua) return false;
   if (a.nearestEnemy(180)) { a.lootIt = null; return false; }
   let it = a.lootIt;
   if (!it || Items.list.indexOf(it) < 0) {

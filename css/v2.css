@@ -733,3 +733,8 @@ body.touch .np-face { width: 130px; } body.touch .np-info h2 { font-size: 26px; 
 @keyframes ciFlash { 0% { opacity: 0.85; } 100% { opacity: 0; } }
 @keyframes ciGlitch { 0% { transform: translate(-6px, 3px); opacity: 0; } 50% { transform: translate(5px, -3px); opacity: 1; } 100% { transform: translate(0, 0); opacity: 1; } }
 body.touch #cutin .ci-hero { height: 90vh; }
+
+/* ===== v19: sea shadows + riding ===== */
+.pci small.aq { color: #7fd8ff; display: block; font-size: 16px; }
+.shl .shact .pbtn.rid { align-items: center; }
+.shl .shact .pbtn.rid button.on { border-color: #ffe14a; color: #fff2a8; }

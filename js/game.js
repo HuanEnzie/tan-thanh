@@ -1007,6 +1007,7 @@ const G = {
           this.corpses.splice(this.corpses.indexOf(c), 1);
           const big = c.arche === 'brute' || c.arche === 'boss';
           const a = new Ally('shadow', c.x, c.y, { img: c.img, hp: (big ? 400 : 140) * pow, dmg: (big ? 50 : 22) * pow, r: c.r, scale: c.scale });
+          if (c.aqua) a.aqua = true;
           this.allies.push(a);
           FX.pillar(c.x, c.y, '#6b5bff', 1, 22); Particles.burst(c.x, c.y, 16, '#6b5bff', 160);
         }

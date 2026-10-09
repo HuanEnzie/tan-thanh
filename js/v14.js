@@ -226,6 +226,7 @@ Object.assign(G, {
 // one chop step for a shadow lumberjack; false = let the normal AI (fight / loot) act
 function chopStep(a, dt) {
   const P = G.player;
+  if (a.aqua) return false;
   if (World.mode !== 'over' || a.nearestEnemy(200)) { a.chopP = null; return false; }
   // loose drops are fetched first (the loot step handles them)
   for (const o of Items.list) if (o.age > 0.4 && dist(o.x, o.y, a.x, a.y) < 700 && (!o._by || o._by === a || o._by.dead)) { a.chopP = null; return false; }
