@@ -9,10 +9,10 @@ const ATTR_NAME = {
 const PTS_PER_LVL = 3, MINI_RESPAWN = 480, SHADOW_CD = 25;
 // shadow tiers: base stats, summon cost, extraction chance and mana cost
 const SH_TIER = {
-  normal: { name: 'Lính', col: '#a8b0ff', hp: 140, dmg: 22, cost: 8, chance: 0.7, mana: 15 },
-  elite: { name: 'Tinh anh', col: '#ffd65a', hp: 260, dmg: 32, cost: 14, chance: 0.55, mana: 25 },
-  mini: { name: 'Mini boss', col: '#ff9a4a', hp: 650, dmg: 55, cost: 25, chance: 0.4, mana: 40 },
-  boss: { name: 'Boss', col: '#ff4a6a', hp: 1200, dmg: 85, cost: 40, chance: 0.3, mana: 60 },
+  normal: { name: 'Lính', col: '#a8b0ff', hp: 140, dmg: 22, cost: 8, chance: 0.4, mana: 15 },
+  elite: { name: 'Tinh anh', col: '#ffd65a', hp: 260, dmg: 32, cost: 14, chance: 0.28, mana: 25 },
+  mini: { name: 'Mini boss', col: '#ff9a4a', hp: 650, dmg: 55, cost: 25, chance: 0.16, mana: 40 },
+  boss: { name: 'Boss', col: '#ff4a6a', hp: 1200, dmg: 85, cost: 40, chance: 0.09, mana: 60 },
 };
 const SH_ORDER = ['boss', 'mini', 'elite', 'normal'];
 // random recruits
@@ -92,7 +92,7 @@ Object.assign(G, {
   shadowAlly(s) { return this.allies.find(a => a.sid === s.id && !a.dead); },
   extractChance(c) {
     const T = SH_TIER[c.tier];
-    return clamp(T.chance + this.attr('int') * 0.005 + (this.player.level - (c.lvl || 1)) * 0.01, 0.05, 0.95);
+    return clamp(T.chance + this.attr('int') * 0.003 + (this.player.level - (c.lvl || 1)) * 0.005, 0.03, 0.75);
   },
   summonShadow(s, free) {
     const v = this.v10, P = this.player;

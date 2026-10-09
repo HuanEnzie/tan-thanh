@@ -486,3 +486,25 @@ body.touch #inv .tabs button { flex-shrink: 0; font-size: 15px; padding: 2px 10p
 body.touch #worldPick .pcl img { width: 44px; height: 30px; }
 #worldPick #pickClass .pcl button { width: auto; min-width: 0; flex: 1 1 0; display: flex; margin: 0; padding: 2px 2px; font-size: 14px; letter-spacing: 0; line-height: 1.1; }
 #worldPick #pickClass .pcl button span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* v12: kill mastery + weapon proficiency */
+.feat12 { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; margin-bottom: 12px; }
+.feat12 .ft { display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 6px; min-width: 0; }
+.feat12 .ft > div { flex: 1; min-width: 0; position: relative; padding-bottom: 6px; }
+.feat12 .ft img { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
+.feat12 .ft b { font-size: 17px; }
+.feat12 .ft small { display: block; opacity: 0.8; font-size: 15px; line-height: 1.1; }
+.feat12 .ft i { position: absolute; left: 0; bottom: 0; height: 3px; background: #ffd65a; }
+.feat12 .ft.t1 { border-color: rgba(205,127,50,0.7); }
+.feat12 .ft.t2 { border-color: rgba(220,220,235,0.8); }
+.feat12 .ft.t3 { border-color: #ffd65a; box-shadow: 0 0 8px rgba(255,214,90,0.35); }
+.feat12 .ft.lock { opacity: 0.45; }
+.feat12 .badge { font-size: 14px; padding: 1px 5px; background: #ffd65a; color: #201608; font-weight: bold; }
+.feat12.ach .ft > div { padding-bottom: 0; }
+.prof12 { margin-bottom: 12px; }
+.prof12 .pg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+@media (max-width: 520px) { .prof12 .pg { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.prof12 .pg > div { display: flex; flex-direction: column; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 5px 7px; font-size: 15px; }
+.prof12 .pg > div.cur { border-color: #4da6ff; box-shadow: inset 0 0 0 1px #4da6ff; }
+.prof12 .pg > div.bad span { color: #ff8a7a; }
+.prof12 .pg > div.good span { color: #8aff9a; }

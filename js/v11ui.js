@@ -51,12 +51,12 @@
       let status, btns = '';
       if (s.job) { const left = Math.max(0, Math.ceil(JOB_TIME - (G.time - s.job.t))); status = `⚒ ${SH_JOBS[s.job.kind].name} • mẻ sau ${left}s`; btns = `<button data-sj="${s.id}">Gọi về</button>`; }
       else if (s.exp) { status = s.exp.done ? '🧭 Đang canh ở nơi khám phá' : `🧭 Đang đi khám phá (${Math.round(Math.min(1, (G.time - s.exp.t0) / s.exp.dur) * 100)}%)`; btns = `<button data-sw="${s.id}">⇄ Hoán đổi</button><button data-sj="${s.id}">Gọi về</button>`; }
-      else if (act) { status = `➤ Đang ${s.mode === 'loot' ? 'nhặt đồ' : 'chiến đấu'} (${Math.round(act.hp)}/${Math.round(act.maxHp)})`; btns = `<button data-sr="${s.id}">Thu hồi</button><button data-sw="${s.id}">⇄</button>`; }
+      else if (act) { status = `➤ Đang ${s.mode !== 'fight' ? 'nhặt đồ' : 'chiến đấu'} (${Math.round(act.hp)}/${Math.round(act.maxHp)})`; btns = `<button data-sr="${s.id}">Thu hồi</button><button data-sw="${s.id}">⇄</button>`; }
       else if (cd) { status = `⌛ Hồi phục ${Math.ceil(s.cd - G.time)}s`; btns = '<button disabled>Triệu hồi</button>'; }
       else { status = '◌ Đang nghỉ'; btns = `<button data-ss="${s.id}">Triệu hồi</button>`; }
       const free = !s.job && !s.exp;
       h += `<div class="pc10 sh ${act ? 'on' : ''}" style="--tc:${T.col}"><img class="spr" src="${src}" alt=""><div class="pci"><b>${H(s.name)}</b><small style="color:${T.col}">${T.name} • cấp ${ss.slv} • ${s.kills || 0} mạng</small><div class="pst"><span>Máu ${ss.hp}</span><span>Công ${ss.dmg}</span><span>Gọi: ${ss.cost}</span></div><div class="pstat">${status}</div>`
-        + `<div class="pbtn">${btns}</div><div class="pbtn">${free ? `<button class="${s.mode === 'loot' ? 'on' : 'ghost'}" data-sl="${s.id}">${s.mode === 'loot' ? '✓ Nhặt đồ' : 'Nhặt đồ'}</button><button class="ghost" data-sk="${s.id}">Làm việc</button><button class="ghost" data-se="${s.id}">Khám phá</button>` : ''}<button class="ghost" data-sx="${s.id}">Thả</button></div></div></div>`;
+        + `<div class="pbtn">${btns}</div><div class="pbtn">${free ? `<button class="${s.mode !== 'fight' ? 'on' : 'ghost'}" data-sl="${s.id}">${s.mode !== 'fight' ? '✓ Nhặt đồ' : 'Nhặt đồ'}</button><button class="ghost" data-sk="${s.id}">Làm việc</button><button class="ghost" data-se="${s.id}">Khám phá</button>` : ''}<button class="ghost" data-sx="${s.id}">Thả</button></div></div></div>`;
     }
     if (!list.length) h += `<p class="muted">Chưa có ${H(S.unit)} nào.</p>`;
     box.innerHTML = h + '</div>';
@@ -67,7 +67,7 @@
     on('data-sr', s => { G.recallShadow(s); this.buildInv(); });
     on('data-sj', s => { s.job = null; s.exp = null; G.toast(`${s.name} đã trở về.`, 'info'); this.buildInv(); });
     on('data-sw', s => { this.closePanel(); G.swapShadow(s); });
-    on('data-sl', s => { s.mode = s.mode === 'loot' ? 'fight' : 'loot'; this.buildInv(); });
+    on('data-sl', s => { s.mode = s.mode !== 'fight' ? 'fight' : 'loot'; this.buildInv(); });
     on('data-sk', s => { this.closePanel(); UI.menuDialog({ name: s.name, portrait: null, text: `Giao việc cho ${s.name}. Cứ ${JOB_TIME}s mang về một mẻ, ${SM().unit} càng mạnh càng nhiều.`, options: Object.entries(SH_JOBS).map(([k, J]) => ({ text: J.name, act: () => G.setJob(s, k) })).concat([{ text: 'Thôi', act: () => {} }]) }); });
     on('data-se', s => { this.exploreSid = s.id; this.closePanel(); G.state = 'playing'; this.openPanel('map'); G.toast(`Chạm vào một chỗ trên bản đồ để gửi ${s.name} tới khám phá.`, 'info'); });
     on('data-sx', (s, b) => { if (b.dataset.sure) { G.recallShadow(s); v.shadows.splice(v.shadows.indexOf(s), 1); this.buildInv(); } else { b.dataset.sure = 1; b.textContent = 'Chắc chắn?'; } });

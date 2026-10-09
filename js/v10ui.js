@@ -56,7 +56,7 @@
     const P = G.player, v = G.v10, box = $('invBody');
     const wd = Math.round(G.attr('str') * 3), sd = Math.round(G.attr('int') * 3);
     let h = `<div class="attr10"><h3>Chỉ số tiềm năng <span class="pts ${v.pts ? 'has' : ''}">còn ${v.pts} điểm</span></h3><div class="arows">`;
-    const desc = { str: '+3% sát thương vũ khí', vit: '+12 máu tối đa', agi: '+1% tốc chạy, +2 thể lực tối đa', int: `+6 ${manaName()} tối đa, +3% sát thương kỹ năng${isArise() ? ', +0.5% lưu bóng' : ''}` };
+    const desc = { str: '+3% sát thương vũ khí', vit: '+12 máu tối đa', agi: '+1% tốc chạy, +2 thể lực tối đa', int: `+6 ${manaName()} tối đa, +3% sát thương kỹ năng${isArise() ? ', +0.3% thu phục' : ''}` };
     for (const k of ATTR_KEYS) h += `<div class="arow"><b>${H(attrName(k))}</b><span class="av">${G.attr(k)}</span><small>${H(desc[k])}</small><button data-at="${k}" data-n="1" ${v.pts ? '' : 'disabled'}>+1</button><button data-at="${k}" data-n="5" ${v.pts >= 5 ? '' : 'disabled'}>+5</button></div>`;
     h += `</div><div class="derived"><span>❤ Máu <b>${Math.round(P.maxHp)}</b></span><span>✦ ${H(manaName())} <b>${Math.floor(v.mana)}/${G.maxMana()}</b></span><span>⚔ Vũ khí <b>+${wd}%</b></span><span>✺ Kỹ năng <b>+${sd}%</b></span><span>➶ Tốc chạy <b>×${P.speedMul().toFixed(2)}</b></span><span>⛨ Giáp <b>${P.armorVal}</b></span><span>⚡ Thể lực <b>${Math.round(P.maxStam)}</b></span></div>`;
     h += `<p class="muted">Mỗi lần lên cấp nhận ${PTS_PER_LVL} điểm. ${H(manaName())} hồi theo thời gian (nhanh gấp đôi ở căn cứ), dùng cho kỹ năng Tế Đàn [V]${isArise() ? ', lưu bóng và gọi binh đoàn [X]' : ''}.</p></div>`;

@@ -271,9 +271,10 @@ Object.assign(G, {
   // loot mode: summons not busy fighting run to drops and bring them to you
   const au = Ally.prototype.update;
   Ally.prototype.update = function (dt) {
-    if (this.sid && !this.dead) {
-      const s = G.shById(this.sid);
-      if (s && s.mode === 'loot' && lootStep(this, dt)) return;
+    // every summon (saved or temporary) picks up drops between fights unless told to only fight
+    if (this.kind === 'shadow' && !this.dead) {
+      const s = this.sid ? G.shById(this.sid) : null;
+      if ((!this.sid || (s && s.mode !== 'fight')) && lootStep(this, dt)) return;
     }
     return au.call(this, dt);
   };
@@ -293,11 +294,11 @@ Object.assign(G, {
 
 function lootStep(a, dt) {
   const P = G.player;
-  if (a.nearestEnemy(220)) { a.lootIt = null; return false; }
+  if (a.nearestEnemy(180)) { a.lootIt = null; return false; }
   let it = a.lootIt;
   if (!it || Items.list.indexOf(it) < 0) {
-    it = null; let bd = 650;
-    for (const o of Items.list) { if (o._by && o._by !== a && !o._by.dead) continue; const d = dist(o.x, o.y, P.x, P.y); if (d < bd && dist(o.x, o.y, a.x, a.y) < 800) { bd = d; it = o; } }
+    it = null; let bd = 800;
+    for (const o of Items.list) { if (o._by && o._by !== a && !o._by.dead) continue; const d = dist(o.x, o.y, P.x, P.y); if (o.age > 0.4 && d < bd && dist(o.x, o.y, a.x, a.y) < 900) { bd = d; it = o; } }
     a.lootIt = it; if (it) it._by = a;
   }
   if (!it) return false;
@@ -311,7 +312,8 @@ function lootStep(a, dt) {
   }
   a.angle = Math.atan2(dy, dx);
   a.vx = lerp(a.vx, dx / d * 240, Math.min(1, dt * 6)); a.vy = lerp(a.vy, dy / d * 240, Math.min(1, dt * 6));
-  a.x += a.vx * dt; a.y += a.vy * dt; World.collideCircle(a, a.r);
+  // summons drift through walls while fetching, so they never get stuck behind a building
+  a.x += a.vx * dt; a.y += a.vy * dt;
   a.walkT += dt * Math.hypot(a.vx, a.vy) * 0.08;
   return true;
 }
