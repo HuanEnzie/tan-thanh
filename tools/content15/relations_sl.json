@@ -1,0 +1,292 @@
+{
+  "rel": {
+    "friend": [
+      [
+        "{hero}, cậu cũng bị kẹt trong Cổng này à? Đi chung đi, tôi không thích đánh quái một mình.",
+        "Tôi là {npc}. Nếu cậu cần người canh lưng ở {place}, cứ gọi tôi.",
+        "Đừng nhìn cấp bậc của tôi rồi lo. Tôi chạy nhanh hơn lũ quái đó.",
+        "Cậu vừa cứu tôi một mạng. Ra khỏi Cổng, tôi mời cậu ăn."
+      ],
+      [
+        "{hero}, tớ đã giữ phần thuốc hồi phục cho cậu. Biết ngay cậu sẽ lại quên mà.",
+        "Ở Hiệp Hội ai cũng dè chừng cậu, nhưng tớ biết cậu vẫn là người đã chia nửa ổ bánh với tớ.",
+        "Lần sau vào Cổng, nhớ đợi tớ. Cùng đánh thì đỡ buồn hơn.",
+        "Tớ nhận ra tiếng bước chân của cậu giữa cả đội hình đấy. Nghe là biết viện binh tới rồi."
+      ],
+      [
+        "{hero}, Cổng đang sập! Đưa tay đây, tớ không bỏ cậu lại.",
+        "Nếu Hiệp Hội muốn đổ lỗi cho cậu, tớ sẽ đứng ra làm chứng.",
+        "Đừng một mình gánh hết lũ quái. Tớ vẫn còn đứng đây.",
+        "Tớ sợ chứ. Nhưng bỏ cậu giữa Đảo Sương Mù còn đáng sợ hơn."
+      ],
+      [
+        "Ra khỏi Cổng rồi, {hero}. Lần này đến lượt tớ chọn quán ăn.",
+        "Dù cậu có cả binh đoàn bóng tối, chỗ bên cạnh cậu vẫn phải để dành cho tớ.",
+        "Từ Ga ngầm Trung Tâm đến tận Đảo Sương Mù, chúng ta đi được xa thật.",
+        "Cậu không cần quay đầu kiểm tra nữa. Tớ luôn theo kịp."
+      ]
+    ],
+    "sworn": [
+      [
+        "{hero}, cậu dám giao lưng cho tôi trong một Cổng chưa từng thăm dò sao?",
+        "Tôi là {npc}. Nếu sống sót qua đêm nay, chúng ta uống với nhau một chén.",
+        "Một mình cậu chặn con boss ấy à? Để tôi góp một tay.",
+        "Đường ra ở phía bắc. Tôi mở lối, cậu giữ chân lũ quái."
+      ],
+      [
+        "Từ hôm nay, hoạn nạn của cậu cũng là chuyện của tôi, {hero}.",
+        "Cậu đã kéo tôi khỏi cửa tử. Tôi không quên ơn đó đâu.",
+        "Dù {faction} quay lưng, tôi vẫn sát cánh với cậu.",
+        "Chén rượu ở {place} hôm ấy chưa cạn. Chúng ta còn nợ nhau một trận thắng."
+      ],
+      [
+        "Máu tôi còn nóng, kiếm tôi chưa gãy. {hero}, cùng xông lên!",
+        "Cậu cứ phá lõi Cổng. Tôi sẽ chặn chúng cho đến hơi thở cuối.",
+        "Nếu bóng tối nuốt mất cậu, tôi sẽ bước vào đó kéo cậu ra.",
+        "Hôm nay chúng ta sống cùng sống, chết cùng chết. Đừng tranh phần nguy hiểm một mình."
+      ],
+      [
+        "{hero}, từ nay cậu là anh em của tôi. Không cần giấy của Hiệp Hội làm chứng.",
+        "Qua bao nhiêu Cổng, lời thề năm ấy vẫn còn nguyên.",
+        "Cứ gọi tên tôi khi cần. Dù ở đâu, tôi cũng sẽ đến.",
+        "Chúng ta đã về đủ cả hai. Nào, đi uống nốt chén rượu còn thiếu."
+      ]
+    ],
+    "sibling": [
+      [
+        "Anh là {hero} sao? Em là {npc}... Em đã tìm anh từ rất lâu rồi.",
+        "Chiếc vòng này mẹ đưa cho em. Bà nói anh cũng có một chiếc giống hệt.",
+        "Em tưởng anh đã mất trong Cổng năm ấy. Cho em nhìn anh thêm một lúc được không?",
+        "Em chưa quen gọi anh là anh. Nhưng nghe tên anh, em thấy thân thuộc lạ lắm."
+      ],
+      [
+        "Anh lại bỏ bữa để đi săn Cổng à? Em để phần cơm trong bếp đấy.",
+        "Em không cần anh lúc nào cũng mạnh. Về nhà bình an là được.",
+        "Hồi nhỏ anh cũng cau mày mỗi khi lo cho em. Giờ em nhớ ra rồi.",
+        "Em đã cất ảnh cũ của chúng ta trong túi. Để lần này không lạc nhau nữa."
+      ],
+      [
+        "Anh, đừng bước vào Cổng đó một mình! Lần trước em đã mất anh đủ lâu rồi.",
+        "Nếu Hệ Thống buộc anh phải lựa chọn, hãy nhớ anh vẫn còn gia đình.",
+        "Em sẽ không trốn sau lưng anh mãi. Cho em cùng chiến đấu.",
+        "Anh nghe thấy em không? Cứ đi theo giọng em, lối ra ở ngay đây!"
+      ],
+      [
+        "Anh về rồi. Tốt quá... Em đã giữ đèn phòng khách sáng suốt đêm.",
+        "Giờ em có thể nói thật lòng: em rất tự hào vì có anh.",
+        "Không Cổng nào chia cắt được nhà mình nữa, anh nhỉ?",
+        "Mai em đến Bệnh viện Thánh Tâm thăm mẹ. Anh đi cùng em nhé."
+      ]
+    ],
+    "lover": [
+      [
+        "{hero}, cậu bị thương ở tay kìa. Để mình băng lại.",
+        "Mình là {npc}. Hình như chúng ta đã gặp nhau ở {place}?",
+        "Cậu cứ lao lên như thế, ai đứng phía sau cũng phải lo đấy.",
+        "Không biết tại sao, vừa thấy cậu bước vào Cổng, mình đã thấy yên tâm."
+      ],
+      [
+        "Mình mang thêm một bình thuốc cho cậu. Đừng hỏi sao mình biết cậu sẽ cần.",
+        "Ở cạnh cậu, tiếng còi báo động Cổng cũng bớt đáng sợ.",
+        "Cậu cười một cái là mình quên sạch điều định nói.",
+        "Sau nhiệm vụ này, cậu có muốn cùng mình đi dạo ở {place} không?"
+      ],
+      [
+        "{hero}, đừng đẩy mình ra để chịu đòn thay. Mình muốn cùng cậu sống sót.",
+        "Mình đã tưởng sẽ không còn được nghe cậu gọi tên. Xin đừng làm mình sợ như vậy nữa.",
+        "Dù cả bầu trời trên Cổng vỡ ra, mình vẫn chọn nắm tay cậu.",
+        "Nếu đây là trận cuối, mình muốn cậu biết: mình yêu cậu."
+      ],
+      [
+        "Bình minh lên rồi, {hero}. Lần này chúng ta cùng nhìn thấy nó.",
+        "Mình không hứa mọi ngày đều bình yên, chỉ hứa sẽ ở bên cậu.",
+        "Bàn tay cậu ấm thật. Cho mình nắm thêm một lát nhé?",
+        "Khi không còn Cổng nào phải vào, mình muốn cùng cậu tìm một mái nhà."
+      ]
+    ],
+    "rival": [
+      [
+        "{hero}, nghe nói cậu phá kỷ lục của tôi ở Cổng hạng B. Tôi đến xem có thật không.",
+        "Tôi là {npc}. Đừng để tôi vượt qua quá dễ, được chứ?",
+        "Cùng một con boss, xem ai chạm tới nó trước.",
+        "Cậu mạnh đấy. Tiếc là vị trí số một chỉ có một."
+      ],
+      [
+        "Tôi tập thêm ba giờ mỗi ngày từ lần thua cậu. Đừng mong trận sau dễ dàng.",
+        "Thấy cậu tiến bộ làm tôi bực thật. Nhưng nhờ thế tôi cũng không dám chậm lại.",
+        "{faction} đặt cược vào tôi. Cậu đừng khiến họ mất tiền nhanh quá.",
+        "Hôm nay tôi cứu cậu vì con boss là phần của tôi. Đừng hiểu lầm."
+      ],
+      [
+        "{hero}, gạt lũ quái sang một bên. Trận đấu của chúng ta kết thúc hôm nay.",
+        "Tôi sẽ không nhận chiến thắng nếu cậu còn đang bị thương. Uống thuốc đi.",
+        "Cậu vượt qua giới hạn rồi sao? Hay lắm, tôi cũng vừa làm được.",
+        "Lõi Cổng sắp nổ. Chúng ta phân thắng bại trước khi nó sập!"
+      ],
+      [
+        "Cậu thắng, {hero}. Lần này tôi tâm phục khẩu phục.",
+        "Hòa à? Vậy giữ mạng cho tốt, tôi còn muốn đấu trận sau.",
+        "Tôi thắng rồi. Nhưng nếu không có cậu, tôi đã chẳng mạnh đến thế.",
+        "Từ giờ bớt gọi tôi là đối thủ đi. Khi vào Cổng, tôi muốn đứng cùng đội với cậu."
+      ]
+    ],
+    "enemy": [
+      [
+        "{hero}, cuối cùng ta cũng gặp kẻ được Hiệp Hội che chở.",
+        "Ngươi không nhớ ta đâu. Nhưng ta nhớ rất rõ đêm Cổng ở {place} mở ra.",
+        "Đừng rút kiếm vội. Ta muốn ngươi nghe vì sao ta đến đây.",
+        "Ngươi mang thứ sức mạnh đã hủy đời ta. Ta sẽ không để ngươi đi."
+      ],
+      [
+        "Trốn trong {faction} cũng vô ích. Ta tìm được dấu vết của ngươi rồi.",
+        "Mỗi Cổng ngươi bước qua, ta đều chờ ở lối ra.",
+        "Ta đã lấy hồ sơ đêm ấy từ Hiệp Hội. Giờ không ai giấu ngươi khỏi ta được nữa.",
+        "Cứ chạy đi, {hero}. Ta muốn ngươi hiểu cảm giác bị săn đuổi."
+      ],
+      [
+        "Binh đoàn bóng tối không cứu được ngươi khỏi mối hận của ta.",
+        "Rút vũ khí đi, {hero}. Đêm nay chỉ một người bước ra khỏi Cổng.",
+        "Ngươi nói mình vô tội? Vậy hãy nhìn thẳng vào ta mà nhắc lại.",
+        "Ta đã đợi trận này quá lâu. Đừng mong vài lời xin lỗi khiến ta dừng tay."
+      ],
+      [
+        "Ta đã thua. Ngươi có thể kết liễu ta, nhưng đừng chối bỏ những người đã chết.",
+        "Ngươi tha cho ta sao? Ta chưa thể tha thứ, nhưng ta sẽ ngừng truy đuổi.",
+        "Mối hận đã kết thúc ở đây. Ta không còn lý do giương kiếm với ngươi.",
+        "Ta đã báo được thù. Sao khi nhìn ngươi ngã xuống, ta vẫn thấy trống rỗng?"
+      ]
+    ],
+    "mentor": [
+      [
+        "{hero}, con chỉ nhìn vào móng vuốt. Hãy nhìn vai con quái trước khi nó ra đòn.",
+        "Ta là {npc}. Nếu muốn sống qua Cổng đầu tiên, con phải học cách lắng nghe.",
+        "Cấp bậc trên giấy không chắn được một nhát kiếm. Nhớ lấy.",
+        "Đứng dậy. Ta chưa thấy con thử hết sức."
+      ],
+      [
+        "Khá hơn rồi. Hôm nay con đã biết bảo vệ đồng đội thay vì chỉ lao tới trước.",
+        "Đừng lệ thuộc vào Hệ Thống. Khi nó im lặng, con vẫn phải tự quyết.",
+        "Ta không dạy con thắng mọi trận, {hero}. Ta dạy con biết khi nào cần rút lui.",
+        "Con nhìn thấy điểm yếu của boss trước ta. Có lẽ đã đến lúc ta đổi bài học."
+      ],
+      [
+        "Lõi Cổng đang biến dạng. Con dẫn mọi người ra ngoài, ta giữ cửa.",
+        "Đừng để lời ta trở thành xiềng xích. Hãy chọn điều con tin là đúng.",
+        "{hero}, hít thở. Nỗi sợ giúp con tỉnh táo, miễn là con không để nó cầm kiếm thay mình.",
+        "Ta không thể bước tiếp cùng con. Trận này, con phải tự mở đường."
+      ],
+      [
+        "Con đã trở về. Với ta, thế là một chiến thắng lớn hơn mọi danh hiệu.",
+        "Hôm nay ta chẳng còn gì để dạy con nữa. Nhưng nếu cần trò chuyện, cứ đến.",
+        "Con đã đi xa hơn ta từng tưởng, {hero}. Hãy dùng sức mạnh ấy cho điều con muốn bảo vệ.",
+        "Từ giờ, khi bước vào Cổng, hãy tin vào phán đoán của mình."
+      ]
+    ]
+  },
+  "links": {
+    "sibling": [
+      "{a} và {b} là anh em ruột, thất lạc sau sự cố Cổng ở {place}.",
+      "{a} là chị của {b}, luôn giấu thuốc hồi phục trong túi áo em.",
+      "{a} và {b} cùng lớn lên tại Bệnh viện Thánh Tâm sau một đợt bùng phát Cổng.",
+      "{a} nhận ra {b} nhờ chiếc vòng tay mẹ để lại cho hai người."
+    ],
+    "ex": [
+      "{a} và {b} từng hẹn hò trước khi gia nhập hai bang hội đối địch.",
+      "{a} vẫn giữ tấm ảnh chụp cùng {b} trước Ga ngầm Trung Tâm.",
+      "{a} và {b} chia tay sau một nhiệm vụ hạng A, nhưng chưa từng nói hết lòng mình.",
+      "{a} tránh nhắc tên {b}, dù vẫn âm thầm hỏi tin sau mỗi cuộc đột kích."
+    ],
+    "rival": [
+      "{a} và {b} tranh nhau vị trí dẫn đầu bảng xếp hạng thợ săn.",
+      "{a} luôn chọn nhiệm vụ khó hơn mỗi khi {b} lập kỷ lục mới.",
+      "{a} và {b} đã hòa nhau ba trận tỉ thí liên tiếp.",
+      "{a} công khai chê chiến thuật của {b}, nhưng luôn chuẩn bị cách phối hợp với người ấy."
+    ],
+    "mentor": [
+      "{a} là người dạy {b} cách nhận ra bẫy ma lực trong Cổng.",
+      "{a} từng cứu {b} khỏi một con boss và nhận người ấy làm học trò.",
+      "{a} giao cho {b} thanh kiếm cũ trước nhiệm vụ đầu tiên.",
+      "{a} thường bắt {b} giải thích kế hoạch rút lui trước khi cho vào Cổng."
+    ],
+    "debt": [
+      "{a} nợ {b} một mạng sau trận sập Cổng tại {place}.",
+      "{a} được {b} trả viện phí khi điều trị ở Bệnh viện Thánh Tâm.",
+      "{a} hứa sẽ giúp {b} một việc để đáp ơn cứu cả đội.",
+      "{a} vẫn giữ chiếc áo khoác {b} đưa trong đêm được giải cứu."
+    ],
+    "lover": [
+      "{a} và {b} yêu nhau sau nhiều năm cùng dẫn đội đột kích.",
+      "{a} luôn đợi {b} trước lối ra Cổng, dù nhiệm vụ kéo dài bao lâu.",
+      "{a} và {b} trao nhau lời hẹn ước trên bờ biển Đảo Sương Mù.",
+      "{a} và {b} giấu chuyện yêu nhau ở Hiệp Hội, nhưng ai cũng nhận ra."
+    ],
+    "enemy": [
+      "{a} hận {b} vì tin rằng người ấy đã bỏ mặc đội mình trong Cổng.",
+      "{a} truy tìm {b} từ ngày hồ sơ sự cố ở {place} bị niêm phong.",
+      "{a} xem {b} là nguyên nhân khiến gia đình mình tan nát.",
+      "{a} thề sẽ tự tay đánh bại {b} để đòi lại công bằng."
+    ]
+  },
+  "gift": {
+    "like": [
+      "Cậu nhớ tôi thích thứ này à? Cảm ơn, {hero}.",
+      "Món này khó tìm lắm. Cậu đã vào Cổng chỉ để lấy nó sao?",
+      "Tôi sẽ giữ nó cẩn thận. Có lẽ còn cẩn thận hơn cả trang bị của mình.",
+      "Đúng thứ tôi cần trước nhiệm vụ ngày mai. Cậu tinh ý thật.",
+      "Nhìn món quà này, tôi lại nhớ buổi chúng ta gặp nhau ở {place}.",
+      "Cảm ơn cậu. Hôm nay mệt mỏi thế nào cũng đáng."
+    ],
+    "dislike": [
+      "Cảm ơn cậu, {hero}. Nhưng thứ này không hợp với tôi lắm.",
+      "Cậu có chắc không đưa nhầm người không?",
+      "Tôi nhận tấm lòng của cậu. Còn món quà... để tôi nghĩ xem dùng thế nào.",
+      "Thứ này làm tôi nhớ tới một nhiệm vụ không vui. Xin lỗi cậu.",
+      "Lần sau đừng tốn tiền vì tôi như vậy nhé.",
+      "Tôi biết cậu có ý tốt. Nhưng tôi không thể nhận món này."
+    ]
+  },
+  "join": [
+    "Tôi đi cùng cậu, {hero}. Cho tôi xem kế hoạch đột kích.",
+    "Được. Tôi sẽ chuẩn bị trang bị rồi gặp cậu ở lối vào Cổng.",
+    "Cậu cần người canh hậu tuyến à? Cứ giao cho tôi.",
+    "Tôi đã báo với {faction}. Đội mình có thể xuất phát ngay.",
+    "Lâu rồi tôi mới thấy một nhiệm vụ đáng để nhận. Đi thôi.",
+    "Nếu cậu tin tôi đủ sức theo kịp, tôi sẽ không để cậu thất vọng."
+  ],
+  "leave": [
+    "Rõ rồi, {hero}. Tôi ở lại căn cứ và giữ liên lạc.",
+    "Cậu cứ đi. Tôi sẽ chuẩn bị thuốc và trang bị cho lúc mọi người trở về.",
+    "Tôi không thích ngồi chờ, nhưng căn cứ cũng cần người bảo vệ.",
+    "Có biến thì gọi ngay. Tôi sẽ đến tiếp viện."
+  ],
+  "duel": [
+    "{hero}, sân đấu đã dọn xong. Hôm nay đừng giữ sức!",
+    "Tôi đã đợi trận tái đấu này lâu lắm rồi. Rút vũ khí đi!",
+    "Không quái vật, không đồng đội. Chỉ có cậu và tôi—bắt đầu!",
+    "Cho tôi xem sức mạnh đã đưa cậu lên đầu bảng xếp hạng!"
+  ],
+  "ambush": [
+    "{hero}, ngươi nhìn nhầm lối ra rồi. Ta chờ ở đây từ lâu.",
+    "Đừng gọi viện binh. Tín hiệu trong Cổng này đã bị ta cắt.",
+    "Bóng của ngươi không che được mọi phía đâu, {hero}!",
+    "Bước thêm một bước đi. Toàn bộ hành lang này là bẫy của ta!"
+  ],
+  "mercy": [
+    "Sao ngươi không kết liễu ta, {hero}? Ta đã định giết ngươi.",
+    "Ta không xin được tha thứ. Nhưng ta sẽ không đuổi theo ngươi nữa.",
+    "Ngươi thắng rồi. Hãy để ta tự mình tìm ra sự thật về đêm đó.",
+    "Ta nợ ngươi một mạng. Mối hận này... ta sẽ để nó dừng ở đây."
+  ],
+  "confess": [
+    "{hero}, mỗi lần Cổng mở, người mình muốn gặp lại đầu tiên luôn là cậu. Mình yêu cậu.",
+    "Mình đã thử giấu đi, nhưng chẳng làm được. Mình thích cậu.",
+    "Nếu cậu cũng có chút rung động, sau nhiệm vụ này hãy nắm tay mình nhé?",
+    "Mình không muốn chỉ là đồng đội của cậu nữa. Cậu có thể cho mình ở bên cậu không?"
+  ],
+  "oath": [
+    "{hero}, từ hôm nay chúng ta là anh em kết nghĩa. Có phúc cùng hưởng, có nạn cùng gánh!",
+    "Trước Cổng này, tôi thề sẽ không bao giờ bỏ cậu lại phía sau.",
+    "Dù cả thế giới quay lưng, tôi vẫn là người anh em đứng cạnh cậu.",
+    "Lấy thanh kiếm này làm chứng: mạng cậu cũng là mạng tôi!"
+  ]
+}

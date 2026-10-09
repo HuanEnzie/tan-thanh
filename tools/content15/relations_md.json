@@ -1,0 +1,292 @@
+{
+  "rel": {
+    "friend": [
+      [
+        "{hero}, anh mới tới {place} à? Đừng đứng sát cửa kính, ngoài đó có thứ thích nhìn vào.",
+        "Tôi là {npc}. Nếu anh cần nước sạch, hỏi tôi trước khi uống thứ trong bồn.",
+        "Anh nhặt được pin dự phòng thật à? Ở đây món đó quý hơn lời hứa đấy.",
+        "Cứ ngồi xuống đi, {hero}. Ghế chưa gãy, còn tôi thì chưa cắn ai."
+      ],
+      [
+        "Tôi để phần cơm cho anh rồi. Đừng hỏi sao ít thịt, cả chợ đêm có ai thấy thịt đâu.",
+        "Đi tuần với anh đỡ chán hơn. Ít nhất anh biết lúc nào nên im lặng.",
+        "Hôm qua anh che lưng cho tôi. Tôi nhớ đấy, dù trí nhớ tôi tệ thật.",
+        "{hero}, mai qua Ga ngầm Bến Cũ với tôi nhé. Đi một mình nghe tiếng chân mình cũng phát sợ."
+      ],
+      [
+        "Anh bị cắn ở đâu? Đưa tay đây, đừng giấu tôi như giấu tiền.",
+        "Cửa sắp bung rồi, {hero}. Tôi giữ chốt, anh đưa mọi người xuống hầm!",
+        "Tôi tưởng mất anh ở Bệnh viện Hồng Phúc. Lần sau muốn chết thì báo trước một tiếng.",
+        "Họ bảo bỏ anh lại cho kịp chuyến xe. Tôi bảo họ cứ lái, còn tôi ở đây."
+      ],
+      [
+        "Anh về rồi. Tốt, tôi còn nợ anh một bữa ăn ra hồn.",
+        "Từ nay thấy tôi làm chuyện ngu, cứ kéo cổ áo lại. Bạn bè để làm việc đó mà.",
+        "Ngoài kia chẳng còn mấy thứ đáng giữ. Tình bạn này thì có, {hero}.",
+        "Nếu mai phải rời {place}, tôi đi cùng anh. Hai đứa mình lạc đường cũng quen rồi."
+      ]
+    ],
+    "sworn": [
+      [
+        "Tôi nghe anh đã cứu người ở {place}. Có gan đấy, nhưng gan không thay được áo giáp đâu.",
+        "{hero}, anh chia nửa bình nước cho người lạ thật à? Tôi muốn biết anh sống được bao lâu.",
+        "Đường này tôi rành, anh thì bắn khá. Đi chung một chuyến xem sao.",
+        "Đừng gọi tôi là anh em vội. Qua được đêm nay rồi nói."
+      ],
+      [
+        "Từ giờ phần lưng tôi giao cho anh. Phần lưng anh, tôi trông.",
+        "Anh còn mạng thì tôi còn đường về. Nhớ thế mỗi khi định lao lên trước.",
+        "Tôi đã khâu vết thương cho anh; kim còn cắm trên áo đây. Đừng bắt tôi làm lại.",
+        "Người của {faction} hỏi chúng ta là gì. Tôi bảo: hai thằng khó chết."
+      ],
+      [
+        "{hero}, thả tay tôi ra là anh thoát được. Nhưng đừng hòng bắt tôi cảm ơn.",
+        "Bọn Hoại Huyết tràn cầu thang rồi. Anh đưa dân ra ngoài, tôi chặn chúng.",
+        "Họ lấy anh để ép tôi mở cổng. Chúng chọn nhầm người để mặc cả rồi.",
+        "Anh đã cõng tôi qua ba tầng bệnh viện. Giờ đến lượt tôi kéo anh khỏi đây."
+      ],
+      [
+        "Từ hôm nay, anh là anh em kết nghĩa của tôi. Sống thì cùng ăn, chết thì có người nhớ.",
+        "Chẳng cần chung máu, {hero}. Cùng giữ một cánh cửa qua đêm ấy là đủ.",
+        "Nhà tôi mất rồi, nhưng vẫn còn anh. Tôi không gọi đó là may mắn nhỏ.",
+        "Dù {place} có sập, tôi vẫn đứng bên anh. Lời này nói một lần là đủ."
+      ]
+    ],
+    "sibling": [
+      [
+        "{hero}? Đừng nhìn tôi như thế. Tôi cũng không tin mình tìm được anh ở đây.",
+        "Vết sẹo trên cổ tay anh... hồi nhỏ em làm đổ nước sôi, đúng không?",
+        "Anh còn giữ tấm ảnh ấy à? Em tưởng nó cháy cùng nhà rồi.",
+        "Nghe họ gọi tên anh, em cứ nghĩ mình nghe nhầm. Bao năm nay em toàn nghe nhầm."
+      ],
+      [
+        "Anh ăn đi, em no rồi. Đừng có nhìn bát em, em nói thật được nửa câu đấy.",
+        "Em không còn là đứa bé anh phải dắt qua đường. Nhưng tối nay, cứ đi cạnh em.",
+        "Chị lại quên mang thuốc à, {hero}? Ngày xưa chị cũng quên áo mưa như thế.",
+        "Ở Chung cư Ánh Dương, em từng đứng chờ anh dưới cầu thang. Giờ thì thôi, em biết đi tìm."
+      ],
+      [
+        "Anh mà bước qua cánh cửa đó một mình, em sẽ giận anh cả đời. Nếu còn cả đời.",
+        "Em đã mất anh một lần rồi. Lần này, kéo cả bệnh viện sập em cũng đưa anh ra.",
+        "Đừng bảo chị bỏ chạy. Người nhà mình đã bỏ lại quá nhiều người rồi.",
+        "Họ nói anh nhiễm Hoại Huyết. Em cần kết quả xét nghiệm, không cần lời đồn."
+      ],
+      [
+        "Bữa nay em nấu cháo khét. Anh ăn đi, đúng vị nhà mình ngày trước.",
+        "Chúng ta không lấy lại được những năm đã mất. Nhưng sáng mai, em sẽ ở đây.",
+        "Anh cứ đi làm việc của anh. Tối về nhớ gõ cửa ba tiếng, em mở.",
+        "Em từng nghĩ mình là người cuối cùng của nhà này. Cảm ơn anh vì đã chứng minh em sai."
+      ]
+    ],
+    "lover": [
+      [
+        "{hero}, áo anh dính bụi rồi. Xin lỗi, tôi chỉ định phủi giúp thôi.",
+        "Tôi giữ chỗ cạnh đèn cho anh. Ở đây tối quá, ngồi gần nhau đỡ lạnh.",
+        "Anh hay trực ca khuya à? Vậy chắc chúng ta còn gặp nhau nhiều.",
+        "Hôm nay anh cười ở Chợ đêm Phố Đèn. Tôi quên mất mình đang định mua gì."
+      ],
+      [
+        "Tôi pha trà cho anh, hơi nhạt. Tay tôi run, nhưng không phải vì lạnh.",
+        "Mỗi lần cổng mở, tôi lại ngước nhìn. Tôi biết mình đang chờ ai rồi.",
+        "Anh đừng liều chỉ để tỏ ra mạnh mẽ. Tôi thích anh nguyên vẹn hơn.",
+        "Nếu anh rảnh sau ca gác, mình đi dọc sân thượng nhé. Trăng vẫn còn đó."
+      ],
+      [
+        "Họ báo anh mắc kẹt trong ga. Tôi biết đường vào; anh đợi tôi.",
+        "Tôi sợ lắm, {hero}. Sợ đến mức không thể đứng yên khi anh còn ở ngoài kia.",
+        "Đừng hứa sẽ không sao. Cứ nắm tay tôi và bước tiếp.",
+        "Nếu chuyến xe chỉ còn một chỗ, anh lên đi. Tôi sẽ tìm đường tới anh."
+      ],
+      [
+        "Ngày mai chưa chắc yên, nhưng tối nay tôi muốn ở bên anh.",
+        "Tôi yêu anh, {hero}. Giữa đống đổ nát này, điều đó vẫn thật rõ ràng.",
+        "Khi mọi chuyện qua đi, mình trồng một chậu cây nhé. Anh nhớ tưới, tôi hay quên.",
+        "Cứ về với tôi sau mỗi chuyến đi. Tôi sẽ luôn chừa một ngọn đèn."
+      ]
+    ],
+    "rival": [
+      [
+        "{hero}, nghe nói anh bắn giỏi. Bia ở cuối sân kia chưa nghe nói thế.",
+        "Đừng giành chuyến hàng này với tôi. Hay cứ thử, xem ai mang được nó về trước.",
+        "Anh là người mới của {faction} à? Để xem họ khen anh quá lời không.",
+        "Tôi không nhường đường vì anh đến trước. Ở đây ai giữ được cửa thì người đó đi."
+      ],
+      [
+        "Anh lại nhanh hơn tôi một bước. Khó chịu thật, nhưng đường anh chọn không tệ.",
+        "Đừng tưởng cứu tôi một lần là thắng. Lần sau tôi tự thoát được.",
+        "Tôi đã tập bắn cả đêm. Mai anh đừng viện cớ súng kẹt.",
+        "Anh làm tốt vụ Bến Cũ. Tôi ghét phải nói câu này, nên nghe cho kỹ."
+      ],
+      [
+        "Cùng một thùng thuốc, hai đội đang chờ. {hero}, hôm nay chúng ta phải phân thắng bại.",
+        "Tôi không để anh nhận hết lỗi vụ sập cổng. Tôi cũng đứng ở đó.",
+        "Anh bị thương mà còn đòi đấu? Thắng kiểu ấy tôi chẳng khoe với ai được.",
+        "Đám xác sống kéo tới rồi. Gác chuyện thắng thua lại, giữ cửa trước đã."
+      ],
+      [
+        "Anh thắng. Giờ cất cái mặt đắc ý đi và giúp tôi chuyển thuốc.",
+        "Hòa nhé, {hero}. Lần đầu tôi thấy thua một nửa cũng vui.",
+        "Tôi vẫn muốn vượt anh. Nhưng từ giờ, cần người canh lưng thì cứ gọi.",
+        "Hôm nay tôi thắng; mai có thể là anh. Miễn cả hai còn sống để đấu tiếp."
+      ]
+    ],
+    "enemy": [
+      [
+        "{hero}, cuối cùng cũng thấy mặt anh. Người nhà tôi chết ở {place}, còn anh bước ra được.",
+        "Anh mang phù hiệu {faction} à? Tôi đã tìm người đeo nó lâu lắm rồi.",
+        "Đứng lại. Tôi muốn nghe anh giải thích vì sao cổng đóng khi chúng tôi còn ở ngoài.",
+        "Anh không nhớ tôi đâu. Tôi thì nhớ giọng anh qua chiếc bộ đàm hôm ấy."
+      ],
+      [
+        "Tôi tìm thấy dấu giày anh ở Ga ngầm Bến Cũ. Đừng phí sức xóa nữa.",
+        "Anh trốn sau tường của Liên Minh Khu Trú Ẩn được bao lâu, {hero}?",
+        "Tôi đã chặn lối ra phía đông. Lần này anh phải nói chuyện với tôi.",
+        "Người của anh đã thấy tôi ở Chợ đêm Phố Đèn. Tốt, bảo họ rằng tôi vẫn đang tìm anh."
+      ],
+      [
+        "Đặt súng xuống, {hero}. Hôm nay không còn cánh cửa nào để anh khóa lại.",
+        "Anh bảo đó là lệnh sơ tán. Em tôi gọi nó là đêm bị bỏ rơi.",
+        "Tôi đã chờ cuộc đối mặt này quá lâu. Đừng bắt tôi nghe thêm một lời nói dối.",
+        "Nhìn thẳng vào tôi. Nếu anh không ra lệnh đóng cổng, hãy nói ai đã làm."
+      ],
+      [
+        "Tôi đã đọc sổ trực. Anh cố mở cổng, còn tôi săn đuổi nhầm người.",
+        "Anh tha tôi, nhưng món nợ máu vẫn còn. Tôi sẽ tìm kẻ thật sự ra lệnh.",
+        "Xong rồi, {hero}. Tôi đã báo thù; giờ chẳng còn ai để đổ lỗi cho nỗi đau này.",
+        "Anh thắng. Tôi không xin anh quên chuyện cũ, chỉ xin một cơ hội sửa điều mình gây ra."
+      ]
+    ],
+    "mentor": [
+      [
+        "{hero}, cầm dao như thế chỉ tổ rách tay. Lại đây, tôi chỉ anh cách giữ.",
+        "Ở Bệnh viện Hồng Phúc, nghe tiếng dép kéo lê thì đừng gọi tên người ta.",
+        "Trước khi mở cửa, nhìn khe dưới. Máu chảy vào phòng thường đến trước con vật.",
+        "Anh muốn theo đội cứu hộ? Được, nhưng học cách băng bó trước cách bắn."
+      ],
+      [
+        "Khá hơn rồi. Hôm nay anh nhớ kiểm tra lối thoát trước khi lao vào.",
+        "Đừng xấu hổ vì sợ, {hero}. Sợ giúp tay anh tránh được nút cò lúc có người đi ngang.",
+        "Tôi giao anh dẫn đường một chuyến. Lạc thì cùng tìm, đừng tự mình liều.",
+        "Anh đã biết cứu một người. Giờ học cách đếm xem phía sau còn mấy người."
+      ],
+      [
+        "Tôi bị kẹt chân, anh dẫn họ đi. Nhớ đường ống kỹ thuật tôi đã chỉ.",
+        "Hết đạn rồi thì dùng đầu óc, {hero}. Cái van đỏ ngay sau lưng anh.",
+        "Anh phải chọn cứu người đang thở trước. Đau thì cứ để lát nữa đau.",
+        "Hôm nay tôi không ra lệnh nữa. Nói tôi nghe anh định đưa cả đội qua đó thế nào."
+      ],
+      [
+        "Anh không cần tôi cầm tay chỉ đường nữa. Tôi mừng, dù hơi buồn.",
+        "Tôi dạy anh cách sống sót; cách giữ lòng mình, anh tự học còn giỏi hơn.",
+        "Từ mai anh huấn luyện người mới đi. Tôi sẽ ngồi gần đó và cố không xen vào.",
+        "Khi anh không biết chọn gì, hãy nhìn những người anh đưa về được. Họ là câu trả lời."
+      ]
+    ]
+  },
+  "links": {
+    "sibling": [
+      "{a} và {b} là anh em ruột, tìm lại nhau sau đợt sơ tán ở Bến Cũ.",
+      "{a} là chị của {b}; cả hai nhận ra nhau nhờ tấm ảnh nhàu trong túi áo.",
+      "{a} và {b} cùng lớn lên ở Chung cư Ánh Dương, rồi thất lạc khi virus lan tới.",
+      "{a} luôn để dành phần ăn cho {b}, dù hai anh em còn hay cãi nhau."
+    ],
+    "ex": [
+      "{a} và {b} từng yêu nhau, nhưng chia tay sau một chuyến cứu hộ không ai muốn nhắc.",
+      "{a} vẫn giữ chiếc bật lửa {b} để lại từ ngày hai người đường ai nấy đi.",
+      "{a} và {b} là người cũ; gặp nhau ở chợ đêm, họ chỉ hỏi thăm chuyện ăn ngủ.",
+      "{a} từng chờ {b} ở Ga ngầm Bến Cũ quá lâu, rồi học cách sống tiếp."
+    ],
+    "rival": [
+      "{a} và {b} thường tranh quyền dẫn đội, nhưng chưa từng bỏ mặc nhau.",
+      "{a} xem {b} là đối thủ bắn súng đáng gờm nhất khu trú ẩn.",
+      "{a} và {b} đua nhau mang thuốc về từ vùng nhiễm, lần nào cũng sát nút.",
+      "{a} không thích cách {b} làm việc, song luôn kiểm tra xem người kia đã về chưa."
+    ],
+    "mentor": [
+      "{a} dạy {b} cách tìm lối thoát trong những tòa nhà mất điện.",
+      "{a} từng là bác sĩ ở Hồng Phúc và chỉ {b} cách khâu vết thương.",
+      "{a} là người hướng dẫn {b} trong chuyến cứu hộ đầu tiên.",
+      "{a} dạy {b} kiểm tra tiếng động trước khi mở cửa, một thói quen đã cứu nhiều mạng."
+    ],
+    "debt": [
+      "{a} nợ {b} một mạng từ đêm ga ngầm bị tràn xác sống.",
+      "{a} chưa quên việc {b} chia viên thuốc cuối cùng cho mình.",
+      "{a} nợ ơn {b}, người đã đưa mẹ của {a} ra khỏi Bệnh viện Hồng Phúc.",
+      "{a} giúp {b} sửa máy phát mỗi khi nó hỏng, coi như trả dần món nợ cũ."
+    ],
+    "lover": [
+      "{a} và {b} yêu nhau, thay phiên trực đêm để người kia được ngủ.",
+      "{a} luôn chừa một chỗ cạnh bếp sưởi cho {b}.",
+      "{a} và {b} tìm thấy nhau ở Chợ đêm Phố Đèn, rồi không muốn lạc nhau nữa.",
+      "{a} và {b} hẹn trồng một cái cây khi tìm được nơi ở lâu dài."
+    ],
+    "enemy": [
+      "{a} hận {b} vì tin rằng {b} đã khóa cổng khi gia đình mình còn ở ngoài.",
+      "{a} săn đuổi {b} từ sau vụ cháy kho thuốc ở Hồng Phúc.",
+      "{a} không tha thứ cho {b} về những người đã chết trong chuyến sơ tán.",
+      "{a} giữ chiếc bộ đàm hỏng làm lời nhắc rằng mình còn món nợ máu với {b}."
+    ]
+  },
+  "gift": {
+    "like": [
+      "Cho tôi thật à, {hero}? Tôi đã tìm thứ này suốt mấy tuần.",
+      "Đúng món tôi cần. Tối nay tôi có thể ngủ mà không lo máy phát tắt.",
+      "Anh nhớ tôi thích thứ này sao? Cảm ơn, tôi sẽ giữ kỹ.",
+      "Tốt quá. Tôi chia một ít cho mấy đứa nhỏ ở {place} được không?",
+      "Trời, còn dùng được này. Anh làm tôi vui hơn cả lúc thấy thùng đồ hộp.",
+      "Cảm ơn anh. Mai cần tôi giúp gì, cứ gọi thẳng tên."
+    ],
+    "dislike": [
+      "Tôi nhận nhé, nhưng lần sau đừng nhặt thứ này cho tôi.",
+      "Cảm ơn anh. Tiếc là tôi không dùng được nó.",
+      "Anh lấy nó từ đâu ra vậy? Thôi, đừng kể.",
+      "Ừm... để tôi xem có ai ở {place} cần món này không.",
+      "Ý anh tốt, tôi biết. Nhưng thứ này làm tôi nhớ chuyện không vui.",
+      "Tôi nhận vì anh đã mang tới. Lần sau hỏi tôi trước nhé."
+    ]
+  },
+  "join": [
+    "Tôi đi cùng anh, {hero}. Chờ tôi lấy túi cứu thương.",
+    "Được, ra khỏi {place} thôi. Anh đi trước, tôi khóa cửa.",
+    "Cho tôi hai phút kiểm tra đạn. Tôi không muốn giữa đường mới biết mình hết.",
+    "Tôi theo anh. Nhưng thấy người bị nạn thì mình dừng lại giúp.",
+    "Đi chứ. Ở đây ngồi nghe máy phát ho mãi cũng phát điên.",
+    "Tôi sẵn sàng rồi. Anh chọn đường, tôi để mắt hai bên."
+  ],
+  "leave": [
+    "Được, tôi ở căn cứ. Anh nhớ báo về trước khi trời tối.",
+    "Tôi sẽ canh cổng. Có chuyện gì, gọi qua bộ đàm ngay.",
+    "Ừ, chuyến này tôi ở lại. Đừng biến nó thành chuyến cuối của anh.",
+    "Tôi hiểu. Tôi lo thuốc men ở đây, anh lo đường về."
+  ],
+  "duel": [
+    "{hero}, sân đã dọn trống. Xem hôm nay ai phải đãi bữa tối.",
+    "Đừng nương tay. Tôi muốn biết mình đã tiến bộ đến đâu.",
+    "Sẵn sàng chưa? Lần này tôi không để anh cướp thế trước đâu.",
+    "Chúng ta đấu một trận cho rõ. Xong rồi cùng đi sửa cái cổng chết tiệt ấy."
+  ],
+  "ambush": [
+    "{hero}! Tôi đã đợi anh qua con hẻm này.",
+    "Đừng chạy về phía chợ. Người của tôi đang chặn lối đó.",
+    "Anh nghe tiếng lon lăn không? Bẫy đấy, và giờ thì muộn rồi.",
+    "Bỏ súng xuống! Lần này tôi không đến để nghe anh xin lỗi."
+  ],
+  "mercy": [
+    "Sao anh không kết liễu tôi? Sau từng ấy chuyện, tôi không hiểu nổi.",
+    "Tôi thua rồi. Anh tha mạng thì tôi sẽ nói hết những gì mình biết.",
+    "Đừng đưa tay đỡ tôi vội. Tôi cần một phút để tin anh thật sự tha cho mình.",
+    "Tôi đã săn anh khắp thành phố. Giờ anh cho tôi sống; món nợ này tôi sẽ tự gánh."
+  ],
+  "confess": [
+    "{hero}, tôi yêu anh. Tôi đã muốn nói từ những đêm cùng anh canh cổng.",
+    "Tôi cứ mong anh trở về, rồi nhận ra điều mình mong là được ở bên anh.",
+    "Nếu anh cũng có tình cảm với tôi, tối mai mình lại gặp nhau dưới ngọn đèn ấy nhé.",
+    "Tôi thương anh, {hero}. Tôi muốn nói rõ, để ngày mai có ra sao anh cũng biết."
+  ],
+  "oath": [
+    "{hero}, từ nay anh là anh em kết nghĩa của tôi. Có đường sống, ta cùng tìm.",
+    "Tôi thề không bỏ anh lại giữa đường. Anh cũng phải giữ mạng mà về.",
+    "Không chung máu mủ, nhưng từ đêm nay chúng ta là người nhà.",
+    "Tôi lấy mạng mình giữ lời: anh gặp nạn, tôi sẽ đến."
+  ]
+}

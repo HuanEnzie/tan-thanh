@@ -1,0 +1,292 @@
+{
+  "rel": {
+    "friend": [
+      [
+        "{hero}, lần đầu gặp ở {place}, ta đã thấy kiếm ý của ngươi bất phàm.",
+        "Đạo hữu cũng đến tìm linh thảo? Vậy chúng ta đi chung một đoạn.",
+        "Ta là {npc}. Nếu ngươi chưa quen đường núi, cứ theo ta.",
+        "Kiếm của ngươi tốt đấy, {hero}. Có dịp cùng ta luận kiếm."
+      ],
+      [
+        "{hero}, có ngươi đồng hành, đường qua Vạn Thú Sơn Mạch bớt phần hiểm trở.",
+        "Ta để dành cho ngươi một viên Tụ Khí Đan. Đừng khách sáo.",
+        "Chuyện ngươi giấu trong lòng, nếu muốn kể, ta sẽ nghe.",
+        "Hôm nay ta lĩnh thưởng ở {faction}; tối nay mời ngươi một vò rượu."
+      ],
+      [
+        "{hero}, lui lại! Yêu thú này để ta cản.",
+        "Ngươi từng cứu ta giữa huyết kiếp. Lần này, đến lượt ta.",
+        "Nếu phải chọn giữa cơ duyên và tính mạng ngươi, ta chẳng cần nghĩ.",
+        "Đừng ngủ, {hero}. Ta đã mang đan dược tới rồi!"
+      ],
+      [
+        "Sau bao phen sinh tử, ngươi vẫn là người ta tin nhất.",
+        "Mai này mỗi người một ngả, cứ gửi truyền âm phù; ta sẽ đến.",
+        "Có ngươi cùng ngắm mây trên Thanh Vân Sơn, đời tu tiên cũng không quá lạnh.",
+        "Cửa động phủ của ta luôn mở cho ngươi, {hero}."
+      ]
+    ],
+    "sworn": [
+      [
+        "{hero}, ngươi có dám cùng ta uống cạn vò rượu này không?",
+        "Ta là {npc}. Kiếm của ngươi khiến ta muốn kết giao.",
+        "Cùng thoát khỏi trận pháp ấy, xem ra chúng ta có chút duyên.",
+        "Ngươi trọng nghĩa khí. Ta kính ngươi một chén."
+      ],
+      [
+        "{hero}, nếu ngươi không chê, từ nay gọi ta một tiếng đệ.",
+        "Huynh có nạn, truyền âm cho đệ; cách nghìn dặm đệ cũng tới.",
+        "Chén rượu kết nghĩa hôm ấy, đệ chưa từng quên.",
+        "Đệ nhặt được linh thạch này. Huynh giữ lấy để trúc cơ."
+      ],
+      [
+        "Huynh đi trước đi! Đệ sẽ giữ cửa trận đến cùng.",
+        "Kẻ nào muốn lấy mạng huynh, phải bước qua kiếm của đệ.",
+        "Dù kim đan vỡ nát, đệ cũng không bỏ huynh một mình.",
+        "Huynh còn nhớ lời thề dưới Hồ Tẩy Kiếm không? Hôm nay đệ đến giữ lời."
+      ],
+      [
+        "Kiếp nạn đã qua. Đệ mừng vì còn được gọi huynh một tiếng.",
+        "Từ Thanh Vân Sơn đến tận chân trời, đường của huynh cũng là đường của đệ.",
+        "Ngày huynh lập tông, nhớ chừa cho đệ một chỗ uống rượu.",
+        "Chúng ta chẳng cùng huyết mạch, nhưng nghĩa huynh đệ này cả đời không đổi."
+      ]
+    ],
+    "sibling": [
+      [
+        "{hero}, ngọc bội của huynh... sao lại giống chiếc mẫu thân để lại cho đệ?",
+        "Đệ là {npc}. Nghe huynh kể quê cũ, lòng đệ bỗng thấy thân quen.",
+        "Huynh cũng biết khúc đồng dao ấy ư? Đệ tưởng chẳng còn ai nhớ.",
+        "Vết sẹo trên tay huynh... hồi nhỏ, có phải đệ đã gây ra?"
+      ],
+      [
+        "Mẫu thân tìm huynh suốt bao năm. Đệ chẳng ngờ hôm nay lại gặp huynh ở {place}.",
+        "Huynh đừng nhường hết đan dược cho đệ; huynh cũng cần dưỡng thương.",
+        "Thuở nhỏ đệ cứ mong có huynh che chở. Nay huynh thật sự ở đây rồi.",
+        "Đệ đã khâu lại túi càn khôn cho huynh. Đừng đánh rơi nữa."
+      ],
+      [
+        "Huynh là người thân cuối cùng của đệ. Đừng bước vào huyết trận!",
+        "Năm ấy đệ lạc mất huynh một lần; hôm nay quyết không buông tay.",
+        "Đệ đã giữ di vật của phụ thân. Huynh phải sống để tự tay nhận lấy.",
+        "Huynh bị thương rồi! Đừng nói không sao, đệ nhìn ra mà."
+      ],
+      [
+        "Nhà cũ chẳng còn, nhưng nơi nào có huynh, nơi ấy là nhà của đệ.",
+        "Đợi huyết kiếp lắng xuống, huynh cùng đệ về thắp hương cho mẫu thân nhé.",
+        "Huynh cứ đi theo tiên đạo. Đệ sẽ giữ ngọn đèn chờ ngày huynh trở lại.",
+        "Từ nay chúng ta không còn phải tìm nhau giữa biển người nữa."
+      ]
+    ],
+    "lover": [
+      [
+        "{hero}, gặp ngươi bên Hồ Tẩy Kiếm, ta nhất thời quên cả phép chào.",
+        "Ta là {npc}. Trời lạnh thế này, ngươi có muốn cùng ta uống trà không?",
+        "Kiếm tu các ngươi đều ít lời như vậy, hay chỉ riêng ngươi?",
+        "Vừa rồi ngươi nhìn sang, ta suýt đánh rơi ngọc giản."
+      ],
+      [
+        "Hôm nay thấy ngươi bình an trở về, lòng ta mới yên.",
+        "Ta luyện chiếc hộ phù này cho ngươi; đường xa nhớ mang theo.",
+        "Ngươi vừa gọi tên ta ư? Xin lỗi, ta còn muốn nghe thêm một lần.",
+        "Ở cạnh ngươi, đến lúc tĩnh tọa ta cũng khó giữ tâm như chỉ thủy."
+      ],
+      [
+        "Nếu huyết kiếp cuốn ngươi đi, ta sẽ tìm đến tận cuối Thiên Nguyên đại lục.",
+        "Đừng lấy thân chắn kiếm cho ta nữa. Ta sợ mất ngươi.",
+        "Ta có một lời cất giữ đã lâu; qua được đêm nay, xin hãy nghe.",
+        "Ngươi nắm tay ta đi. Trận này, chúng ta cùng vượt."
+      ],
+      [
+        "Ta thương ngươi, {hero}. Từ nay chẳng muốn giấu nữa.",
+        "Dẫu tiên lộ dài hơn ngàn năm, ta vẫn muốn đi bên ngươi.",
+        "Đợi hoa trên Thanh Vân Sơn nở, ta cùng ngươi về ngắm nhé.",
+        "Lời ước dưới trăng hôm ấy, ta sẽ giữ đến khi tóc bạc."
+      ]
+    ],
+    "rival": [
+      [
+        "{hero}, nghe nói kiếm pháp ngươi đứng đầu lứa này. Ta muốn thử.",
+        "Ta là {npc}. Đừng để ta thất vọng ở kỳ đại hội tới.",
+        "Cùng tranh một suất vào Tàng Kiếm Các ư? Vậy gặp nhau trên lôi đài.",
+        "Kiếm chiêu vừa rồi khá lắm, nhưng ngươi còn sơ hở."
+      ],
+      [
+        "Ngươi lại nhanh hơn ta một bước. Lần sau sẽ không thế đâu.",
+        "Viên Trúc Cơ Đan ấy, ta sẽ tự tay giành lấy.",
+        "Đừng tưởng ta chỉ biết ganh đua; kiếm ý của ngươi, ta thật lòng khâm phục.",
+        "Ngươi tiến cảnh nhanh như vậy, ta càng không thể lười biếng."
+      ],
+      [
+        "Hôm nay không còn đường lui. Rút kiếm đi, {hero}!",
+        "Ta đợi trận này quá lâu rồi; hãy cho ta thấy toàn bộ bản lĩnh của ngươi.",
+        "Nếu ngươi ngã xuống ở đây, ta sẽ chẳng bao giờ cam lòng.",
+        "Một kiếm định thắng bại. Ngươi dám chứ?"
+      ],
+      [
+        "Trận này ta thua. Lần tới, ta sẽ thắng cho ngươi xem.",
+        "Ngươi thắng rồi, {hero}. Từ nay ta kính ngươi như một đạo hữu.",
+        "Chúng ta đã phân cao thấp; giờ cùng uống một chén được chứ?",
+        "Kiếm đạo còn dài. Có ngươi làm đối thủ, ta chẳng sợ đường xa."
+      ]
+    ],
+    "enemy": [
+      [
+        "{hero}, chính ngươi là kẻ được {faction} che chở? Ta muốn xem họ cứu ngươi thế nào.",
+        "Nợ máu ở Trấn Lạc Hà, ta sẽ tính lên đầu ngươi.",
+        "Ngươi mang thanh kiếm ấy ư? Ta nhận ra nó, dù vỏ kiếm đã đổi.",
+        "Ta là {npc}. Nhớ lấy tên kẻ sẽ đòi món nợ cũ."
+      ],
+      [
+        "Cứ chạy đi, {hero}. Dấu linh lực của ngươi chưa thoát khỏi tay ta.",
+        "Ngươi trốn vào Thanh Vân Sơn cũng vô ích; ta sẽ tìm tới.",
+        "Đồng bọn ngươi cản được ta một lần, không cản được lần thứ hai.",
+        "Mỗi ngày ngươi còn sống, mối hận này càng nung nóng kiếm của ta."
+      ],
+      [
+        "Đêm nay, giữa {place}, ta và ngươi phải chấm dứt ân oán.",
+        "Rút kiếm! Ta không đến đây để nghe ngươi biện bạch.",
+        "Ngươi còn nhớ những người đã chết ở Trấn Lạc Hà không?",
+        "Ta đã bỏ cả kim đan để đổi lấy trận pháp này. Ngươi đừng mong thoát."
+      ],
+      [
+        "Ngươi tha ta, nhưng mối hận này chưa thể tan trong một ngày. Ta sẽ rời đi.",
+        "Chân tướng đã rõ. Ta hận lầm ngươi; món nợ này, ta sẽ trả.",
+        "Ta đã báo thù xong. Vậy mà lòng vẫn trống rỗng.",
+        "Kiếm của ta gãy rồi. Từ nay ân oán giữa chúng ta cũng dừng tại đây."
+      ]
+    ],
+    "mentor": [
+      [
+        "{hero}, căn cơ ngươi chưa vững; khoan vội dẫn linh khí vào kinh mạch.",
+        "Ta là {npc}. Nếu muốn học kiếm, trước hết hãy học đứng cho vững.",
+        "Tư chất khá, nhưng tâm quá gấp. Ngươi tên gì?",
+        "Đến Hồ Tẩy Kiếm lúc bình minh; ta sẽ xem ngươi có chịu được khổ không."
+      ],
+      [
+        "Hôm nay ngươi giữ được kiếm tâm giữa loạn trận. Ta rất hài lòng.",
+        "Viên đan này giúp ngươi dưỡng mạch; đừng dùng nó để ép phá cảnh.",
+        "Ngươi chưa hiểu thức kiếm cuối, vì ngươi vẫn sợ thất bại.",
+        "Ta chỉ đường, còn từng bước trúc cơ phải do chính ngươi đi."
+      ],
+      [
+        "Kim đan kiếp sắp giáng. Bình tâm, nhớ nhịp thổ nạp ta đã dạy.",
+        "Ta không thể thay ngươi gánh lôi kiếp, nhưng sẽ giữ hộ pháp đến phút cuối.",
+        "Giữa sống chết, đừng cầu kiếm nhanh; hãy nhìn cho rõ một đường kiếm.",
+        "Nếu trận này ta không trở về, ngọc giản trong tay áo là dành cho ngươi."
+      ],
+      [
+        "Ngươi đã vượt xa điều ta từng mong. Từ nay, hãy tin vào đạo của mình.",
+        "Sư đồ một trận, thấy ngươi thành tài, ta không còn gì tiếc nuối.",
+        "Đường phía trước ta chẳng dạy được nữa; lúc nào mỏi mệt, cứ về tìm ta.",
+        "Kiếm của ngươi đã có tiếng nói riêng. Hãy mang nó đi khắp Thiên Nguyên."
+      ]
+    ]
+  },
+  "links": {
+    "sibling": [
+      "{a} và {b} là huynh muội thất lạc từ nhỏ, nhận nhau nhờ đôi ngọc bội.",
+      "{a} là huynh trưởng của {b}, từng thay em gánh phạt ở Thanh Vân Tông.",
+      "{a} và {b} cùng huyết mạch, nhưng lớn lên ở hai tông môn đối địch.",
+      "{a} là tỷ tỷ của {b}; mỗi năm đều gửi đan dược về cho em."
+    ],
+    "ex": [
+      "{a} và {b} từng hẹn ước bên Hồ Tẩy Kiếm, rồi chia tay vì khác tiên đạo.",
+      "{a} từng là đạo lữ của {b}; một lần bế quan đã khiến họ xa nhau.",
+      "{a} và {b} đã cắt đứt tình duyên, song vẫn giữ tín vật của nhau.",
+      "{a} từng chờ {b} trở về Trấn Lạc Hà, cho đến khi lời hẹn cũ phai đi."
+    ],
+    "rival": [
+      "{a} và {b} tranh vị trí đứng đầu kiếm bảng suốt ba năm.",
+      "{a} xem {b} là đối thủ duy nhất đủ sức tiếp trọn ba kiếm của mình.",
+      "{a} và {b} cùng tìm một truyền thừa trong Vạn Thú Sơn Mạch.",
+      "{a} chưa từng thắng {b} trên lôi đài, nhưng lần nào cũng trở lại."
+    ],
+    "mentor": [
+      "{a} truyền cho {b} thức kiếm đầu tiên dưới chân Thanh Vân Sơn.",
+      "{a} là sư phụ của {b}, nghiêm khắc canh giữ từng bước trúc cơ.",
+      "{a} dẫn {b} nhập đạo, rồi giao lại một quyển kiếm phổ cũ.",
+      "{a} dạy {b} luyện đan ở Dược Vương Cốc, trước hết là cách nhận độc thảo."
+    ],
+    "debt": [
+      "{a} nợ {b} ơn cứu mạng sau trận thú triều.",
+      "{a} nợ {b} một viên Hồi Mệnh Đan và lời hứa sẽ trả khi cần.",
+      "{a} nợ {b} ơn che chở gia quyến trong huyết kiếp.",
+      "{a} nợ {b} cơ hội trúc cơ, bởi năm ấy {b} đã nhường phần linh tuyền."
+    ],
+    "lover": [
+      "{a} và {b} là đạo lữ, cùng tu luyện trên Thanh Vân Sơn.",
+      "{a} và {b} trao tín vật bên Hồ Tẩy Kiếm, hẹn cùng vượt kim đan kiếp.",
+      "{a} và {b} yêu nhau, dù mỗi người phụng sự một tông môn.",
+      "{a} và {b} thường hẹn gặp dưới đèn hoa ở Trấn Lạc Hà."
+    ],
+    "enemy": [
+      "{a} hận {b} vì cho rằng {b} đã hại sư phụ mình.",
+      "{a} truy tìm {b} để đòi món nợ máu ở Trấn Lạc Hà.",
+      "{a} hận {b} sau lần tranh đoạt truyền thừa khiến đồng môn bỏ mạng.",
+      "{a} thề báo thù {b}, kẻ đã phá hủy động phủ của mình."
+    ]
+  },
+  "gift": {
+    "like": [
+      "Ngươi còn nhớ ta thích thứ này ư? Ta sẽ giữ cẩn thận.",
+      "Linh thảo này đúng lúc ta cần. Đa tạ, {hero}.",
+      "Món quà đẹp quá; ta nhìn mãi mà chẳng nỡ cất đi.",
+      "Ngươi tặng ta kiếm tuệ này sao? Để ta buộc lên chuôi kiếm.",
+      "Đan hương thật dịu. Tấm lòng của ngươi, ta xin nhận.",
+      "Ta chỉ nhắc một lần mà ngươi đã nhớ. Đa tạ ngươi."
+    ],
+    "dislike": [
+      "Ta biết ngươi có lòng, nhưng thứ này không hợp với ta.",
+      "Mùi linh thảo này làm ta nhức đầu. Ngươi giữ lại nhé.",
+      "Kiếm tuệ này đẹp, chỉ tiếc kiếm của ta không dùng được.",
+      "Ta xin nhận tấm lòng; món quà này, ngươi hãy tặng người cần hơn.",
+      "Lần sau đừng tốn linh thạch vì ta vào thứ này.",
+      "Ngươi không biết ta kiêng loại đan dược ấy ư? Thôi, không sao."
+    ]
+  },
+  "join": [
+    "Ta đi cùng ngươi, {hero}. Đường qua {place} không dễ vượt một mình.",
+    "Được, ta thu xếp xong sẽ lên đường cùng ngươi.",
+    "Ngươi cần một người hộ pháp? Ta nhận lời.",
+    "Thanh kiếm này còn dùng được. Dẫn đường đi, {hero}.",
+    "Ta đã chờ ngươi mở lời từ lâu; lần này cùng đi.",
+    "Vì chuyện ở {place}, ta cũng phải đến đó. Chúng ta đồng hành."
+  ],
+  "leave": [
+    "Ta sẽ ở lại trông coi động phủ. Ngươi nhớ truyền âm báo bình an.",
+    "Được, ta ở lại căn cứ; có biến, cứ gửi tín phù.",
+    "Ta không theo nữa, nhưng sẽ giữ sẵn đan dược đợi ngươi về.",
+    "Ngươi cứ đi. Phòng tuyến nơi này giao cho ta."
+  ],
+  "duel": [
+    "{hero}, lên lôi đài! Hôm nay ta muốn thử kiếm mới của ngươi.",
+    "Ba chiêu đầu ta sẽ không nhường. Rút kiếm đi!",
+    "Trận trước ngươi thắng; trận này xem ai tiến bộ hơn.",
+    "Đừng giữ sức, {hero}. Ta muốn thua dưới toàn lực của ngươi."
+  ],
+  "ambush": [
+    "{hero}, ngươi bước vào trận rồi. Hôm nay không ai cứu được ngươi!",
+    "Động thủ! Đừng để {hero} thoát khỏi sơn cốc!",
+    "Ta đã đợi ngươi ba ngày ở đây. Nợ cũ, trả đi!",
+    "Kiếm trận khép lại! {hero}, ngươi còn đường nào để chạy?"
+  ],
+  "mercy": [
+    "Vì sao ngươi tha ta? Ta từng muốn lấy mạng ngươi.",
+    "Ta bại rồi. Ân không giết này, ta sẽ ghi nhớ.",
+    "Thu kiếm đi... Ta sẽ không đuổi theo ngươi nữa.",
+    "Ngươi có thể giết ta, nhưng đã không làm. Ta cần thời gian nghĩ cho rõ."
+  ],
+  "confess": [
+    "{hero}, ta thương ngươi. Lời này ta đã muốn nói từ lâu.",
+    "Ta không mong ngươi đáp lại ngay; chỉ xin ngươi biết lòng ta.",
+    "Mỗi lần nghe tiếng bước chân ngươi, ta lại chẳng giữ nổi bình tâm.",
+    "Nếu ngươi nguyện ý, ta muốn cùng ngươi đi hết tiên lộ này."
+  ],
+  "oath": [
+    "Trời đất chứng giám, ta nguyện kết nghĩa cùng {hero}, hoạn nạn không rời.",
+    "Từ nay huynh gặp nguy, đệ lấy kiếm mình chắn trước.",
+    "Một chén rượu này kết tình huynh đệ; sống chết, đệ cùng huynh gánh.",
+    "Dưới ánh trăng Thanh Vân Sơn, đệ thề không phụ nghĩa kết giao hôm nay."
+  ]
+}

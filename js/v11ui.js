@@ -43,7 +43,8 @@
     const tab = document.querySelector('#inv [data-tab="shadows"]'); if (tab) tab.textContent = S.army;
     let h = `<h3>${H(S.army)} <small>đã lưu ${v.shadows.length}/${cap} • lính tạm tối đa ${G.tempCap()} • ${H(manaName())} ${Math.floor(v.mana)}/${G.maxMana()}</small></h3>`;
     const st = Object.entries(v.stock || {}).filter(([, n]) => n >= 1).map(([id, n]) => `${Math.floor(n)} ${id === 'gold' ? cur().name : itm(id).name}`);
-    h += `<div class="shbar"><button id="shAll">${S.icon} GỌI TẤT CẢ [K]</button><span class="muted">${H(S.skill)}: hạ kẻ địch, đứng cạnh xác (khói màu) nhấn [E] để thu phục; thất bại thì chỉ đứng dậy tạm thời. Mỗi cấp thêm 1 ô lưu và 1 lính tạm. Mỗi loại boss chỉ có một.${st.length ? `<br>📦 Đang giữ: ${H(st.join(', '))} — về căn cứ để nhận.` : ''}</span></div><div class="party10 shl">`;
+    const nAll = v.shadows.length, sel = v.sumN | 0, busyN = v.shadows.filter(s => G.shBusy(s)).length;
+    h += `<div class="shctl"><div class="shn"><span>Số ${H(S.unit)} mỗi lần gọi</span><button id="shMinus" aria-label="Giảm">−</button><b id="shNum">${sel ? sel : 'Tất cả'}</b><button id="shPlus" aria-label="Tăng">+</button></div><button id="shCall">${S.icon} GỌI ${sel ? sel : 'QUÂN RẢNH'} [K]</button><button id="shCallAll" ${busyN ? '' : 'class="ghost"'}>⚑ GỌI TOÀN BỘ${busyN ? ` (+${busyN} đang bận)` : ''}</button><button id="shDismiss" class="warn">✕ HỦY TRIỆU HỒI [Shift+K]</button></div><div class="shbar"><span class="muted">${H(S.skill)}: hạ kẻ địch, đứng cạnh xác (khói màu) nhấn [E] để thu phục; thất bại thì chỉ đứng dậy tạm thời. Mỗi cấp thêm 1 ô lưu và 1 lính tạm. Mỗi loại boss chỉ có một.${st.length ? `<br>📦 Đang giữ: ${H(st.join(', '))} — về căn cứ để nhận.` : ''}</span></div><div class="party10 shl">`;
     const list = v.shadows.slice().sort((a, b) => SH_ORDER.indexOf(a.tier) - SH_ORDER.indexOf(b.tier));
     const MODES = [['fight', '⚔', 'Chiến đấu'], ['loot', '🎒', 'Nhặt đồ'], ['wood', '🪓', 'Đốn gỗ']];
     for (const s of list) {
@@ -62,7 +63,12 @@
     if (!list.length) h += `<p class="muted">Chưa có ${H(S.unit)} nào.</p>`;
     box.innerHTML = h + '</div>';
     box.querySelectorAll('button').forEach(b => this.bindBtn(b));
-    $('shAll').onclick = () => { G.summonAll(); this.buildInv(); };
+    const setN = n => { v.sumN = Math.max(0, Math.min(Math.max(1, v.shadows.length), n)); if (v.sumN >= v.shadows.length && v.shadows.length) v.sumN = 0; this.buildInv(); };
+    $('shMinus').onclick = () => setN((v.sumN || v.shadows.length) - 1);
+    $('shPlus').onclick = () => setN((v.sumN || 0) + 1);
+    $('shCall').onclick = () => { G.summonAll({ noShift: true }); this.buildInv(); };
+    $('shCallAll').onclick = () => { G.summonAll({ noShift: true, includeBusy: true, n: 1e9 }); this.buildInv(); };
+    $('shDismiss').onclick = () => { G.dismissAll(); this.buildInv(); };
     const f = id => G.shById(+id), on = (sel, fn) => box.querySelectorAll(`[${sel}]`).forEach(b => b.onclick = () => fn(f(b.getAttribute(sel)), b));
     on('data-ss', s => { const r = G.summonShadow(s); if (r === 'mana') G.toast(`Không đủ ${manaName()}.`, 'warn'); this.buildInv(); });
     on('data-sr', s => { G.recallShadow(s); this.buildInv(); });

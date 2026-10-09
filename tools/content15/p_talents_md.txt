@@ -1,0 +1,35 @@
+THẾ GIỚI: TẬN THẾ ZOMBIE. Thành phố hiện đại đổ nát sau virus Hoại Huyết. Người sống sót nấp trong khu trú ẩn, bệnh viện, ga ngầm, chợ đêm. Giọng văn: trần trụi, đời thường, hơi đen tối nhưng có tình người. Xưng hô hiện đại (tôi, anh, chị, em, mày/tao khi thân).
+Địa danh / phe mẫu: Bệnh viện Hồng Phúc, Ga ngầm Bến Cũ, Chợ đêm Phố Đèn, Chung cư Ánh Dương; phe: Đội Cứu Hộ Bình Minh, Hội Người Gác Đèn, Liên Minh Khu Trú Ẩn.
+Viết nội dung cho GAME nhập vai. Mỗi "thiên phú" (tốt) hoặc "khuyết điểm" (xấu) bẩm sinh của nhân vật chính cần tên và một mẩu câu chuyện nguồn gốc.
+Cho mỗi KEY dưới đây, viết ĐÚNG 3 biến thể (variants) khác hẳn nhau về tên và câu chuyện. Tên ≤ 26 ký tự, nghe hay, hợp thế giới. Câu chuyện (story) 1-2 câu, ≤ 230 ký tự, ngôi thứ hai ("Bạn..."), kể nguồn gốc / sự kiện tuổi thơ làm nên điều đó, có hình ảnh cụ thể (không chung chung). Với khuyết điểm: giọng ngậm ngùi hoặc hài hước, nêu rõ cái giá phải trả. Mỗi biến thể còn có "tag": 1 câu ngắn ≤ 60 ký tự mô tả tính chất để hiển thị.
+KEY và ý nghĩa:
+- bone: thể chất cứng cáp, nhiều máu, chịu đòn tốt
+- swift: nhanh nhẹn, dễ né đòn, chạy nhanh
+- eye: nhãn lực tinh tường, thiện xạ, đánh trúng điểm yếu (chí mạng)
+- might: sức mạnh bẩm sinh, đánh cận chiến uy lực
+- sage: ngộ tính cao, học hỏi và lên cấp nhanh
+- mana: nguồn linh khí / năng lượng / mana dồi dào
+- fortune: vận may, hay nhặt được đồ tốt
+- regen: hồi phục vết thương nhanh một cách lạ thường
+- shadow: thân thế gắn với bóng tối và cõi chết, dễ thu phục linh hồn / xác sống / bóng
+- ward: mệnh cứng, hiểm nghèo vẫn sống sót
+- trade: khéo buôn bán, tiền bạc đến dễ
+- craft: tay nghề khéo léo: chế tạo, đốn gỗ, thuốc men hiệu quả hơn
+- lead: phong thái thủ lĩnh, đồng đội tin theo, dễ kết thân
+- slayer: sinh ra để săn kẻ mạnh, tinh anh và boss
+- fury: càng bị thương càng hung hãn, hút máu khi chiến đấu
+- mind: tâm tĩnh như nước, hồi năng lượng khi bình thản
+- frail: thể chất yếu ớt, ít máu
+- slow: chân chậm, di chuyển ì ạch
+- glutton: dễ đói khát, ăn uống nhiều
+- unlucky: vận đen, đồ rơi kém
+- clumsy: vụng về với vũ khí tầm xa, nạp chậm, bắn kém
+- weak: tay yếu, cận chiến kém uy lực
+- dull: chậm hiểu, kinh nghiệm thu được ít
+- dark: sợ bóng tối, ban đêm chiến đấu kém đi
+- poor: nghèo rớt, tiền kiếm được ít
+- leak: mạch linh khí / năng lượng bị tắc, ít mana
+- feud: mang thù oán, có kẻ truy sát mình
+- lone: cô độc, khó kết thân, người khác dè chừng
+
+Trả về JSON thuần (không markdown) dạng: {"bone":[{"name":"...","tag":"...","story":"..."}, ...3 phần tử...], "swift":[...], ...đủ 28 key}

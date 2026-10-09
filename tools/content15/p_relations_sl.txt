@@ -1,0 +1,14 @@
+THẾ GIỚI: THỢ SĂN CỔNG / HỆ THỐNG. Hiện đại có các Cổng không gian phân hạng E đến S, Hiệp Hội Thợ Săn, bang hội, quái vật, Hệ Thống thức tỉnh, binh đoàn bóng tối. Giọng văn: hiện đại, kịch tính kiểu manhwa thợ săn. Tên người kiểu Hàn.
+Địa danh / phe mẫu: Ga ngầm Trung Tâm, Toà nhà Hiệp Hội Thợ Săn, Bệnh viện Thánh Tâm, Đảo Sương Mù; phe: Hiệp Hội Thợ Săn, Bang Hội Bạch Hổ, Bang Hội Phượng Hoàng.
+Viết lời thoại cho hệ thống quan hệ giữa NHÂN VẬT CHÍNH và NPC. Ô thay thế: {hero} = tên nhân vật chính, {npc} = tên NPC, {place}, {faction}. Lời thoại là NPC nói với nhân vật chính (trừ khi ghi chú khác), 1-2 câu, ≤ 170 ký tự, đúng giọng thế giới và đúng cách xưng hô.
+Quan hệ (rel) và 4 giai đoạn (stage 0: mới quen, 1: thân dần / bắt đầu hiềm khích, 2: biến cố / cao trào, 3: kết quả cuối). Với mỗi rel và mỗi stage viết ĐÚNG 4 câu khác nhau:
+- friend: bạn bè thân thiết dần
+- sworn: kết nghĩa huynh đệ / tỷ muội (anh em kết nghĩa, sống chết có nhau)
+- sibling: người thân ruột thịt thất lạc hoặc em/anh/chị ruột của nhân vật chính (tình cảm gia đình)
+- lover: tình yêu lãng mạn (e thẹn, rung động, tỏ tình, thề ước) - lịch sự, không tục
+- rival: đối thủ cạnh tranh ngang tài, vừa ghét vừa nể, cuối cùng hoá bạn hoặc phân thắng bại
+- enemy: kẻ thù thực sự có mối hận với nhân vật chính (stage 0: lời khiêu khích/lần đầu chạm mặt, 1: truy đuổi, 2: đối đầu trực diện, 3: kết cục - tha thứ hoặc báo thù xong)
+- mentor: sư phụ / người dẫn đường già dặn truyền dạy cho nhân vật chính
+Thêm "links": liên hệ giữa NPC với NPC khác, mỗi loại 4 mẫu câu miêu tả (không phải lời thoại), dùng {a} và {b} là hai NPC: "sibling" (anh chị em), "ex" (người cũ), "rival" (đối thủ), "mentor" ({a} là thầy của {b}), "debt" ({a} nợ ơn {b}), "lover" ({a} và {b} yêu nhau), "enemy" ({a} hận {b}).
+Thêm "gift": 6 câu NPC nói khi nhận quà thích, 6 câu khi nhận quà không thích; "join": 6 câu NPC nói khi đồng ý đi theo hero; "leave": 4 câu khi bị bảo ở lại căn cứ; "duel": 4 câu rival hô trước trận tỉ thí; "ambush": 4 câu enemy hô khi phục kích; "mercy": 4 câu enemy nói sau khi bị đánh bại và được tha; "confess": 4 câu tỏ tình (lover); "oath": 4 câu thề kết nghĩa (sworn).
+Trả JSON thuần: {"rel":{"friend":[[4 câu stage0],[4 câu stage1],[4 câu stage2],[4 câu stage3]], "sworn":[...], ... đủ 7 rel}, "links":{"sibling":[4 mẫu],...}, "gift":{"like":[6],"dislike":[6]}, "join":[6], "leave":[4], "duel":[4], "ambush":[4], "mercy":[4], "confess":[4], "oath":[4]}

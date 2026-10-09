@@ -1,5 +1,6 @@
 // ===== v14: interaction chooser, popup closing, wood (chop / smash / plant / shadow lumberjacks), shadow caps + names =====
-const R3 = () => { const k = rk(RL.id); return k === 'tt' || k === 'sl' ? k : 'md'; };
+var R3_OVERRIDE = null; // set while the creation screen shows a world that is not loaded yet
+const R3 = () => { const k = R3_OVERRIDE || (RL ? rk(RL.id) : 'md'); return k === 'tt' || k === 'sl' ? k : 'md'; };
 const WOOD_GROW_MS = 4 * 60 * 1000;
 const isTree = p => !!p && p.canopy && !p.dead && !p.container && !p.kind.startsWith('sapling');
 const isCrate = p => !!p && !p.dead && p.container === 'crate' && !p.drivable && !(p.kind || '').startsWith('chest');

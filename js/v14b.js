@@ -78,7 +78,8 @@ const mn = () => (typeof manaName === 'function' ? manaName() : 'mana');
 })();
 
 const PROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
-const perkLv = id => (G.player && G.player.perks[id]) || 0;
+const perkLv = id => (G.player && G.player.perks[id]) || 0; // total power (grade-weighted)
+const perkCnt = id => { const P = G.player; if (!P) return 0; if (P.pcnt) return P.pcnt[id] || 0; return Math.round(P.perks[id] || 0); };
 
 // ---------- numbers from all talents (cached per perk state) ----------
 G.pfx = function () {
@@ -99,6 +100,12 @@ G.pfx = function () {
     adren: k('adren'), ward: k('ward'), meditate: k('meditate'), second: k('second'), speed: 0.1 * k('shade'),
     luckBonus: 0.3 * k('king'), pierce: k('eagle'), maxHp: 100 * k('bulwark'),
   };
+  // innate flaws can push talents below zero: keep every number sane
+  for (const key of ['critAdd', 'critDmg', 'execute', 'slayer', 'combo', 'delver', 'heal', 'regen', 'manaRegen', 'siphon', 'dodge', 'thorns', 'wood', 'extract', 'adren', 'ward', 'meditate', 'second', 'maxHp']) if (f[key] < 0) f[key] = 0;
+  f.xp = Math.max(0.5, f.xp); f.gold = Math.max(0.4, f.gold); f.manaMul = Math.max(0.5, f.manaMul); f.forager = Math.max(0.6, f.forager); f.spow = Math.max(0.7, f.spow);
+  f.slots = Math.max(0, Math.floor(f.slots + 0.01)); f.tempSlots = Math.max(0, Math.floor(f.tempSlots + 0.01)); f.wood = Math.max(0, Math.round(f.wood));
+  f.rangedDmg = Math.max(0.5, f.rangedDmg); f.skillDmg = Math.max(0.5, f.skillDmg);
+  if (P.fxExtra) P.fxExtra(f);
   P._pfx = f; return f;
 };
 
@@ -107,18 +114,17 @@ G.pfx = function () {
   const weight = (p, c) => {
     if (p.realms && !p.realms.includes(R3())) return 0;
     if (p.major) return p.cls ? (p.cls === c ? 3 : 0) : 2;
-    if (perkLv(p.id) >= p.max) return 0;
-    if (p.id === 'pierce' && perkLv('pierce') >= 3) return 0;
+    if (perkCnt(p.id) >= p.max) return 0;
     const w = PCLS[c] || {};
     let m = 0; for (const t of p.tags) m = Math.max(m, w[t] ?? 1);
-    return (p.tags.length ? m : 1) * (perkLv(p.id) ? 1.25 : 1);
+    return (p.tags.length ? m : 1) * (perkCnt(p.id) ? 1.25 : 1);
   };
   G.offerPerks = function (lvl) {
     const c = this.v10 && this.v10.cls, pool = PERKS.map(p => ({ p, w: weight(p, c) }));
     const picks = [];
     const take = list => { let tot = list.reduce((s, x) => s + x.w, 0); if (tot <= 0) return null; let r = Math.random() * tot; for (const x of list) { r -= x.w; if (r <= 0) return x; } return list[list.length - 1]; };
     if (lvl % 10 === 0) {
-      let majors = pool.filter(x => x.p.major && x.w > 0 && perkLv(x.p.id) < 1);
+      let majors = pool.filter(x => x.p.major && x.w > 0 && perkCnt(x.p.id) < 1);
       while (picks.length < 3 && majors.length) { const x = take(majors); picks.push(x.p); majors = majors.filter(y => y !== x); }
     }
     let rest = pool.filter(x => !x.p.major && x.w > 0 && !picks.includes(x.p));
@@ -135,33 +141,39 @@ G.pfx = function () {
     document.querySelector('#levelup p').textContent = major ? `★ Cấp ${lvl}: chọn một THIÊN PHÚ LỚN (1 / 2 / 3)` : 'Chọn một thiên phú (1 / 2 / 3)';
     const box = $('cards'); box.innerHTML = '';
     this.perkPicks.forEach((p, i) => {
-      const lv = perkLv(p.id), cd = document.createElement('div');
+      const lv = perkCnt(p.id), cd = document.createElement('div'), gr = GRADE[p.grade ?? 1], gname = gradeName(p.grade ?? 1);
       const fit = !p.major && c && p.tags.some(t => (PCLS[c] || {})[t] >= 2);
-      cd.className = 'card' + (p.major ? ' major' : '');
-      cd.innerHTML = `<div class="ck">${i + 1}</div><img src="${IMG[p.icon] ? IMG[p.icon].src : ''}" alt=""><h3>${esc(p.name)}${p.max > 1 ? ' ' + PROMAN[lv + 1] : ''}</h3><p>${esc(p.desc(lv + 1))}</p>${p.major ? '<small class="pk">★ THIÊN PHÚ LỚN</small>' : fit ? `<small class="pk">✔ Hợp ${esc(clsName(c))}</small>` : ''}${p.max > 1 ? `<small class="pk2">Bậc ${lv + 1}/${p.max}</small>` : ''}`;
+      cd.className = 'card' + (p.major ? ' major' : '') + ' g' + (p.grade ?? 1); cd.style.setProperty('--gc', gr.col);
+      cd.innerHTML = `<div class="ck">${i + 1}</div><img src="${IMG[p.icon] ? IMG[p.icon].src : ''}" alt=""><h3>${esc(p.name)}${p.max > 1 ? ' ' + PROMAN[lv + 1] : ''}</h3><p>${esc(p.desc(lv + 1))}</p><small class="gr" style="color:${gr.col}">◆ ${esc(gname)} — hiệu lực ×${gr.mult}</small>${p.major ? '<small class="pk">★ THIÊN PHÚ LỚN</small>' : fit ? `<small class="pk">✔ Hợp ${esc(clsName(c))}</small>` : ''}${p.max > 1 ? `<small class="pk2">Bậc ${lv + 1}/${p.max}</small>` : ''}`;
       cd.onclick = () => this.pickPerk(i);
       cd.onmouseenter = () => Sound.play('sfx_hover', 0.2);
       box.appendChild(cd);
     });
     this.showScreen('levelup');
   };
-  const ap = G.applyPerk;
-  G.applyPerk = function (id) {
+  G.applyPerk = function (id, mult = 1, grade = 1) {
     const P = this.player, v = this.v10;
-    ap.call(this, id);
-    if (id === 'bulwark') { P.maxHp += 100; P.hp = P.maxHp; }
-    if (id === 'sovereign' && v) { v.pts += 4; this.toast('+4 điểm tiềm năng — cộng ở Túi > Nhân vật.', 'quest'); }
-    if (id === 'lifetree') P.shield = Math.max(P.shield || 0, 40);
+    P.perks[id] = (P.perks[id] || 0) + mult;
+    if (!P.pcnt) { P.pcnt = {}; for (const k in P.perks) P.pcnt[k] = Math.round(P.perks[k]) || 0; P.pcnt[id] = Math.max(0, (P.pcnt[id] || 0) - 1); }
+    P.pcnt[id] = (P.pcnt[id] || 0) + 1;
+    (P.pgr || (P.pgr = {}))[id] = ((P.pgr[id]) || []).concat(grade);
+    if (id === 'hp') { P.maxHp += 25 * mult; P.hp = P.maxHp; }
+    if (id === 'stam') { P.maxStam = Math.round(P.maxStam * (1 + 0.35 * mult)); P.stamina = P.maxStam; }
+    if (id === 'bulwark') { P.maxHp += 100 * mult; P.hp = P.maxHp; }
+    if (id === 'sovereign' && v) { const n = Math.round(4 * mult); v.pts += n; this.toast(`+${n} điểm tiềm năng — cộng ở Túi > Nhân vật.`, 'quest'); }
+    if (id === 'lifetree') P.shield = Math.max(P.shield || 0, 40 * mult);
+    Sound.play('sfx_achievement', 0.5, 1.2);
+    UI.dirty = true;
     P._pfx = null;
   };
   // stat sheet: chosen talents with their effect
   const ba = UI.buildAttr;
   UI.buildAttr = function () {
     ba.call(this);
-    const P = G.player, list = PERKS.filter(p => P.perks[p.id]);
+    const P = G.player, list = PERKS.filter(p => perkCnt(p.id) > 0);
     let h = `<div class="perk14"><h3>Thiên phú <small>${list.length} đã chọn</small></h3>`;
     if (!list.length) h += '<p class="muted">Chưa có. Mỗi lần lên cấp chọn 1 trong 3; cấp 10, 20, 30… có Thiên phú Lớn.</p>';
-    for (const p of list) { const lv = P.perks[p.id]; h += `<div class="pk14 ${p.major ? 'maj' : ''}"><img src="${IMG[p.icon] ? IMG[p.icon].src : ''}" alt=""><div><b>${esc(p.name)}${p.max > 1 ? ' ' + PROMAN[lv] : ''}</b><small>${esc(p.desc(lv))}</small></div></div>`; }
+    for (const p of list) { const lv = perkCnt(p.id), pw = P.perks[p.id] || 0, gs = (P.pgr && P.pgr[p.id]) || []; h += `<div class="pk14 ${p.major ? 'maj' : ''}"><img src="${IMG[p.icon] ? IMG[p.icon].src : ''}" alt=""><div><b>${esc(p.name)}${p.max > 1 ? ' ' + PROMAN[Math.min(6, lv)] : ''} <span class="gdots">${gs.map(g => `<i style="color:${GRADE[g].col}">◆</i>`).join('')}</span></b><small>${esc(p.desc(Math.max(1, lv)))}${pw && Math.abs(pw - lv) > 0.05 ? ` (hiệu lực tổng ×${pw.toFixed(1)})` : ''}</small></div></div>`; }
     $('invBody').insertAdjacentHTML('beforeend', h + '</div>');
   };
 
