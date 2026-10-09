@@ -9,7 +9,7 @@ Có ba cách chơi:
   - App mở toàn màn hình, xoay ngang. Vào **Cài đặt → 📥 Tải dữ liệu để chơi offline** để chơi không cần mạng.
 - Chơi online: https://claude.ai/artifact/HNwsvSuoVAEXYxXWtcDnbp
 - Chạy trên máy: bấm đúp `CHOI_GAME.bat`, hoặc chạy `python -m http.server` rồi mở `index.html`.
-
+ 
 Để trang GitHub Pages chạy được, repo phải bật Pages: Settings → Pages → Source "Deploy from a branch" → nhánh `main`, thư mục `/ (root)`. Mỗi lần đổi code, tăng `VERSION` trong `sw.js` để máy người chơi xoá bộ đệm cũ.
 
 ## Thế giới
