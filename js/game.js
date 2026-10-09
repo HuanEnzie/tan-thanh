@@ -279,6 +279,7 @@ const G = {
       const cc = (P.perks.crit || 0) * 0.1 + (wp && wp.crit || 0) + (P.relic('critdmg') ? 0.05 : 0) + 0.05 + (P.pab && P.pab.crit || 0);
       if (Math.random() < cc) { dmg *= 2 + P.relic('critdmg') / 100; crit = true; }
     }
+    if (this._xcrit) { crit = true; this._xcrit = false; }
     const zar = (z.t.armor || 0) + (z.armorB || 0);
     if (zar && src !== 'fire' && src !== 'poison') dmg *= 1 - zar;
     z.hp -= dmg;
@@ -297,8 +298,8 @@ const G = {
     const aff = wp && (wp.aff || wp.affixes);
     if (aff && aff.length && src !== 'fire' && src !== 'poison') this.procs(z, dmg, aff);
     if (src === 'melee' || src === 'gun') { const v = aff && aff.includes('vamp'); if (v) P.hp = Math.min(P.maxHp, P.hp + dmg * 0.04); }
-    if (dmg >= 1 && src !== 'fire' && src !== 'poison') Floaters.add(z.x + R.range(-6, 6), z.y - z.r - 6, Math.round(dmg) + (crit ? '!' : ''), crit ? '#ffdd33' : src === 'ally' ? '#b9a8ff' : '#ffffff', crit ? 13 : 8);
-    else if (dmg >= 3 && Math.random() < 0.3) Floaters.add(z.x, z.y - z.r, Math.round(dmg), src === 'fire' ? '#ff9a3c' : '#7cf04a', 7);
+    DmgNum.hit(z, dmg, crit, src);
+    if (crit) DmgNum.crit(z, ang);
     if (z.state !== 'chase') { z.state = 'chase'; z.lastSeen = { x: P.x, y: P.y }; }
     if (z.hp <= 0) { this.killEnemy(z, src); return true; }
     return false;

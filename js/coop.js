@@ -638,6 +638,7 @@ G.remoteKill = function (k) {
       const cc = (P.perks.crit || 0) * 0.1 + (wp && wp.crit || 0) + (P.relic('critdmg') ? 0.05 : 0) + 0.05 + (P.pab && P.pab.crit || 0);
       if (Math.random() < cc) { dmg *= 2 + P.relic('critdmg') / 100; crit = true; }
     }
+    if (this._xcrit) { crit = true; this._xcrit = false; }
     const aff = wp && (wp.aff || wp.affixes) || [];
     Net.queueHit(z.id, dmg, kx * (1 - (z.boss ? 1 : 0)), ky * (1 - (z.boss ? 1 : 0)), aff, src === 'fire' || src === 'poison' ? src : 'net');
     if (src !== 'fire' && src !== 'poison') {
@@ -645,7 +646,7 @@ G.remoteKill = function (k) {
       const a = ang != null ? ang : Math.atan2(ky, kx);
       Particles.blood(z.x, z.y, a, crit ? 12 : 6, crit ? 220 : 150);
       if (crit) Particles.sparks(z.x, z.y, a + Math.PI, 6, ['#fff6b0', '#ffffff']);
-      if (dmg >= 1) Floaters.add(z.x + R.range(-6, 6), z.y - z.r - 6, Math.round(dmg) + (crit ? '!' : ''), crit ? '#ffdd33' : '#ffffff', crit ? 13 : 8);
+      DmgNum.hit(z, dmg, crit, src); if (crit) DmgNum.crit(z, ang);
       P.energy = Math.min(100, P.energy + dmg * 0.05 * (1 + P.relic('energy') / 100 + (P.perks.skill || 0) * 0.3) / Math.max(1, z.lvl * 0.25));
       if ((src === 'melee' || src === 'gun') && aff.includes('vamp')) P.hp = Math.min(P.maxHp, P.hp + dmg * 0.04);
     }

@@ -209,8 +209,8 @@ Object.assign(G, {
       else if (c === 'ranger' && src === 'gun') dmg *= 1.2;
       else if (c === 'mage' && src === 'skill') dmg *= 1.25;
       if (c === 'assassin' && (src === 'melee' || src === 'gun')) {
-        if (P.backstabT > this.time) { P.backstabT = 0; dmg *= 2.5; FX.slash(z.x, z.y, ang || 0, 40, 2, 'rgba(190,120,255,0.9)', 0.18); Floaters.add(z.x, z.y - 30, 'ÁM SÁT!', '#d8a8ff', 10); }
-        else if (Math.random() < 0.15 + this.attr('agi') * 0.004) dmg *= 2;
+        if (P.backstabT > this.time) { P.backstabT = 0; dmg *= 2.5; this._xcrit = true; FX.slash(z.x, z.y, ang || 0, 40, 2, 'rgba(190,120,255,0.9)', 0.18); Floaters.add(z.x, z.y - 30, 'ÁM SÁT!', '#d8a8ff', 10); }
+        else if (Math.random() < 0.15 + this.attr('agi') * 0.004) { dmg *= 2; this._xcrit = true; }
       }
     }
     return he.call(this, z, dmg, kx, ky, src, ang, wp);
