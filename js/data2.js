@@ -115,7 +115,7 @@ const CHESTS = [
 // ---------- biomes ----------
 // extra tile ids (walkable unless listed in World.isSolidT)
 Object.assign(T, { SNOW: 13, SWAMP: 14, ASH: 15, MYCEL: 16, CRYS: 17, SAKURA: 18, DESERT: 19, JUNGLE: 20, ICE: 21, LAVA: 22, GRAVE: 23, LEAVES: 24 });
-const BIOME_TEX = { 13: 'tex_snow', 14: 'tex_swamp', 15: 'tex_ash', 16: 'tex_mycel', 17: 'tex_crystal', 18: 'tex_sakura', 19: 'tex_desert', 20: 'tex_jungle', 21: 'tex_ice', 22: 'tex_lava', 23: 'tex_grave', 24: 'tex_leaves' };
+const BIOME_TEX = { 25: 'tex_water', 13: 'tex_snow', 14: 'tex_swamp', 15: 'tex_ash', 16: 'tex_mycel', 17: 'tex_crystal', 18: 'tex_sakura', 19: 'tex_desert', 20: 'tex_jungle', 21: 'tex_ice', 22: 'tex_lava', 23: 'tex_grave', 24: 'tex_leaves' };
 Object.assign(MINI_COL, { 13: [225, 232, 240], 14: [52, 62, 34], 15: [40, 34, 34], 16: [108, 64, 128], 17: [44, 60, 120], 18: [120, 160, 90], 19: [214, 150, 80], 20: [30, 70, 34], 21: [150, 200, 220], 22: [230, 110, 30], 23: [64, 62, 56], 24: [160, 80, 34] });
 const BIOMES = {
   plains:   { name: 'Đồng Cỏ', desc: 'Gió lùa qua những đồng cỏ hoang', ground: null, trees: null, treeD: 1, amb: null },

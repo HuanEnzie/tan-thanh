@@ -297,8 +297,8 @@ function lootStep(a, dt) {
   if (a.nearestEnemy(180)) { a.lootIt = null; return false; }
   let it = a.lootIt;
   if (!it || Items.list.indexOf(it) < 0) {
-    it = null; let bd = 800;
-    for (const o of Items.list) { if (o._by && o._by !== a && !o._by.dead) continue; const d = dist(o.x, o.y, P.x, P.y); if (o.age > 0.4 && d < bd && dist(o.x, o.y, a.x, a.y) < 900) { bd = d; it = o; } }
+    it = null; const LR = G.shLeash(); let bd = LR;
+    for (const o of Items.list) { if (o._by && o._by !== a && !o._by.dead) continue; const d = dist(o.x, o.y, P.x, P.y); if (o.age > 0.4 && d < bd && dist(o.x, o.y, a.x, a.y) < LR + 120) { bd = d; it = o; } }
     a.lootIt = it; if (it) it._by = a;
   }
   if (!it) return false;

@@ -41,7 +41,7 @@
   UI.buildShadows = function () {
     const v = G.v10, box = $('invBody'), cap = G.shadowCap(), S = SM();
     const tab = document.querySelector('#inv [data-tab="shadows"]'); if (tab) tab.textContent = S.army;
-    let h = `<h3>${H(S.army)} <small>đã lưu ${v.shadows.length}/${cap} • lính tạm tối đa ${G.tempCap()} • ${H(manaName())} ${Math.floor(v.mana)}/${G.maxMana()}</small></h3>`;
+    let h = `<h3>${H(S.army)} <small>đã lưu ${v.shadows.length}/${cap} • lính tạm tối đa ${G.tempCap()} • tầm hoạt động ${Math.round(G.shLeash() / TILE)}m • khám phá tối đa ${G.shExploreMax()} ô vùng • ${H(manaName())} ${Math.floor(v.mana)}/${G.maxMana()}</small></h3>`;
     const st = Object.entries(v.stock || {}).filter(([, n]) => n >= 1).map(([id, n]) => `${Math.floor(n)} ${id === 'gold' ? cur().name : itm(id).name}`);
     const nAll = v.shadows.length, sel = v.sumN | 0, busyN = v.shadows.filter(s => G.shBusy(s)).length;
     h += `<div class="shctl"><div class="shn"><span>Số ${H(S.unit)} mỗi lần gọi</span><button id="shMinus" aria-label="Giảm">−</button><b id="shNum">${sel ? sel : 'Tất cả'}</b><button id="shPlus" aria-label="Tăng">+</button></div><button id="shCall">${S.icon} GỌI ${sel ? sel : 'QUÂN RẢNH'} [K]</button><button id="shCallAll" ${busyN ? '' : 'class="ghost"'}>⚑ GỌI TOÀN BỘ${busyN ? ` (+${busyN} đang bận)` : ''}</button><button id="shDismiss" class="warn">✕ HỦY TRIỆU HỒI [Shift+K]</button></div><div class="shbar"><span class="muted">${H(S.skill)}: hạ kẻ địch, đứng cạnh xác (khói màu) nhấn [E] để thu phục; thất bại thì chỉ đứng dậy tạm thời. Mỗi cấp thêm 1 ô lưu và 1 lính tạm. Mỗi loại boss chỉ có một.${st.length ? `<br>📦 Đang giữ: ${H(st.join(', '))} — về căn cứ để nhận.` : ''}</span></div><div class="party10 shl">`;

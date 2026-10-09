@@ -1,6 +1,8 @@
 // ===== Infinite procedural world (superblocks of 32x32 tiles) + dungeon mode =====
 const T = { GRASS: 0, ROAD: 1, SIDEWALK: 2, DIRT: 3, WOOD: 4, TILEF: 5, WALL: 6, WATER: 7, SAND: 8, CONC: 9, WINDOW: 10, FIELD: 11, GRAVEL: 12 };
+T.DEEP = 25; // deep sea: swimmable, but you need air
 const MINI_COL = {
+  25: [12, 36, 70],
   0: [52, 78, 38], 1: [52, 52, 56], 2: [120, 120, 118], 3: [110, 84, 52], 4: [120, 84, 50], 5: [150, 150, 150],
   6: [30, 26, 24], 7: [26, 62, 72], 8: [200, 180, 120], 9: [95, 95, 95], 10: [80, 120, 140], 11: [100, 90, 40], 12: [90, 90, 90],
 };
@@ -60,8 +62,25 @@ const World = {
   occAt(tx, ty) { const sb = this.sbOf(tx, ty); return sb ? sb.occ[(ty - sb.ty0) * SB + (tx - sb.tx0)] : 1; },
   setOcc(tx, ty) { const sb = this.sbOf(tx, ty); if (sb) sb.occ[(ty - sb.ty0) * SB + (tx - sb.tx0)] = 1; },
   inb() { return true; },
-  isSolidT(t) { return t === T.WALL || t === T.WATER || t === T.WINDOW || t === T.LAVA; },
-  isGround(t) { return t === T.GRASS || t === T.DIRT || (t >= 13 && t !== T.ICE && t !== T.LAVA); },
+  isSolidT(t) { return t === T.WALL || t === T.WATER || t === T.DEEP || t === T.WINDOW || t === T.LAVA; },
+  // water is solid for land creatures, open for swimmers (e.swim) and the only place for sea creatures and boats (e.aqua)
+  solidFor(e, tx, ty) {
+    const t = this.get(tx, ty), w = t === T.WATER || t === T.DEEP;
+    if (e.aqua) return !w;
+    if (w) return !e.swim;
+    return this.isSolidT(t);
+  },
+  // pure function of the tile: 0 land, 1 shallow sea, 2 deep sea, 3 river (roads bridge rivers, not seas)
+  waterAt(gx, gy) {
+    const d = Math.hypot(gx, gy);
+    if (this.mode !== 'over' || d < SB * 3.5) return 0;
+    const bonus = d < SB * 8 ? 0.34 * (1 - d / (SB * 8)) : 0;
+    const b = fbm(gx / 110 + 500, gy / 110 + 500, 3) - bonus;
+    if (b > 0.66) { if (fbm(gx / 22 + 300, gy / 22 + 300, 2) > 0.64) return 0; return b > 0.715 ? 2 : 1; }
+    if (d > SB * 4 && Math.abs(fbm(gx / 70 + 1000, gy / 70 + 1000, 2) - 0.5) < 0.008) return 3;
+    return 0;
+  },
+  isGround(t) { return t === T.GRASS || t === T.DIRT || (t >= 13 && t !== T.ICE && t !== T.LAVA && t !== T.DEEP); },
   solidAt(tx, ty) { return this.isSolidT(this.get(tx, ty)); },
   fill(x0, y0, x1, y1, t) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.set(x, y, t); },
   reserve(x0, y0, x1, y1) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.setOcc(x, y); },
@@ -230,6 +249,22 @@ const World = {
       }
       if (BI.oasis) for (let k = 0; k < 5; k++) { const a = SR.range(0, TAU); sb.pendingTrees = (sb.pendingTrees || []).concat([[Math.round(cx + Math.cos(a) * (rr + 2)), Math.round(cy + Math.sin(a) * (rr + 2)), BI.oasis]]); }
     }
+    // seas, rivers and islands (world-scale noise, so they flow across superblocks)
+    let wetN = 0; const seaMap = [];
+    if (zone === 0 && !['volcano', 'crystal', 'mushroom', 'grave'].includes(sb.biome)) {
+      for (let y = -2; y < SB + 2; y++) for (let x = -2; x < SB + 2; x++) {
+        const w = this.waterAt(tx0 + x, ty0 + y);
+        if (x >= 0 && y >= 0 && x < SB && y < SB) {
+          const i = y * SB + x;
+          if (w) { sb.tiles[i] = w === 2 ? T.DEEP : T.WATER; wetN++; if (w !== 3) seaMap.push(i, sb.tiles[i]); }
+          else {
+            let near = 0; for (let dy = -2; dy <= 2 && !near; dy++) for (let dx = -2; dx <= 2; dx++) if ((dx || dy) && this.waterAt(tx0 + x + dx, ty0 + y + dy)) { near = 1; break; }
+            if (near && (sb.tiles[i] === T.GRASS || sb.tiles[i] === T.DIRT || sb.tiles[i] >= 13 && sb.tiles[i] !== T.ICE && sb.tiles[i] !== T.LAVA)) sb.tiles[i] = sb.biome === 'snow' ? T.SNOW : T.SAND;
+          }
+        }
+      }
+    }
+    sb.wet = wetN / (SB * SB);
     // roads along the west / north edges
     const V = this.hasV(sx, sy), H = this.hasH(sx, sy);
     const urban = zone > 0;
@@ -246,6 +281,7 @@ const World = {
     if (H) for (let x = 0; x < SB; x++) if (!(V && x < 4) && sb.tiles[4 * SB + x] !== T.WATER) sb.tiles[4 * SB + x] = side;
     if (this.hasV(sx + 1, sy) && urban) for (let y = (H ? 4 : 0); y < SB; y++) sb.tiles[y * SB + 31] = T.SIDEWALK;
     if (this.hasH(sx, sy + 1) && urban) for (let x = (V ? 4 : 0); x < SB; x++) sb.tiles[31 * SB + x] = T.SIDEWALK;
+    for (let k = 0; k < seaMap.length; k += 2) sb.tiles[seaMap[k]] = seaMap[k + 1]; // a road never crosses open sea
     for (let i = 0; i < SB * SB; i++) if (sb.tiles[i] === T.ROAD) sb.occ[i] = 0;
     // interior
     const ix0 = tx0 + (V ? 5 : 1), iy0 = ty0 + (H ? 5 : 1), ix1 = tx0 + 30, iy1 = ty0 + 30;
@@ -256,6 +292,7 @@ const World = {
     else if (forced) this.genPOI(bk, forced, sb);
     else if (this.v5Site && this.v5Site(sx, sy)) this.genV5Site(bk, sb);
     else if (this.wonderAt(sx, sy) != null) this.genWonder(bk, this.wonderAt(sx, sy), sb);
+    else if (sb.wet > 0.1) this.genWild(bk);
     else {
       const r = SR.f();
       const gateP = R.gatesCommon ? 0.09 : 0.045;
@@ -1005,7 +1042,12 @@ const World = {
           if (m & 8) for (let k = 0; k < 4; k++) ctx.fillRect(X + 4, Y + 3 + k * 7, 24, 4);
         }
       }
-      if (t === T.WATER) { ctx.fillStyle = 'rgba(0,10,20,0.2)'; ctx.fillRect(X, Y, TILE, TILE); }
+      if (t === T.WATER || t === T.DEEP) {
+        ctx.fillStyle = t === T.DEEP ? 'rgba(0,14,48,0.5)' : 'rgba(0,10,20,0.2)'; ctx.fillRect(X, Y, TILE, TILE);
+        ctx.fillStyle = 'rgba(190,230,255,0.10)'; const hh = hash2(tx * 3 + 1, ty * 3 + 2); ctx.fillRect(X + hh * 18, Y + 6 + ((hh * 97) % 1) * 18, 8 + hh * 6, 2);
+        ctx.fillStyle = 'rgba(235,248,255,0.45)';
+        for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) { const n = this.get(tx + dx, ty + dy); if (n === T.WATER || n === T.DEEP || n === T.ICE || n === T.LAVA) continue; if (dy === -1) ctx.fillRect(X, Y, TILE, 3); if (dy === 1) ctx.fillRect(X, Y + TILE - 3, TILE, 3); if (dx === -1) ctx.fillRect(X, Y, 3, TILE); if (dx === 1) ctx.fillRect(X + TILE - 3, Y, 3, TILE); }
+      }
     }
     const arr = this.decals.get(nkey(cx, cy));
     if (arr) for (const d of arr) this.drawDecal(ctx, d);
@@ -1017,7 +1059,7 @@ const World = {
     const ty0 = Math.floor((e.y - r) / TILE), ty1 = Math.floor((e.y + r) / TILE);
     let hit = false;
     for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
-      if (!this.solidAt(tx, ty)) continue;
+      if (!this.solidFor(e, tx, ty)) continue;
       const nx = clamp(e.x, tx * TILE, tx * TILE + TILE), ny = clamp(e.y, ty * TILE, ty * TILE + TILE);
       const dx = e.x - nx, dy = e.y - ny; const d2 = dx * dx + dy * dy;
       if (d2 < r * r) {

@@ -97,7 +97,7 @@ Object.assign(G, {
 
   // ---------- UI: Thành tựu tab, proficiency table in Nhân vật ----------
   const THUMB = {};
-  const thumb = img => { if (!(img in THUMB)) { try { THUMB[img] = IMG[img] ? IMG[img].toDataURL() : ''; } catch (e) { THUMB[img] = ''; } } return THUMB[img]; };
+  const thumb = img => { const im = IMG[img]; return im ? (im.src || (im.toDataURL ? im.toDataURL() : '')) : ''; };
   const bi = UI.buildInv;
   UI.buildInv = function () {
     if (this.invTab !== 'feats') return bi.call(this);

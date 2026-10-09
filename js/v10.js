@@ -9,10 +9,10 @@ const ATTR_NAME = {
 const PTS_PER_LVL = 3, MINI_RESPAWN = 480, SHADOW_CD = 25;
 // shadow tiers: base stats, summon cost, extraction chance and mana cost
 const SH_TIER = {
-  normal: { name: 'Lính', col: '#a8b0ff', hp: 140, dmg: 22, cost: 8, chance: 0.4, mana: 15 },
-  elite: { name: 'Tinh anh', col: '#ffd65a', hp: 260, dmg: 32, cost: 14, chance: 0.28, mana: 25 },
-  mini: { name: 'Mini boss', col: '#ff9a4a', hp: 650, dmg: 55, cost: 25, chance: 0.16, mana: 40 },
-  boss: { name: 'Boss', col: '#ff4a6a', hp: 1200, dmg: 85, cost: 40, chance: 0.09, mana: 60 },
+  normal: { name: 'Lính', col: '#b46bff', hp: 140, dmg: 22, cost: 8, chance: 0.4, mana: 15 },
+  elite: { name: 'Tinh anh', col: '#ffe14a', hp: 260, dmg: 32, cost: 14, chance: 0.28, mana: 25 },
+  mini: { name: 'Thủ lĩnh', col: '#ff9a2a', hp: 650, dmg: 55, cost: 25, chance: 0.16, mana: 40 },
+  boss: { name: 'Quân vương', col: '#ff3b3b', hp: 1200, dmg: 85, cost: 40, chance: 0.09, mana: 60 },
 };
 const SH_ORDER = ['boss', 'mini', 'elite', 'normal'];
 // random recruits

@@ -237,7 +237,7 @@ function chopStep(a, dt) {
     a.chopScan = 0.6;
     let bd = 1e9;
     for (const q of World.propsNear(a.x, a.y, 620, a._cq || (a._cq = []))) {
-      if (!isTree(q) || dist(q.x, q.y, P.x, P.y) > 760) continue;
+      if (!isTree(q) || dist(q.x, q.y, P.x, P.y) > G.shLeash()) continue;
       if (q._by && q._by !== a && !q._by.dead) continue;
       const d = dist(q.x, q.y, a.x, a.y); if (d < bd) { bd = d; p = q; }
     }

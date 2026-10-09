@@ -128,11 +128,12 @@
     const vw = G.view;
     for (const c of G.corpses) {
       if (!c.tier || G.time - c.t > 120 || !vw || c.x < vw.x0 || c.x > vw.x1 || c.y < vw.y0 || c.y > vw.y1) continue;
-      const k = 1 - (G.time - c.t) / 120, big = c.tier === 'boss' || c.tier === 'mini';
-      ctx.globalAlpha = (0.35 + Math.sin(G.time * 4 + c.x) * 0.15) * k;
-      ctx.fillStyle = big ? '#b06bff' : '#6b5bff';
-      ctx.beginPath(); ctx.ellipse(c.x, c.y, (big ? 30 : 16) * (c.scale || 1), (big ? 14 : 8) * (c.scale || 1), 0, 0, TAU); ctx.fill();
-      if (Math.random() < 0.15) Particles.add({ x: c.x + R.range(-10, 10), y: c.y, vx: R.range(-6, 6), vy: R.range(-40, -20), life: 0.8, max: 0.8, size: 2, col: '#8a7bff', drag: 1, glow: true });
+      const k = 1 - (G.time - c.t) / 120, tc = SH_TIER[c.tier].col, big = c.tier === 'boss' || c.tier === 'mini', rich = c.tier !== 'normal';
+      ctx.globalAlpha = (0.4 + Math.sin(G.time * 4 + c.x) * 0.15) * k;
+      ctx.fillStyle = tc;
+      ctx.beginPath(); ctx.ellipse(c.x, c.y, (big ? 30 : rich ? 22 : 16) * (c.scale || 1), (big ? 14 : rich ? 10 : 8) * (c.scale || 1), 0, 0, TAU); ctx.fill();
+      ctx.globalAlpha *= 0.8; ctx.strokeStyle = tc; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(c.x, c.y, (big ? 36 : rich ? 27 : 20) * (c.scale || 1), (big ? 17 : rich ? 13 : 10) * (c.scale || 1), 0, 0, TAU); ctx.stroke();
+      if (Math.random() < (rich ? 0.3 : 0.15)) Particles.add({ x: c.x + R.range(-10, 10), y: c.y, vx: R.range(-6, 6), vy: R.range(-50, -20), life: 0.9, max: 0.9, size: big ? 3 : 2, col: tc, drag: 1, glow: true });
       ctx.globalAlpha = 1;
     }
   };
