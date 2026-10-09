@@ -9,3 +9,7 @@ app/desktop/dist/
 app/android/node_modules/
 app/android/android/
 app/desktop/www/
+
+js/bundle.js
+artifact_pub.html
+artifact_test.html
