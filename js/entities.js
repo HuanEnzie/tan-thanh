@@ -376,14 +376,14 @@ class Enemy {
         for (const r of rem) { if (r.dead || r.away) continue; const dd = dist(this.x, this.y, r.x, r.y); if (dd < bd - 30) { bd = dd; best = r; } }
         for (const a of G.allies) { if (a.downed || a.dead || a.kind === 'merchant' || (a.kind === 'civ' && a.rescued)) continue; const dd = dist(this.x, this.y, a.x, a.y); if (dd < bd - 30) { bd = dd; best = a; } }
         this.tgt = best;
-        const sight = G.sightRange() * (this.elite ? 1.3 : 1);
+        const sight = (G.sightFor ? G.sightFor(this, best) : G.sightRange()) * (this.elite ? 1.3 : 1);
         const sees = bd < sight && (bd < 140 || World.bldAt(best.x, best.y) === World.bldAt(this.x, this.y)) && World.los(this.x, this.y, best.x, best.y);
-        if (sees || this.horde || (this.guard && bd < 300) || bd < 70 || this.boss && bd < 600) {
+        if (sees || this.horde || (this.guard && bd < 300) || bd < (G.nearSense ? G.nearSense(this, best) : 70) || this.boss && bd < 600) {
           if (this.state !== 'chase' && bd < 500 && Math.random() < 0.4) Sound.at(G.groanSfx(), this.x, this.y, 0.5);
           this.state = 'chase'; this.lastSeen = { x: best.x, y: best.y }; this.lostT = 0;
         } else if (this.state === 'chase') {
           this.lostT = (this.lostT || 0) + 0.25;
-          if (this.lostT > 6 && bd > sight * 1.6) { this.state = 'investigate'; this.target = this.lastSeen || { x: best.x, y: best.y }; }
+          if (G.chaseLost ? G.chaseLost(this, best, bd, sight) : this.lostT > 6 && bd > sight * 1.6) { this.state = 'investigate'; this.target = this.lastSeen || { x: best.x, y: best.y }; }
         }
       }
     }
@@ -395,7 +395,7 @@ class Enemy {
       let dir = null;
       const tgtP = this.tgt === P || this.tgt === P.car;
       if (d < 600 && (d < 90 || World.bldAt(tgt.x, tgt.y) === World.bldAt(this.x, this.y)) && World.los(this.x, this.y, tgt.x, tgt.y)) dir = [dx / d, dy / d];
-      else if (tgtP) dir = G.flowDir(this.x, this.y);
+      else if (tgtP && (!G.canTrack || G.canTrack(this))) dir = G.flowDir(this.x, this.y);
       if (!dir) { const ls = this.lastSeen || tgt; const ddx = ls.x - this.x, ddy = ls.y - this.y, dd = Math.hypot(ddx, ddy) || 1; dir = [ddx / dd, ddy / dd]; }
       mx = dir[0]; my = dir[1];
       if (this.t.ranged) {

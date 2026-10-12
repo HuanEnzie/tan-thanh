@@ -369,9 +369,10 @@ body.touch #q21hud{display:none}
         }
       }
       lastPx = P.x; lastPy = P.y;
-      const dashing = P.dashT > 0;
-      if (dashing && !lastDash) dAdd('dash', 1);
-      lastDash = dashing;
+      // a dash restarts the dash cooldown; the mage blink zeroes dashT in the same frame, so dashT alone misses it
+      const cd = P.dashCd || 0;
+      if (lastDash !== false && cd > lastDash + 0.05) dAdd('dash', 1);
+      lastDash = cd;
     }
 
     // blood moon survivor: a night that ends while the player never died

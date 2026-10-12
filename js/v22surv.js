@@ -35,6 +35,7 @@
   // ---------- màn tạo nhân vật: hai nút chọn chế độ ----------
   const MODE_TXT = {
     survival: 'Kiểu chơi: Sinh tồn. Tay trắng, không có đồ. Chết thì túi đồ rơi tại chỗ gục; hồi sinh ở giường (nếu có) hoặc nơi xuất phát.',
+    expert: 'Kiểu chơi: Sinh tồn chuyên gia. Như Sinh tồn, nhưng quái đánh hơi được bạn từ xa: trát bùn cạnh nước hoặc tẩm xăng [P] để xoá mùi.',
     classic: 'Kiểu chơi: Cổ điển. Luật cũ: bắt đầu với súng, đồ và vật tư. Chết là xoá bản lưu.',
   };
   function syncMode() {
@@ -48,10 +49,11 @@
     const st = document.createElement('style'); st.id = 'v22surv-css';
     st.textContent = `#sv22Mode{display:flex;gap:6px;flex-shrink:0;align-items:center}
 #sv22Mode button{min-width:0;font-size:16px;padding:4px 10px;letter-spacing:0;white-space:nowrap;background:rgba(255,255,255,.05)}
+@media (max-width:900px){.cr-foot #crHint{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#sv22Mode button{padding:4px 7px}}
 #sv22Mode button.on{border-color:#ffd65a;color:#ffe9a0;background:rgba(255,214,90,.14)}`;
     document.head.appendChild(st);
     const box = document.createElement('div'); box.id = 'sv22Mode';
-    box.innerHTML = '<button data-svm="survival">⛏ Sinh tồn (mặc định)</button><button data-svm="classic">⚔ Cổ điển</button>';
+    box.innerHTML = '<button data-svm="survival">⛏ Sinh tồn</button><button data-svm="expert">☠ Chuyên gia</button><button data-svm="classic">⚔ Cổ điển</button>';
     back.insertAdjacentElement('afterend', box);
     box.querySelectorAll('button').forEach(b => {
       UI.bindBtn && UI.bindBtn(b);
@@ -114,10 +116,11 @@
   const st = G.start;
   G.start = function (isNew) {
     if (isNew) {
-      const want = this._svWant === 'survival' ? 'survival' : 'classic';
+      const expert = this._svWant === 'expert';
+      const want = this._svWant === 'survival' || expert ? 'survival' : 'classic';
       this._svWant = null;
       const s = svState();
-      if (s) { s.mode = want; s.dead = false; s.bags = []; s.bed = null; s.lastBag = 0; s.spawn = null; s.seq = 0; s.tut = []; }
+      if (s) { s.mode = want; s.dead = false; s.bags = []; s.bed = null; s.lastBag = 0; s.spawn = null; s.seq = 0; s.tut = []; s.expert = expert; }
       if (want === 'survival' && this.player) {
         startSurvival();
         setTimeout(() => SYS.msg('Bạn tỉnh dậy ở một vùng đất lạ, tay trắng. Hãy thu thập gỗ, đá, sợi cỏ để chế tạo công cụ (C).', 'quest'), 1500);

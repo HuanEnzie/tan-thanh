@@ -53,6 +53,13 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 
 ## Bản v22: Sinh tồn, Đỡ đòn, Thây ma, Tầm nhìn
 
+- **Lẩn trốn**:
+  - Khom lưng [Ctrl / nút KHOM] để đi chậm, không có tiếng bước chân, quái khó thấy hơn.
+  - Quái chưa phát hiện chỉ nhìn thấy phía trước mặt; đi thường gây tiếng động nhỏ (75 px), chạy và bắn ồn hơn.
+  - Khuất tầm nhìn khoảng 2,5 giây là quái bỏ đuổi và đi tìm chỗ thấy bạn lần cuối (dấu ? / !).
+  - Khom lưng đánh cận chiến vào quái chưa phát hiện: Ám sát ×2,5 sát thương.
+- **Sinh tồn chuyên gia** (chọn khi tạo nhân vật, hoặc bật trong Cài đặt): quái đánh hơi được bạn từ xa, không cắt đuôi được. Trát bùn cạnh nước / ruộng (2,5 phút, mưa làm trôi nhanh) hoặc tẩm xăng (5 phút, lửa đau gấp đôi) để xoá mùi [P].
+
 - **Chế độ Sinh tồn** (mặc định khi tạo nhân vật; vẫn chọn được Cổ điển):
   - Tỉnh dậy ở một vùng đất ngẫu nhiên, tay trắng, không có vũ khí.
   - Chết không mất save: đồ rơi thành túi tại chỗ (💀 trên bản đồ). Hồi sinh ở giường đã đặt hoặc ở điểm xuất phát.
@@ -207,6 +214,8 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 | N | Hệ Thống |
 | B | Chế độ xây (E / chuột trái: đặt, [ ]: đổi vật) |
 | Chuột phải | Xô / Đỡ đòn |
+| Ctrl | Khom lưng / đứng dậy (đi chậm, không gây tiếng động, khó bị thấy) |
+| P | Xoá mùi: trát bùn cạnh nước, hoặc tẩm Can xăng (Sinh tồn chuyên gia) |
 | E | Tương tác, mở rương, mua bán |
 | U | Truyền tống |
 | 1–4 | Đổi vũ khí |
