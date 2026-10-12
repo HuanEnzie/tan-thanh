@@ -4,9 +4,14 @@
 // API: G.buildNear(type, r) -> nearest record of that type within r px (overworld only) or null.
 //      Bus21.emit('build', rec) after each placement.
 // Keys: B (or the hammer button) toggles build mode; E or left click places; [ ] cycle items; B or Esc leave.
+// Dismantle (tháo dỡ): Delete or the ⛏ button on the bar switches build mode to dismantle; hold E or left click on a
+// piece for 0.6 s to take it down. Refund: the placeable item (x1) while the piece is at least half intact; below 50% hp
+// half of its recipe materials (main material at least 1). A chest gives its contents to the bag; a respawn bed clears
+// the respawn point (G.v10.surv.bed).
 (function () {
   const RT = new Map();                 // rec.id -> { sb, prop, open, shotT }   runtime only, never saved
-  const BD = { on: false, sel: 0, tg: null, sig: '', bar: null, openRec: null, tip: false };
+  const BD = { on: false, sel: 0, tg: null, sig: '', bar: null, openRec: null, tip: false, dis: false, dh: null, dtg: null };
+  const DIS_T = 0.6;                    // seconds to hold on a piece before it comes down
   const RANKS = ['E', 'D', 'C', 'B', 'A', 'S'];
   const ORDER = ['wall_wood', 'wall_stone', 'wall_metal', 'door', 'fence', 'barricade', 'bed', 'chest', 'bench', 'furnace',
     'defarray', 'tparray', 'torch', 'campfire', 'spikes', 'floor', 'trap'];
@@ -113,15 +118,15 @@
     }
     return { tx, ty };
   }
-  function target(t) {
+  // the aim tile { tx, ty, far }: far = the mouse is more than 4 tiles away (desktop only)
+  function aim() {
     const P = G.player;
-    let tx, ty, far = false;
-    if (Touch.on) ({ tx, ty } = touchTile());
-    else {
-      const cx = Input.mouse.wx ?? P.x + Math.cos(P.angle) * 34, cy = Input.mouse.wy ?? P.y + Math.sin(P.angle) * 34;
-      far = dist(P.x, P.y, cx, cy) > 4 * TILE;
-      tx = Math.floor(cx / TILE); ty = Math.floor(cy / TILE);
-    }
+    if (Touch.on) return Object.assign({ far: false }, touchTile());
+    const cx = Input.mouse.wx ?? P.x + Math.cos(P.angle) * 34, cy = Input.mouse.wy ?? P.y + Math.sin(P.angle) * 34;
+    return { tx: Math.floor(cx / TILE), ty: Math.floor(cy / TILE), far: dist(P.x, P.y, cx, cy) > 4 * TILE };
+  }
+  function target(t) {
+    const { tx, ty, far } = aim();
     const why = check(tx, ty, t, far);
     return { tx, ty, cx: tx * TILE + 16, cy: ty * TILE + 16, ok: !why, why: why || '' };
   }
@@ -160,7 +165,15 @@
       if (syncRec(rec, sb) === 'gone') removeRec(rec, 'broken');
     }
   }
-  // remove a record and its prop; why: 'dismantle' (refund), 'broken' / 'worn' (lost)
+  // what a dismantled piece gives back: its placeable item (x1) while it is at least half intact (or has no hp);
+  // below 50% hp, half of the recipe materials per piece (rounded down, main material at least 1)
+  function refundOf(rec) {
+    const d = BT[rec.t];
+    const R = d.hp && rec.hp != null && rec.hp / d.hp < 0.5 ? RECIPES.find(r => r.out === d.item) : null;
+    if (!R) return [[d.item, 1]];
+    return Object.keys(R.need).map((k, i) => [k, Math.max(i ? 0 : 1, Math.floor(Math.ceil(R.need[k] / R.n) / 2))]).filter(p => p[1] > 0);
+  }
+  // remove a record and its prop; why: 'dismantle' (refund, chest contents to the bag), 'broken' / 'worn' (lost)
   function removeRec(rec, why) {
     const v = BUILD(); if (!v) return;
     const i = v.list.indexOf(rec); if (i < 0) return;
@@ -168,13 +181,23 @@
     if (rt && !rt.prop.dead && World.sbs.get(rt.sb.key) === rt.sb) World.removeProp(rt.prop);
     RT.delete(rec.id);
     v.list.splice(i, 1);
-    const x = rec.tx * TILE + 16, y = rec.ty * TILE + 16, P = G.player;
-    if (why === 'dismantle') {
-      const item = BT[rec.t].item;
-      P.inv[item] = (P.inv[item] || 0) + 1; UI.dirty = true;
-      Floaters.add(x, y - 14, '+1 ' + itemName(item), '#b8f28a', 9);
+    const x = rec.tx * TILE + 16, y = rec.ty * TILE + 16, P = G.player, S = G.v10 && G.v10.surv;
+    if (rec.t === 'bed' && S && S.bed && S.bed.x === Math.round(x) && S.bed.y === Math.round(y)) {
+      S.bed = null;
+      SYS.msg('Điểm hồi sinh ở chiếc giường này đã bị xoá. Hồi sinh tại nơi xuất phát.', 'warn');
     }
-    if (rec.inv) for (const id in rec.inv) if (rec.inv[id] > 0) Items.drop(x, y, id, rec.inv[id]);
+    if (why === 'dismantle') {
+      const got = {}, parts = [];
+      if (rec.inv) for (const id in rec.inv) if (rec.inv[id] > 0) got[id] = (got[id] || 0) + rec.inv[id];
+      for (const [id, n] of refundOf(rec)) got[id] = (got[id] || 0) + n;
+      for (const id in got) {
+        P.inv[id] = (P.inv[id] || 0) + got[id];
+        parts.push(got[id] + ' ' + itemName(id));
+        Floaters.add(x, y - 14 - parts.length * 9, '+' + got[id] + ' ' + itemName(id), '#b8f28a', 9);
+      }
+      UI.dirty = true;
+      G.toast('Đã tháo ' + BT[rec.t].name + '. Nhận lại: ' + parts.join(', ') + '.', 'good');
+    } else if (rec.inv) for (const id in rec.inv) if (rec.inv[id] > 0) Items.drop(x, y, id, rec.inv[id]);
     Particles.debris(x, y, 10, '#8a6a4a');
     if (why === 'broken') G.toast(BT[rec.t].name + ' của bạn đã bị phá.', 'warn');
     if (why === 'worn') G.toast(BT[rec.t].name + ' đã mòn hết.', 'info');
@@ -415,6 +438,7 @@
     const b = document.createElement('div');
     b.id = 'bd22bar'; b.hidden = true;
     b.addEventListener('click', e => {
+      if (e.target.closest && e.target.closest('button[data-dis]')) { setDis(!BD.dis); return; }
       const btn = e.target.closest ? e.target.closest('button[data-i]') : null;
       if (!btn) return;
       BD.sel = +btn.dataset.i; BD.sig = ''; renderBar();
@@ -438,19 +462,21 @@
     const b = ensureBar(), av = avail();
     placeBar();
     BD.sel = clampI(BD.sel, av.length);
-    const tg = BD.tg;
+    const tg = BD.tg, dt = BD.dtg;
     const cur = av[BD.sel], name = cur ? typeName(cur.t) : '';
-    const hint = !av.length ? '' : tg && !tg.ok ? tg.why
-      : Touch.on ? name + ' · E: đặt · B: thoát' : name + ' — chuột trái / E: đặt · [ ] đổi · B / Esc: thoát';
-    const sig = av.map(a => a.t + a.n).join() + '|' + BD.sel + '|' + hint;
+    const hint = BD.dis ? disHint(dt)
+      : !av.length ? '' : tg && !tg.ok ? tg.why
+      : Touch.on ? name + ' · E: đặt · ⛏: tháo · B: thoát' : name + ' — chuột trái / E: đặt · [ ] đổi · Delete: tháo dỡ · B / Esc: thoát';
+    const sig = av.map(a => a.t + a.n).join() + '|' + BD.sel + '|' + hint + '|' + BD.dis;
     if (sig === BD.sig) return;
     BD.sig = sig;
     const row = av.length ? av.map((a, i) => {
       const ic = itemIcon(a.item) || spriteFor(a.t), im = IMG[ic];
-      return `<button data-i="${i}" class="${i === BD.sel ? 'on' : ''}" title="${esc21(typeName(a.t))}">` +
+      return `<button data-i="${i}" class="${i === BD.sel && !BD.dis ? 'on' : ''}" title="${esc21(typeName(a.t))}">` +
         `${im ? `<img src="${im.src}" alt="">` : ''}<span>${esc21(a.t === 'trap' ? itemName('trap') : typeName(a.t))}</span><i>${a.n}</i></button>`;
     }).join('') : '<span class="none">Chưa có vật đặt được. Chế tạo bằng [C].</span>';
-    b.innerHTML = `<div class="row">${row}</div><div class="hint">${esc21(hint)}</div>`;
+    const dis = `<button data-dis="1" class="${BD.dis ? 'on' : ''}" title="Tháo dỡ công trình (Delete)"><b class="ic">⛏</b><span>Tháo dỡ</span></button>`;
+    b.innerHTML = `<div class="row">${row}${dis}</div><div class="hint">${esc21(hint)}</div>`;
   }
   function setOn(on) {
     if (on === BD.on) return;
@@ -459,19 +485,70 @@
       if (G.state !== 'playing' || !P || P.dead) { G.toast('Chỉ xây khi đang chơi.', 'warn'); return; }
       BD.on = true; BD.sel = clampI(BD.sel, avail().length); BD.sig = '';
       ensureBar().hidden = false; renderBar();
-      if (!BD.tip) { BD.tip = true; G.toast('Chế độ xây: E hoặc chuột trái để đặt. [ ] đổi vật. B hoặc Esc để thoát.', 'info'); }
+      if (!BD.tip) { BD.tip = true; G.toast('Chế độ xây: E hoặc chuột trái để đặt. [ ] đổi vật. Delete (hoặc ⛏ trên thanh) để tháo dỡ. B hoặc Esc để thoát.', 'info'); }
     } else {
-      BD.on = false; BD.tg = null;
+      BD.on = false; BD.tg = null; BD.dis = false; BD.dh = null; BD.dtg = null;
       if (BD.bar) BD.bar.hidden = true;
     }
     const eb = document.querySelector('#tbtns [data-k="KeyE"] span');
     if (eb) eb.textContent = BD.on ? 'Đặt' : 'Dùng';
     Sound.play('sfx_click', 0.4, on ? 1.2 : 0.9);
   }
-  function buildFrame(g) {
+  // ---------- dismantle mode: aim at a piece, hold E or the left button for 0.6 s ----------
+  function setDis(on) {
+    if (on === BD.dis || (on && !BD.on)) return;
+    if (on && guest()) { G.toast('Khách không tháo dỡ được.', 'warn'); return; }
+    BD.dis = on; BD.dh = null; BD.dtg = null; BD.tg = null;
+    const eb = document.querySelector('#tbtns [data-k="KeyE"] span');
+    if (eb) eb.textContent = on ? 'Tháo' : 'Đặt';
+    Sound.play('sfx_click', 0.4, on ? 0.9 : 1.1);
+    renderBar();
+  }
+  function disHint(dt) {
+    const nm = dt && dt.rec ? typeName(dt.rec.t) : '';
+    if (Touch.on) return nm ? 'Giữ E: tháo ' + nm + ' · ⛏: thoát' : 'Hướng vào công trình để tháo · ⛏: thoát';
+    return nm ? nm + ' — giữ E / chuột trái 0.6 giây để tháo · Delete: thoát' : 'Đưa chuột vào công trình để tháo · Delete / B: thoát';
+  }
+  function disFrame(g, dt) {
+    const a = aim(), v = BUILD();
+    const rec = !a.far && v ? v.list.find(r => r.tx === a.tx && r.ty === a.ty) || null : null;
+    const was = BD.dtg && BD.dtg.rec;
+    BD.dtg = a.far ? null : { tx: a.tx, ty: a.ty, rec };
+    if (was !== rec) renderBar();                    // the hint names the piece under the aim
+    const held = Input.down('KeyE') || (!Touch.on && Input.mouse.down && !UI.pointerOverUI);
+    if (!held || !rec) { BD.dh = null; return; }
+    if (BD.dh && BD.dh.wait) return;                 // a piece was just taken: release the button first
+    if (!BD.dh || BD.dh.rec !== rec) BD.dh = { rec, t: 0, wait: false };
+    BD.dh.t += dt;
+    if (BD.dh.t < DIS_T) return;
+    BD.dh = { rec: null, t: 0, wait: true };
+    removeRec(rec, 'dismantle');
+    Sound.play('sfx_craft', 0.6, 0.8);
+    Particles.dust(rec.tx * TILE + 16, rec.ty * TILE + 16, 6);
+    renderBar();
+  }
+  function drawDis(ctx) {
+    const t = BD.dtg; if (!t) return;
+    const x = t.tx * TILE, y = t.ty * TILE, rec = t.rec;
+    ctx.save();
+    ctx.fillStyle = rec ? 'rgba(255,60,60,0.28)' : 'rgba(255,255,255,0.06)';
+    ctx.fillRect(x, y, TILE, TILE);
+    ctx.strokeStyle = rec ? '#ff3b3b' : 'rgba(255,255,255,0.3)'; ctx.lineWidth = 2;
+    ctx.strokeRect(x + 1, y + 1, TILE - 2, TILE - 2);
+    if (rec && BD.dh && BD.dh.rec === rec) {          // progress ring above the piece
+      const f = Math.min(1, BD.dh.t / DIS_T), cx = x + TILE / 2, cy = y - 8;
+      ctx.lineWidth = 3; ctx.strokeStyle = '#ffd27a';
+      ctx.beginPath(); ctx.arc(cx, cy, 7, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function buildFrame(g, dt) {
     const P = g.player;
     P.cool = Math.max(P.cool || 0, 0.12);            // no shooting or swinging while building
-    if (P.car) { BD.tg = null; return; }
+    if (P.car) { BD.tg = null; BD.dtg = null; BD.dh = null; return; }
+    if (Input.hit('Delete')) setDis(!BD.dis);
+    if (BD.dis) { disFrame(g, dt); if (g.frame % 15 === 0) renderBar(); return; }
     const av = avail();
     if (Input.hit('BracketRight') && av.length) BD.sel = (BD.sel + 1) % av.length;
     if (Input.hit('BracketLeft') && av.length) BD.sel = (BD.sel - 1 + av.length) % av.length;
@@ -483,7 +560,9 @@
   }
   function drawGhost(ctx) {
     const P = G.player;
-    if (!BD.on || G.state !== 'playing' || !BD.tg || !P) return;
+    if (!BD.on || G.state !== 'playing' || !P) return;
+    if (BD.dis) return drawDis(ctx);
+    if (!BD.tg) return;
     const av = avail(); if (!av.length) return;
     const cur = av[clampI(BD.sel, av.length)], tg = BD.tg;
     ctx.save();
@@ -522,7 +601,7 @@
   const upd0 = G.update;
   G.update = function (dt) {
     if (this.player) trackMove(this.player);
-    if (BD.on && this.state === 'playing' && this.player && !this.player.dead) buildFrame(this);
+    if (BD.on && this.state === 'playing' && this.player && !this.player.dead) buildFrame(this, dt);
     return upd0.call(this, dt);
   };
   const ia0 = G.interact;
@@ -567,7 +646,7 @@
     const f0 = G[name];
     if (typeof f0 !== 'function') continue;
     G[name] = function () {
-      BD.on = false; BD.tg = null; BD.openRec = null;
+      BD.on = false; BD.tg = null; BD.openRec = null; BD.dis = false; BD.dh = null; BD.dtg = null;
       if (BD.bar) BD.bar.hidden = true;
       return f0.apply(this, arguments);
     };
@@ -576,7 +655,7 @@
   Throws.draw = function (ctx) { td0.call(this, ctx); drawGhost(ctx); };
   const key0 = UI.key;
   UI.key = function (code) {
-    if (code === 'Escape' && BD.on && G.state === 'playing') { setOn(false); return; }
+    if (code === 'Escape' && BD.on && G.state === 'playing') { if (BD.dis) setDis(false); else setOn(false); return; }
     return key0.call(this, code);
   };
   const cp0 = UI.closePanel;
@@ -638,6 +717,8 @@ body.touch #bd22bar .hint{font-size:11px;overflow:hidden;text-overflow:ellipsis;
 #bd22bar button{position:relative;flex:0 0 auto;width:50px;height:50px;padding:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:rgba(40,28,14,.92);border:1px solid #8a6a3a;border-radius:4px;color:#f4e6c8;font-size:10px;line-height:1.05;letter-spacing:0;min-width:0;cursor:pointer}
 #bd22bar button.on{border-color:#ffd27a;box-shadow:0 0 8px rgba(255,210,122,.7);background:rgba(90,60,20,.95)}
 #bd22bar button img{width:22px;height:22px;object-fit:contain;image-rendering:pixelated;pointer-events:none}
+#bd22bar button .ic{font-size:20px;line-height:1;font-weight:normal;pointer-events:none}
+#bd22bar button.on[data-dis]{border-color:#ff7a7a;box-shadow:0 0 8px rgba(255,90,90,.7)}
 #bd22bar button span{max-width:46px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none}
 #bd22bar button i{position:absolute;top:-5px;right:-4px;font-style:normal;font-size:11px;background:#000;border-radius:6px;padding:0 3px;color:#ffd27a}
 #bd22bar .hint{font-size:12px;color:#c8b48a;white-space:nowrap}

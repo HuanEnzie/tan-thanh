@@ -9,17 +9,17 @@
   const styleEl = document.createElement('style');
   styleEl.id = 'v21sys-css';
   styleEl.textContent = `
-#sys21-hud{position:absolute;top:16px;right:16px;z-index:4;pointer-events:auto;cursor:pointer;min-width:0;width:100px;height:46px;padding:2px 4px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:linear-gradient(180deg,rgba(8,22,46,.94),rgba(4,12,28,.94));border:2px solid #4fc3ff;border-radius:6px;box-shadow:0 0 12px rgba(79,195,255,.75),inset 0 0 10px rgba(79,195,255,.25);color:#dff4ff;text-shadow:0 0 6px rgba(79,195,255,.9);line-height:1;transform:none}
-#sys21-hud:hover,#sys21-hud:focus-visible{background:linear-gradient(180deg,rgba(14,40,80,.96),rgba(6,20,44,.96));border-color:#7fd8ff;box-shadow:0 0 18px rgba(127,216,255,.95),inset 0 0 12px rgba(79,195,255,.35);outline:none;transform:none}
+#sys21-hud{position:absolute;top:16px;right:16px;z-index:4;pointer-events:auto;cursor:pointer;min-width:0;width:100px;height:46px;padding:2px 4px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border:1px solid #4fc3ff;border-radius:0;background:linear-gradient(#7fd8ff,#7fd8ff) left top/9px 2px no-repeat,linear-gradient(#7fd8ff,#7fd8ff) left top/2px 9px no-repeat,linear-gradient(#7fd8ff,#7fd8ff) right top/9px 2px no-repeat,linear-gradient(#7fd8ff,#7fd8ff) right top/2px 9px no-repeat,linear-gradient(#7fd8ff,#7fd8ff) left bottom/9px 2px no-repeat,linear-gradient(#7fd8ff,#7fd8ff) left bottom/2px 9px no-repeat,linear-gradient(#7fd8ff,#7fd8ff) right bottom/9px 2px no-repeat,linear-gradient(#7fd8ff,#7fd8ff) right bottom/2px 9px no-repeat,repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px),linear-gradient(180deg,rgba(14,38,74,.95),rgba(4,12,28,.95));box-shadow:0 0 12px rgba(79,195,255,.7),inset 0 0 10px rgba(79,195,255,.22);color:#dff4ff;text-shadow:0 0 6px rgba(79,195,255,.9);line-height:1;transform:none}
+#sys21-hud:hover,#sys21-hud:focus-visible{border-color:#bfefff;box-shadow:0 0 18px rgba(127,216,255,.95),inset 0 0 14px rgba(79,195,255,.4);outline:none;transform:none}
 #sys21-hud:active{transform:translateY(1px)}
-#sys21-hud .ic{font-size:20px;color:#7fd8ff}
-#sys21-hud .lb{font-size:13px;letter-spacing:.5px;white-space:nowrap}
-#sys21-hud .dot{position:absolute;top:-7px;right:-7px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ff4a4a;color:#fff;font-size:12px;line-height:16px;text-align:center;font-style:normal;text-shadow:none;box-shadow:0 0 6px #ff4a4a}
+#sys21-hud .ic{font-size:20px;color:#7fd8ff;text-shadow:0 0 8px #7fd8ff}
+#sys21-hud .lb{font-size:13px;letter-spacing:1px;white-space:nowrap}
+#sys21-hud .dot{position:absolute;top:-9px;right:-9px;min-width:18px;height:18px;padding:0 2px;background:#ff3b3b;color:#fff;font-size:12px;line-height:18px;text-align:center;font-style:normal;text-shadow:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
 #sys21-hud .dot[hidden]{display:none}
-body.touch #sys21-hud{top:calc(8px + env(safe-area-inset-top,0px));right:calc(220px + env(safe-area-inset-right,0px));min-width:0;width:106px;height:32px;flex-direction:row;gap:5px;padding:0 6px;box-shadow:0 3px 0 #000,0 0 10px rgba(79,195,255,.6)}
+body.touch #sys21-hud{top:calc(8px + env(safe-area-inset-top,0px));right:calc(220px + env(safe-area-inset-right,0px));min-width:0;width:106px;height:32px;flex-direction:row;gap:5px;padding:0 6px;box-shadow:0 0 10px rgba(79,195,255,.6),inset 0 0 8px rgba(79,195,255,.2)}
 body.touch #sys21-hud .ic{font-size:16px}
-body.touch #sys21-hud .lb{font-size:12px;letter-spacing:0;white-space:nowrap}
-body.touch #sys21-hud .dot{top:-6px;right:-6px}
+body.touch #sys21-hud .lb{font-size:12px;letter-spacing:.5px;white-space:nowrap}
+body.touch #sys21-hud .dot{top:-7px;right:-7px;min-width:16px;height:16px;line-height:16px;font-size:11px}
 #s21 .s21b .sys21-b{min-width:0}
 #s21 .s21b .sys21-b:disabled{opacity:.4;cursor:default}
 #s21 .sys21-card{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:6px 0 10px}

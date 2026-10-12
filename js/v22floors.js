@@ -2,14 +2,16 @@
 // The ground floor is the overworld building itself (its block is generated as before). A building with
 // b.floors >= 2 gets one stairs prop 'flup' ("Lên tầng 2") inside its footprint on the ground floor.
 // Floor f >= 2 is an 'interior' instance: World.mode = 'interior' and ONE generated block that holds the footprint
-// (rock everywhere else). Its superblock key is a negative key K = -(1000000 + n), n = code(x0, y0, f), so
+// (outside it: a WINDOW void, solid but see-through; chunks paint it as the overworld snapshot I.snap, see buildSnap).
+// Outer walls carry windows every 4 tiles. Its superblock key is a negative key K = -(1000000 + n), n = code(x0, y0, f), so
 // ensure() stores and looks up its looted/removed props in World.delta[K] like an overworld block does.
 // The overworld delta is never swapped. G.save() while inside saves the ground-floor spot G.flRet as the position.
 // Stairs: 'fldn' (down) and 'flup' (up) sit on the same two tiles on every upper floor (S = down, U = up).
 // Going down from floor 2 returns to the overworld at G.flRet (the spot where you climbed).
 // Legacy blocks (World.legacy22), the start house and co-op get no floors and no new roof style.
+// Outside, near a building (<= 220 px, line of sight): each door and window cuts a soft wedge through its roof
+// (updateReveal, roof canvas per building repainted at most every 100 ms). G.canSee accepts creatures inside a wedge.
 (function () {
-  const LIM = 130000;                                   // |x0|,|y0| below this keep the key code injective
   const TYPE_LOOT = { house: 'house', apartment: 'house', office: 'house', hotel: 'house', highrise: 'house', hospital: 'medical', mall: 'market', restaurant: 'kitchen', palace: 'treasure', shop: 'market', store: 'crate' };
   // [item, count, container loot (null = none), solid]; same item keys as v21world (sprites f21_mod_* / f21_tt_*)
   const FURN_I = {
@@ -49,10 +51,16 @@
     }
     return null;
   };
-  const keyOf = (b, f) => (Math.abs(b.x0) < LIM && Math.abs(b.y0) < LIM && f >= 2 && f < 8)
-    ? -(1000000 + ((b.x0 + 131072) * 262144 + (b.y0 + 131072)) * 8 + f) : null;
+  // the block of floor f sits at a small superblock position hashed from the building (|sx|, |sy| <= 400), so the
+  // renderer keeps float precision; its key is the normal nkey, and its World.delta entry lives under -key-1 (deltaMap below)
+  const keyOf = (b, f) => (f >= 2 && f < 8)
+    ? nkey(Math.floor(h3(b.x0, b.y0, 2210 + f) * 801) - 400, Math.floor(h3(b.y0, b.x0, 2230 + f) * 801) - 400) : null;
   // inverse of nkey(sx, sy) = (sx + 50000) * 100000 + (sy + 50000): the block that owns key K
   const sxyOf = K => { const A = Math.floor(K / 100000); return [A - 50000, (K - A * 100000) - 50000]; };
+  // overworld keys are positive and share World.delta with the floors, so floor deltas use a mirrored key (-k-1)
+  const IDM = { get: k => World.delta.get(-k - 1), set: (k, v) => World.delta.set(-k - 1, v), has: k => World.delta.has(-k - 1), delete: k => World.delta.delete(-k - 1) };
+  const dmO = World.deltaMap;
+  World.deltaMap = function () { return this.mode === 'interior' ? IDM : dmO.call(this); };
   const floorsFor = b => {
     if (!stairsOf(b) || keyOf(b, 2) == null) return 1;
     const u = h3(b.x0, b.y0, 2201);
@@ -98,23 +106,32 @@
 
   // ---------- one upper floor: the block of the 'interior' mode ----------
   function genInterior(sb) {
-    sb.tiles.fill(T.WALL);                                  // everything outside the footprint is rock
+    // outside the footprint: a WINDOW void. It is solid like rock, but it does not stop line of sight or the view cone,
+    // so the view passes out through the windows; renderChunk paints it as the overworld snapshot (see buildSnap)
+    sb.tiles.fill(T.WINDOW);
     sb.zone = 0; sb.biome = 'plains';                       // no wild/urban rules apply inside a floor
+    sb.fp = null;
     const I = G.flCur;
     if (!I || World._temp || sb.key !== I.key) return;
     const b = I.b, W = b.x1 - b.x0 + 1, H = b.y1 - b.y0 + 1;
     const x0 = sb.tx0 + Math.floor((SB - W) / 2), y0 = sb.ty0 + Math.floor((SB - H) / 2), x1 = x0 + W - 1, y1 = y0 + H - 1;
+    sb.fp = [x0, y0, x1, y1];
     const ft = I.ft, f = I.f;
     const rnd = mulberry32(Math.floor(h3(b.x0, b.y0, 2208 + f) * 4294967296) | 0);
     const ri = (a, c) => a + Math.floor(rnd() * (c - a + 1));
     const at = (x, y) => (y - sb.ty0) * SB + (x - sb.tx0);
     const put = (x, y, t) => { sb.tiles[at(x, y)] = t; };
-    // shell: walls, glass windows on the outer walls (as makeBuilding does), floor inside
+    // shell: outer walls, floor inside. Windows: one every 4 tiles along each outer wall, the same spots on every floor
+    // of the building (phase from the building seed), never on the stairs or the corners
     for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-      const edge = x === x0 || x === x1 || y === y0 || y === y1, corner = (x === x0 || x === x1) && (y === y0 || y === y1);
+      const edge = x === x0 || x === x1 || y === y0 || y === y1;
       put(x, y, edge ? T.WALL : ft);
-      if (edge && !corner && rnd() < 0.18) put(x, y, T.WINDOW);
+      rnd();                                                // same draw count as before, so the furniture layout is unchanged
     }
+    const wph = Math.floor(h3(b.x0, b.y0, 2209) * 4);
+    // (the stairs stand inside the floor, never on an outer wall, so no window can sit on them)
+    for (let x = x0 + 1; x < x1; x++) if ((x - x0 + wph) % 4 === 0) { put(x, y0, T.WINDOW); put(x, y1, T.WINDOW); }
+    for (let y = y0 + 1; y < y1; y++) if ((y - y0 + wph) % 4 === 0) { put(x0, y, T.WINDOW); put(x1, y, T.WINDOW); }
     // rooms: the same split as makeBuilding, every wall keeps a doorway
     const gaps = [];
     const split = (ax, ay, bx, by, depth) => {
@@ -266,6 +283,11 @@
     const P = G.player;
     I.key = keyOf(I.b, I.f);
     I.name = I.b.name || 'Nhà nhiều tầng';
+    if (I.snap) {                                           // where the outside snapshot sits in this floor's block (px)
+      const W = I.b.x1 - I.b.x0 + 1, H = I.b.y1 - I.b.y0 + 1, s = sxyOf(I.key);
+      I.snapX = (s[0] * SB + Math.floor((SB - W) / 2) - SNAP_M) * TILE;
+      I.snapY = (s[1] * SB + Math.floor((SB - H) / 2) - SNAP_M) * TILE;
+    }
     G.flCur = I;
     World.mode = 'interior'; World.dg = null;
     World.reset();
@@ -301,7 +323,7 @@
     Sound.play('sfx_portal', 0.5, 1.1);
     G.flRet = { x: P.x, y: P.y };
     const I = { b: { x0: d.x0, y0: d.y0, x1: d.x1, y1: d.y1, seed: d.seed, type: d.type, name: d.name }, F: d.F, ft: d.ft, lv: Math.max(1, World.levelAt(p.x, p.y)), f: 2, rooms: roomsOf(d) };
-    UI.fade(() => { G.transit = false; show(I, 'up'); });
+    UI.fade(() => { G.transit = false; I.snap = buildSnap(d); show(I, 'up'); });
   }
   function change(f, dir) {
     if (!G.flCur) return;
@@ -448,40 +470,185 @@
   G.load = function () { const r = ld.call(this); this.flCur = null; return r; };   // a loaded save is always the ground floor
 
   // ---------- roofs: styles, damage, ledges ----------
-  const dmgPat = {};
-  function roofDmg(b, x, y, w, h) {
-    if (!(b.dmg > 0) || !(b.roofAlpha >= 0.02)) return;
-    ctx.save();
-    ctx.globalAlpha = b.roofAlpha * Math.min(1, b.dmg);
+  // every roof painter takes (g, pats, a): the main ctx with its pattern cache, or a reveal canvas with its own
+  function roofDmg(b, x, y, w, h, g = ctx, pats = ROOF_PATS, a = b.roofAlpha) {
+    if (!(b.dmg > 0) || !(a >= 0.02)) return;
+    g.save();
+    g.globalAlpha = a * Math.min(1, b.dmg);
     const im = IMG.tex22_roofdmg;
     if (im) {
-      if (!dmgPat.p) { dmgPat.p = ctx.createPattern(im, 'repeat'); dmgPat.p.setTransform(new DOMMatrix().scale(0.5)); }
-      ctx.fillStyle = dmgPat.p; ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
+      if (!pats.dmg) { pats.dmg = g.createPattern(im, 'repeat'); pats.dmg.setTransform(new DOMMatrix().scale(0.5)); }
+      g.fillStyle = pats.dmg; g.fillRect(x - 3, y - 3, w + 6, h + 6);
     } else {                                                // no art yet: a few holes, the same for the same building
       const rnd = mulberry32(b.seed + 91), n = Math.round(b.dmg * 14);
       for (let i = 0; i < n; i++) {
         const cx = x + 8 + rnd() * (w - 16), cy = y + 8 + rnd() * (h - 16), r = 3 + rnd() * 6;
-        ctx.fillStyle = 'rgba(18,10,6,0.85)'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill();
-        ctx.fillStyle = 'rgba(255,220,160,0.22)'; ctx.beginPath(); ctx.arc(cx + 1, cy - 1, r * 0.45, 0, TAU); ctx.fill();
+        g.fillStyle = 'rgba(18,10,6,0.85)'; g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill();
+        g.fillStyle = 'rgba(255,220,160,0.22)'; g.beginPath(); g.arc(cx + 1, cy - 1, r * 0.45, 0, TAU); g.fill();
       }
     }
-    ctx.restore();
+    g.restore();
   }
   const dr = drawRoof;
-  drawRoof = function (b, x, y, w, h) {
-    if (!b.roofStyle) { dr(b, x, y, w, h); roofDmg(b, x, y, w, h); return; }
+  drawRoof = function (b, x, y, w, h, g = ctx, pats = ROOF_PATS, a = b.roofAlpha) {
+    if (!b.roofStyle) { dr(b, x, y, w, h, g, pats, a); roofDmg(b, x, y, w, h, g, pats, a); return; }
     const keep = b.roof, tex = roofTex(b);
     b.roof = tex;                                          // the base pass draws whatever b.roof names
-    try { dr(b, x, y, w, h); } finally { b.roof = keep; }
-    if (!(b.roofAlpha >= 0.02)) return;
-    ctx.globalAlpha = b.roofAlpha;
-    if (!IMG[tex]) { ctx.fillStyle = ROOF_TINT[b.roofStyle]; ctx.fillRect(x - 3, y - 3, w + 6, h + 6); }
+    try { dr(b, x, y, w, h, g, pats, a); } finally { b.roof = keep; }
+    if (!(a >= 0.02)) return;
+    g.globalAlpha = a;
+    if (!IMG[tex]) { g.fillStyle = ROOF_TINT[b.roofStyle]; g.fillRect(x - 3, y - 3, w + 6, h + 6); }
     if (b.floors >= 2) {                                   // stepped border: one step per storey above the second
-      ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 2;
-      ctx.strokeRect(x + 5, y + 5, w - 10, h - 10);
-      if (b.floors >= 3) ctx.strokeRect(x + 12, y + 12, w - 24, h - 24);
+      g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 2;
+      g.strokeRect(x + 5, y + 5, w - 10, h - 10);
+      if (b.floors >= 3) g.strokeRect(x + 12, y + 12, w - 24, h - 24);
     }
-    ctx.globalAlpha = 1;
-    roofDmg(b, x, y, w, h);
+    g.globalAlpha = 1;
+    roofDmg(b, x, y, w, h, g, pats, a);
+  };
+
+  // ---------- reveal: near a building, its doors and windows open the roof over the rooms behind them ----------
+  // REVQ holds this frame's wedges (flat quads of 8 numbers); G.canSee accepts anything inside one.
+  const REV_R = 220, REVQ = [];
+  function openingsOf(b) {
+    if (b._ops) return b._ops;
+    const ops = [];
+    for (const [tx, ty] of b.doors || []) ops.push({ tx, ty, door: true });
+    for (let x = b.x0 + 1; x < b.x1; x++) for (const y of [b.y0, b.y1]) if (World.get(x, y) === T.WINDOW) ops.push({ tx: x, ty: y, door: false });
+    for (let y = b.y0 + 1; y < b.y1; y++) for (const x of [b.x0, b.x1]) if (World.get(x, y) === T.WINDOW) ops.push({ tx: x, ty: y, door: false });
+    for (const o of ops) { o.x = o.tx * TILE + 16; o.y = o.ty * TILE + 16; }
+    return (b._ops = ops);
+  }
+  // the wedge from the player through one opening, a few tiles deep into the rooms (a door is wider and deeper than a window)
+  function wedgeOf(P, o) {
+    const dx = o.x - P.x, dy = o.y - P.y, d = Math.hypot(dx, dy);
+    if (d < 8) return null;
+    const ux = dx / d, uy = dy / d, nx = -uy, ny = ux;
+    const half = o.door ? 16 : 7, depth = (o.door ? 6 : 3) * TILE;
+    let L = 0;
+    for (let t = 10; t <= depth; t += 6) {                  // stops at the first interior wall
+      if (World.get(Math.floor((o.x + ux * t) / TILE), Math.floor((o.y + uy * t) / TILE)) === T.WALL) break;
+      L = t;
+    }
+    if (L < 20) return null;
+    const hw = half + L * 0.35, ex = o.x + ux * L, ey = o.y + uy * L;
+    return [o.x + nx * half - ux * 8, o.y + ny * half - uy * 8, o.x - nx * half - ux * 8, o.y - ny * half - uy * 8,
+      ex - nx * hw, ey - ny * hw, ex + nx * hw, ey + ny * hw];
+  }
+  function inQuad(q, x, y) {
+    let pos = 0, neg = 0;
+    for (let i = 0; i < 8; i += 2) {
+      const j = (i + 2) % 8, c = (q[j] - q[i]) * (y - q[i + 1]) - (q[j + 1] - q[i + 1]) * (x - q[i]);
+      if (c > 0) pos++; else if (c < 0) neg++;
+    }
+    return pos === 0 || neg === 0;
+  }
+  // the roof canvas of one building with the wedges erased (soft edge); painted only when the reveal changes
+  function paintRC(b, x, y, w, h, r, quads) {
+    const W = w + 6, H = h + 6, res = (G.lowGfx || W * H > 250000) ? 1 : 2;
+    const pw = Math.ceil(W * res), ph = Math.ceil(H * res);
+    if (!r.rc || r.rc.width !== pw || r.rc.height !== ph) { r.rc = document.createElement('canvas'); r.rc.width = pw; r.rc.height = ph; r.rg = r.rc.getContext('2d'); r.pats = {}; }
+    const g = r.rg;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.filter = 'none';
+    g.clearRect(0, 0, pw, ph);
+    g.setTransform(res, 0, 0, res, -(x - 3) * res, -(y - 3) * res);
+    drawRoof(b, x, y, w, h, g, r.pats, 1);
+    g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
+    if ('filter' in g) g.filter = `blur(${2 * res}px)`;
+    for (const q of quads) { g.beginPath(); g.moveTo(q[0], q[1]); for (let i = 2; i < 8; i += 2) g.lineTo(q[i], q[i + 1]); g.closePath(); g.fill(); }
+    g.filter = 'none'; g.globalCompositeOperation = 'source-over';
+    if (ctx.dirty) ctx.dirty(r.rc);
+  }
+  // once per frame, before the props and creatures are drawn (play.js render calls it with the buildings on screen)
+  function updateReveal(vis) {
+    REVQ.length = 0;
+    const P = G.player, now = performance.now();
+    const live = !!P && !P.car && !P.boat && !P.dead && World.mode === 'over';
+    for (const [b, x, y, w, h] of vis) {
+      let quads = null;
+      if (live && b.roofAlpha >= 0.5 && World.bldAt(P.x, P.y) !== b &&
+          P.x > x - REV_R && P.x < x + w + REV_R && P.y > y - REV_R && P.y < y + h + REV_R) {
+        for (const o of openingsOf(b)) {
+          if (Math.hypot(o.x - P.x, o.y - P.y) > REV_R || !World.los(P.x, P.y, o.x, o.y)) continue;
+          const q = wedgeOf(P, o);
+          if (q) (quads || (quads = [])).push(q);
+        }
+      }
+      if (!quads) { if (b._rv) b._rv.on = false; continue; }   // the canvas stays with the building for the next reveal
+      const r = b._rv || (b._rv = { rc: null, rg: null, sig: '', t: -1e9, pats: {}, on: false });
+      for (const q of quads) REVQ.push(q);
+      const sig = quads.map(q => q.map(v => Math.round(v / 3)).join(',')).join('|');
+      if (!r.on || (sig !== r.sig && now - r.t >= 100)) { paintRC(b, x, y, w, h, r, quads); r.sig = sig; r.t = now; r.on = true; }
+    }
+  }
+  // creatures in a revealed wedge are visible (the roof is cut there); everything else keeps the v22fov rule
+  G.revealTick = updateReveal;                             // play.js render calls it once per frame
+  const csBase = G.canSee;
+  G.canSee = function (x, y) {
+    for (const q of REVQ) if (inQuad(q, x, y)) return true;
+    return csBase.call(this, x, y);
+  };
+
+  // ---------- upper floors: the view outside, through the windows ----------
+  // the overworld around the footprint (SNAP_M tiles each side), seen from above: ground tiles and neighbour roofs,
+  // dimmed and desaturated. Built once while the overworld is still loaded, then kept with the floor (I.snap).
+  const SNAP_M = 14, SNAP_S = 0.5, SKY = '#161c28';           // SNAP_S: canvas px per world px
+  function buildSnap(d) {
+    try {
+      const W = d.x1 - d.x0 + 1, H = d.y1 - d.y0 + 1;
+      const ox = (d.x0 - SNAP_M) * TILE, oy = (d.y0 - SNAP_M) * TILE, sw = (W + 2 * SNAP_M) * TILE, sh = (H + 2 * SNAP_M) * TILE;
+      const cv = document.createElement('canvas');
+      cv.width = Math.ceil(sw * SNAP_S); cv.height = Math.ceil(sh * SNAP_S);
+      const g = cv.getContext('2d');
+      g.setTransform(SNAP_S, 0, 0, SNAP_S, -ox * SNAP_S, -oy * SNAP_S);
+      g.imageSmoothingEnabled = true;
+      const hasF = 'filter' in g;
+      if (hasF) g.filter = 'saturate(0.5) brightness(0.72)';
+      for (let cy = Math.floor(oy / CHPX); cy <= Math.floor((oy + sh) / CHPX); cy++) for (let cx = Math.floor(ox / CHPX); cx <= Math.floor((ox + sw) / CHPX); cx++) {
+        if (!World.sbs.has(nkey(Math.floor(cx / 4), Math.floor(cy / 4)))) continue;
+        g.drawImage(World.getChunk(cx, cy), cx * CHPX, cy * CHPX, CHPX, CHPX);
+      }
+      for (const sb of World.sbs.values()) for (const b of sb.buildings) {
+        if (b.x0 === d.x0 && b.y0 === d.y0) continue;
+        const bx = b.x0 * TILE, by = b.y0 * TILE, bw = (b.x1 - b.x0 + 1) * TILE, bh = (b.y1 - b.y0 + 1) * TILE;
+        if (bx > ox + sw || by > oy + sh || bx + bw < ox || by + bh < oy) continue;
+        const im = IMG[b.roofStyle ? roofTex(b) : b.roof];
+        if (im) { const p = g.createPattern(im, 'repeat'); p.setTransform(new DOMMatrix().scale(0.5)); g.fillStyle = p; } else g.fillStyle = '#4a4a54';
+        g.fillRect(bx - 3, by - 3, bw + 6, bh + 6);
+      }
+      if (hasF) g.filter = 'none';
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.fillStyle = 'rgba(14,20,34,0.22)'; g.fillRect(0, 0, cv.width, cv.height);   // dusk veil
+      return { cv, sw, sh };
+    } catch (e) { console.error('[v22 FL] snapshot', e); return null; }
+  }
+  // chunks of an interior floor: the void and the window tiles are cleared, then the snapshot and a sky fill go
+  // behind whatever is left, and the windows get their glass. Baked once per chunk, so no extra cost per frame.
+  const rcBase = World.renderChunk;
+  World.renderChunk = function (ctx2, cx, cy) {
+    rcBase.call(this, ctx2, cx, cy);
+    if (this.mode !== 'interior' || !G.flCur) return;
+    const I = G.flCur, snap = I.snap, wins = [];
+    let back = false;
+    for (let ty = cy * CH; ty < cy * CH + CH; ty++) for (let tx = cx * CH; tx < cx * CH + CH; tx++) {
+      const sb = this.sbOf(tx, ty), fp = sb && sb.fp;
+      if (!fp || tx < fp[0] || tx > fp[2] || ty < fp[1] || ty > fp[3]) { ctx2.clearRect(tx * TILE, ty * TILE, TILE, TILE); back = true; }
+      else if (sb.tiles[(ty - sb.ty0) * SB + (tx - sb.tx0)] === T.WINDOW) { ctx2.clearRect(tx * TILE, ty * TILE, TILE, TILE); wins.push(tx, ty); back = true; }
+    }
+    if (back) {
+      ctx2.save();
+      ctx2.globalCompositeOperation = 'destination-over';
+      if (snap) { ctx2.imageSmoothingEnabled = true; ctx2.drawImage(snap.cv, I.snapX, I.snapY, snap.sw, snap.sh); }
+      ctx2.fillStyle = SKY; ctx2.fillRect(cx * CHPX, cy * CHPX, CHPX, CHPX);
+      ctx2.restore();
+    }
+    for (let i = 0; i < wins.length; i += 2) {
+      const X = wins[i] * TILE, Y = wins[i + 1] * TILE;
+      ctx2.fillStyle = 'rgba(130,190,215,0.16)'; ctx2.fillRect(X + 2, Y + 2, TILE - 4, TILE - 4);
+      ctx2.fillStyle = 'rgba(32,52,60,0.95)';
+      ctx2.fillRect(X + 4, Y + 4, TILE - 8, 2); ctx2.fillRect(X + 4, Y + TILE - 6, TILE - 8, 2);
+      ctx2.fillRect(X + 4, Y + 4, 2, TILE - 8); ctx2.fillRect(X + TILE - 6, Y + 4, 2, TILE - 8);
+      ctx2.fillRect(X + 15, Y + 4, 2, TILE - 8); ctx2.fillRect(X + 4, Y + 15, TILE - 8, 2);
+    }
   };
 })();

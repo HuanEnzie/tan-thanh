@@ -10,7 +10,7 @@
   const PEN_NAME = { md: 'Vùng Phạt', tt: 'Vùng Thiên Phạt', sl: 'Vùng Phạt' };
   const PEN_HEAD = { md: 'Hình phạt', tt: 'Thiên phạt', sl: 'Hình phạt' };
   const WARN_TXT = 'Nếu không hoàn thành sẽ chịu hình phạt';
-  const DAILY_GOAL = { move: 1500, gate: 1, loot: 10, skill: 12, dash: 30 };
+  const DAILY_GOAL = { move: 600, gate: 1, loot: 10, skill: 12, dash: 20 };   // one in-game day = 8 min of play
   const DAILY_POOL = ['gate', 'loot', 'skill', 'dash'];
   const MOVE_PX = 32;                                          // 32 px = 1 m
   const EM_T = { kill15: 90, elite: 120, gate: 600 };          // emergency time limits (s)
@@ -26,17 +26,43 @@
   const PLAYER_KILL = { melee: 1, gun: 1, skill: 1, car: 1, shock: 1 };
   const SKILL_SUB = { 'KỸ NĂNG': 1, 'TUYỆT KỸ': 1, 'TRỖI DẬY': 1 };  // startCut subtitles of mana/ultimate skills
   const CSS = `
-#q21hud{margin-top:6px;width:190px;max-width:46vw;background:rgba(6,14,30,.8);border:1px solid rgba(79,195,255,.5);border-radius:4px;color:#dff4ff;font:13px/1.3 system-ui,sans-serif;text-align:left;cursor:pointer;user-select:none}
-#q21hud .q21h-top{display:flex;align-items:center;gap:6px;padding:2px 6px;border-bottom:1px solid rgba(79,195,255,.25)}
-#q21hud .q21h-top b{flex:1;color:#7fd8ff;letter-spacing:.5px}
-#q21hud .q21h-x{background:none;border:1px solid rgba(79,195,255,.5);color:#bfe9ff;border-radius:3px;width:22px;height:18px;line-height:14px;padding:0;font-size:15px;cursor:pointer}
-#q21hud .q21h-body{padding:3px 6px}
-#q21hud .q21h-body>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-#q21hud .q21h-pen{color:#ff8a8a;font-weight:bold}
-#q21hud.q21-collapsed .q21h-body{display:none}
-body.touch #q21hud{display:none}
-#q21chip{position:fixed;z-index:30;display:none;height:22px;line-height:22px;padding:0 8px;box-sizing:border-box;max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:13px system-ui,sans-serif;background:rgba(6,14,30,.85);border:1px solid rgba(79,195,255,.55);border-radius:4px;color:#dff4ff;cursor:pointer;user-select:none}
-#q21chip.pen{border-color:#ff5a5a;color:#ffd0d0}
+/* left column under the day bar: story box, daily chip, tutorial card (v22surv) */
+#qcol{display:flex;flex-direction:column;gap:6px;width:236px;max-width:46vw;margin-top:8px}
+#qcol #objective{position:relative;margin-top:0;padding:4px 30px 5px 8px;border-left:3px solid var(--gold);font-size:20px;line-height:1.05}
+#qcol #objective b{font-size:16px;letter-spacing:1px}
+#qcol #objText{display:block}
+#qcolBtn{position:absolute;top:3px;right:3px;pointer-events:auto;min-width:0;width:24px;height:20px;padding:0;line-height:16px;font:16px var(--font);background:rgba(0,0,0,.4);border:1px solid rgba(255,207,58,.55);color:var(--gold);text-shadow:none;cursor:pointer}
+#q21hud{display:block;background:var(--panel);border:1px solid rgba(79,195,255,.45);border-left:3px solid #7fd8ff;padding:3px 8px 4px;color:var(--text);font-size:18px;line-height:1.05;text-align:left;cursor:pointer;pointer-events:auto;user-select:none}
+#q21hud .q21h-top{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+#q21hud .q21h-top b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;color:#7fd8ff;font-size:16px;font-weight:normal;letter-spacing:1px}
+#q21hud .q21h-n{color:var(--text)}
+#q21hud .q21h-bar{height:5px;margin:3px 0 1px;background:rgba(255,255,255,.14);overflow:hidden}
+#q21hud .q21h-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7fd8ff,#6dff9a)}
+#q21hud .q21h-st{color:var(--gold);font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#q21hud .q21h-st:empty{display:none}
+#q21hud .q21h-st.pen{color:#ff8a8a;font-weight:bold}
+#qcol.q-collapsed>:not(#objective){display:none!important}
+#qcol.q-collapsed #objText{display:none!important}
+#mmlabel{width:190px;text-align:center;font-size:15px;line-height:1.1;color:var(--muted);background:var(--panel);border:1px solid rgba(255,207,58,.25);padding:3px 6px;margin-top:6px;transition:opacity .4s}
+#mmlabel.q-hint-off{display:none}
+body:not(.touch) #topright{top:72px;width:190px}
+body.touch #qcol{width:200px;gap:4px}
+body.touch #qcol #objective{padding:3px 22px 3px 6px;font-size:15px;max-width:none;white-space:normal;overflow:visible;text-overflow:clip}
+body.touch #qcol #objective b{font-size:12px}
+body.touch #qcol #objText{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+body.touch #qcolBtn{width:20px;height:18px;min-width:0;font-size:13px;line-height:13px}
+body.touch #q21hud{padding:2px 5px 3px;font-size:14px}
+body.touch #q21hud .q21h-top b{font-size:12px}
+body.touch #q21hud .q21h-st{font-size:13px}
+body.touch #bossbar{width:min(380px,46vw)}
+body:has(#bossbar:not(.hidden)) #s21msg{top:72px}
+body.touch:has(#bossbar:not(.hidden)) #s21msg{top:90px}
+body.touch #bars{top:auto;bottom:calc(8px + env(safe-area-inset-bottom, 0px))}
+body.touch #feed{top:auto;bottom:112px}
+body.touch #feed .toast:nth-child(n+3){display:none}
+#s21msg{width:min(520px,80vw)}
+body.touch #s21msg{left:220px;right:112px;width:auto;transform:none}
+body.touch #s21msg{gap:4px}body.touch #s21msg .m{font-size:14px;padding:3px 8px;line-height:1.1}body.touch #s21msg .m:nth-last-child(n+3){display:none}
 #q21pen{position:fixed;inset:0;pointer-events:none;z-index:35;display:none;animation:q21p 1.4s ease-in-out infinite}
 @keyframes q21p{0%,100%{box-shadow:inset 0 0 60px 16px rgba(255,40,40,.35)}50%{box-shadow:inset 0 0 96px 34px rgba(255,40,40,.7)}}
 #q21pent{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:36;display:none;pointer-events:none;background:rgba(40,0,0,.82);border:1px solid #ff5a5a;color:#ffd0d0;padding:3px 12px;font:bold 15px system-ui,sans-serif;border-radius:4px;letter-spacing:1px;white-space:nowrap}
@@ -86,16 +112,21 @@ body.touch #q21hud{display:none}
     const rnd = rngOf(seedOf(day)), pool = DAILY_POOL.slice(), picks = [];
     for (let i = 0; i < 2; i++) picks.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
     const ids = ['kill', 'move', ...picks];
-    return { list: ids.map(id => ({ id, goal: id === 'kill' ? 30 + 2 * P.level : DAILY_GOAL[id], prog: 0, done: 0 })), mv: 0, claimed: 0 };
+    return { list: ids.map(id => ({ id, goal: id === 'kill' ? 15 + P.level : DAILY_GOAL[id], prog: 0, done: 0 })), mv: 0, claimed: 0 };
   }
-  const dailyName = it => ({ kill: `Tự tay hạ ${it.goal} quái`, move: 'Di chuyển 1500 m', gate: 'Đóng 1 ' + gate(), loot: 'Lục soát 10 vật', skill: 'Dùng kỹ năng 12 lần', dash: 'Lướt 30 lần' })[it.id];
-  // a new calendar day: judge the previous day (progress but not finished -> Penalty Zone after 60 s in the open world)
+  const dailyName = it => ({ kill: `Tự tay hạ ${it.goal} quái`, move: `Di chuyển ${it.goal} m`, gate: 'Đóng 1 ' + gate(), loot: 'Lục soát 10 vật', skill: 'Dùng kỹ năng 12 lần', dash: 'Lướt 30 lần' })[it.id];
+  // a new in-game day (dawn, G.day): judge the previous day. All done but not claimed -> claimed automatically;
+  // started but fewer than half the tasks done -> Penalty Zone after 60 s in the open world.
+  // Old saves keyed the day by the calendar date ('2026-10-12'); that key simply differs and starts a fresh day.
+  const dayKey = () => 'g' + (G.day || 1);
   function checkDay(q, P) {
-    const t = today21();
+    const t = dayKey();
     if (q.daily && q.day === t) return;
     if (q.daily && q.day) {
-      const L = q.daily.list;
-      if (L.some(i => i.prog > 0) && !L.every(i => i.done)) { q.penPending = 1; q.penWait = 0; }
+      const L = q.daily.list, done = L.filter(i => i.done).length;
+      if (done === L.length && !q.daily.claimed) claimDaily();
+      else if (L.some(i => i.prog > 0) && done * 2 < L.length && /^g/.test(q.day)) { q.penPending = 1; q.penWait = 0; }
+      SYS.msg('Ngày mới — nhiệm vụ hằng ngày đã được làm mới.', 'quest');
     }
     q.day = t; q.daily = makeDaily(t, P); markDirty();
   }
@@ -227,62 +258,66 @@ body.touch #q21hud{display:none}
   }
 
   // ---------- HUD tracker and penalty overlay ----------
+  // Left column (#qcol, inside #topleft under the day bar): story box (#objective, moved here), daily chip (#q21hud),
+  // tutorial card (#v22tut, added by v22surv). The column collapses with the ▾/▸ button; state in localStorage 'tt_qcol'.
+  const HINT_SEC = 20;                                        // key-hint line [M] ... shows for 20 s of play; F1 shows it again
+  let hintOn = true, hintT = 0, hintPl = null;
+  const colOff = () => { try { return localStorage.getItem('tt_qcol') === '1'; } catch (e) { return false; } };
+  function colApply() {
+    if (!dom) return;
+    const c = colOff();
+    dom.col.classList.toggle('q-collapsed', c);
+    dom.tog.textContent = c ? '▸' : '▾';
+    dom.tog.title = c ? 'Mở rộng' : 'Thu gọn';
+  }
+  function colToggle() {
+    const c = !colOff();
+    try { localStorage.setItem('tt_qcol', c ? '1' : '0'); } catch (e) {}
+    colApply(); layoutLeft();
+  }
   function ensureDom() {
     if (dom) return dom;
-    const tr = document.getElementById('topright');
-    if (!document.body || !tr) return null;
+    const tl = document.getElementById('topleft'), obj = document.getElementById('objective');
+    if (!document.body || !tl || !obj || !document.getElementById('topright')) return null;
     const st = document.createElement('style'); st.id = 'v21quest-css'; st.textContent = CSS; document.head.appendChild(st);
+    const col = document.createElement('div'); col.id = 'qcol';
+    tl.insertBefore(col, obj); col.appendChild(obj);
+    const tog = document.createElement('button'); tog.id = 'qcolBtn'; tog.type = 'button'; obj.appendChild(tog);
     const hud = document.createElement('div'); hud.id = 'q21hud';
-    hud.innerHTML = '<div class="q21h-top"><b>NHIỆM VỤ</b><button class="q21h-x" type="button" title="Thu gọn / mở rộng">−</button></div><div class="q21h-body"></div>';
-    tr.appendChild(hud);
+    hud.innerHTML = '<div class="q21h-top"><b>NHIỆM VỤ NGÀY</b><span class="q21h-n"></span></div><div class="q21h-bar"><i></i></div><div class="q21h-st"></div>';
+    col.appendChild(hud);
     const pen = document.createElement('div'); pen.id = 'q21pen'; document.body.appendChild(pen);
     const pent = document.createElement('div'); pent.id = 'q21pent'; document.body.appendChild(pent);
-    const chip = document.createElement('div'); chip.id = 'q21chip'; document.body.appendChild(chip);
-    chip.addEventListener('click', () => SYS.open('quest'));
-    hud.addEventListener('click', e => {
-      const q = qs(); if (!q) return;
-      if (e.target.closest && e.target.closest('.q21h-x')) { q.hudOff = q.hudOff ? 0 : 1; hudApply(); return; }
-      SYS.open('quest');
-    });
-    dom = { hud, hb: hud.querySelector('.q21h-body'), hx: hud.querySelector('.q21h-x'), pen, pent, chip };
+    tog.addEventListener('click', e => { e.stopPropagation(); colToggle(); });
+    hud.addEventListener('click', () => SYS.open('quest'));
+    window.addEventListener('keydown', e => { if (e.code === 'F1') { e.preventDefault(); hintOn = !hintOn; hintT = 0; const ml = document.getElementById('mmlabel'); if (ml) ml.classList.toggle('q-hint-off', !hintOn); } });
+    dom = { col, tog, hud, cnt: hud.querySelector('.q21h-n'), bar: hud.querySelector('.q21h-bar i'), st: hud.querySelector('.q21h-st'), pen, pent,
+      feed: document.getElementById('feed') };
+    colApply();
     return dom;
   }
-  function hudApply() {
-    const q = qs(); if (!dom || !q) return;
-    dom.hud.classList.toggle('q21-collapsed', !!q.hudOff);
-    dom.hx.textContent = q.hudOff ? '+' : '−';
+  // desktop: the feed (toasts) sits right below the column; touch keeps its CSS place (above the bottom-left bars)
+  function layoutLeft() {
+    if (!dom) return;
+    const tl = document.getElementById('topleft'); if (!tl) return;
+    const touch = document.body.classList.contains('touch'), bottom = tl.getBoundingClientRect().bottom;
+    if (dom.feed) dom.feed.style.top = touch ? '' : (bottom + 8) + 'px';
   }
   function hudUpdate(q) {
     const d = ensureDom(); if (!d || !q.daily) return;
     const L = q.daily.list, doneN = L.filter(i => i.done).length;
-    let b = `<div>Nhiệm vụ ngày ${doneN}/${L.length}${q.daily.claimed ? ' ✓' : ''}</div>`;
-    if (q.em) b += `<div>⚑ ${esc(emShort(q.em))}${q.em.type === 'kill15' ? ' ' + q.em.prog + '/15' : ''} · ${fmtT(q.em.t)}</div>`;
-    if (q.pen) b += `<div class="q21h-pen">${esc(penName().toUpperCase())} · ${fmtT(q.pen.t)}</div>`;
-    else if (q.penPending) b += `<div class="q21h-pen">⚠ ${esc(penName())} sắp tới</div>`;
-    d.hb.innerHTML = b;
-    hudApply();
+    d.cnt.textContent = `${doneN}/${L.length}` + (q.daily.claimed ? ' ✓' : '');
+    d.bar.style.width = (100 * doneN / L.length).toFixed(1) + '%';
+    let s = '', warn = false;
+    if (q.pen) { s = `⚠ ${penName()} · ${fmtT(q.pen.t)}`; warn = true; }
+    else if (q.penPending) { s = `⚠ ${penName()} sắp tới`; warn = true; }
+    else if (q.em) s = `⚑ ${emShort(q.em)}${q.em.type === 'kill15' ? ' ' + q.em.prog + '/15' : ''} · ${fmtT(q.em.t)}`;
+    if (d.st.textContent !== s) d.st.textContent = s;
+    d.st.classList.toggle('pen', warn);
     d.pen.style.display = q.pen ? 'block' : 'none';
     d.pent.style.display = q.pen ? 'block' : 'none';
     if (q.pen) d.pent.textContent = `${penName().toUpperCase()} · ${fmtT(q.pen.t)}`;
-    chipUpdate(q, d);
-  }
-  // touch: one compact chip directly under the HỆ THỐNG button (fallback: top 44px, centred)
-  function chipUpdate(q, d) {
-    const hudEl = document.getElementById('hud');
-    if (!document.body.classList.contains('touch') || !hudEl || hudEl.classList.contains('hidden')) { d.chip.style.display = 'none'; return; }
-    const L = q.daily ? q.daily.list : [], doneN = L.filter(i => i.done).length;
-    const t = q.pen ? q.pen.t : (q.em ? q.em.t : null);
-    d.chip.textContent = `Ngày ${doneN}/${L.length}` + (t !== null ? ` · ⚠ ${fmtT(t)}` : '');
-    d.chip.classList.toggle('pen', !!q.pen);
-    const a = document.getElementById('sys21-hud'), r = a ? a.getBoundingClientRect() : null;
-    let top = 44;
-    if (r && r.width > 0) { top = r.bottom + 4; d.chip.style.left = r.left + 'px'; d.chip.style.transform = 'none'; }
-    else { d.chip.style.left = '50%'; d.chip.style.transform = 'translateX(-50%)'; }
-    // a visible boss bar (top centre) pushes the chip below it
-    const bb = document.getElementById('bossbar');
-    if (bb && !bb.classList.contains('hidden')) { const br = bb.getBoundingClientRect(); if (br.height > 0) top = Math.max(top, br.bottom + 4); }
-    d.chip.style.top = top + 'px';
-    d.chip.style.display = 'block';
+    layoutLeft();
   }
 
   // ---------- System tab ----------
@@ -294,7 +329,7 @@ body.touch #q21hud{display:none}
     if (q.pen) h += `<div class="q21-win q21-pen"><div class="q21-head">${esc(penName().toUpperCase())}</div><div>Còn <b>${fmtT(q.pen.t)}</b> — không thể dịch chuyển hay dùng cuộn. Sống sót để nhận 5 ${esc(spName())}.</div></div>`;
     else if (q.penPending) h += `<div class="q21-win q21-pen"><div class="q21-head">${esc(R21(PEN_HEAD).toUpperCase())}</div><div>Hôm qua bạn chưa hoàn thành nhiệm vụ ngày. ${esc(penName())} bắt đầu sau ${Math.max(0, PEN_WAIT - Math.floor(q.penWait))} giây chơi ở thế giới mở.</div></div>`;
     h += `<div class="q21-win"><div class="q21-head">${esc(R21(DAILY_TITLE))}</div>`;
-    h += `<div class="q21-sub">${esc(R21(DAILY_SUB))} · ngày ${esc(q.day)} · ${L.filter(i => i.done).length}/${L.length}</div>`;
+    h += `<div class="q21-sub">${esc(R21(DAILY_SUB))} · ngày ${esc(String(q.day).replace(/^g/, ''))} · làm mới lúc 6:00 sáng · ${L.filter(i => i.done).length}/${L.length}</div>`;
     h += `<div class="q21-warn">⚠ ${WARN_TXT}</div>`;
     for (const it of L) {
       const pct = Math.min(100, it.prog / it.goal * 100);
@@ -342,6 +377,9 @@ body.touch #q21hud{display:none}
   const tick = G.v5Tick;
   G.v5Tick = function (dt) {
     tick.call(this, dt);
+    if (this.player !== hintPl) { hintPl = this.player; hintOn = true; hintT = 0; }   // a new game shows the key hint again
+    if (hintOn) { hintT += dt; if (hintT >= HINT_SEC) hintOn = false; }
+    const ml = document.getElementById('mmlabel'); if (ml) ml.classList.toggle('q-hint-off', !hintOn);
     const q = qs(), P = this.player;
     if (!q || !P || isGuest()) return;
     pingT++;

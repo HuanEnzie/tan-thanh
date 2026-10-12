@@ -5,7 +5,7 @@
 //   G.chaseLost(z, tgt, bd, sight) true -> the chaser gives up and goes to look where it last saw the target
 //   G.canTrack(z)                 false -> no path-finding to the player (it only walks to lastSeen)
 // State: G.player.crouch (not saved), G.player.scentT / scentK ('mud' | 'gas'), G.v10.surv.expert (saved).
-// Keys: Ctrl = khom / đứng, P = xoá mùi (bùn cạnh nước, hoặc 1 Can xăng). Touch: nút KHOM, nút MÙI (chế độ chuyên gia).
+// Keys: CapsLock (Ctrl too in the installed app) = khom / đứng, P = xoá mùi (bùn cạnh nước, hoặc 1 Can xăng). Touch: nút KHOM, nút MÙI (chế độ chuyên gia).
 (function () {
   const CONE = 65 * Math.PI / 180;            // enemies that are not chasing see ±65° in front
   const REAR = 0.3, CROUCH_SEE = 0.5, CROUCH_CHASE = 0.7, INVEST = 0.8;
@@ -101,7 +101,7 @@
     on = !!on && !P.car && !P.boat;
     if (!!P.crouch === on) return;
     P.crouch = on;
-    this.toast(on ? 'Khom lưng: đi chậm, không gây tiếng động, quái khó thấy hơn.' : 'Đứng dậy.', 'info');
+    this.toast(on ? 'Khom lưng [CapsLock]: đi chậm, không gây tiếng động, quái khó thấy hơn.' : 'Đứng dậy.', 'info');
     hud(true);
   };
 
@@ -241,8 +241,16 @@ body.touch #st22{bottom:calc(64px + env(safe-area-inset-bottom,0px));font-size:1
   window.addEventListener('keydown', e => {
     if (G.state !== 'playing' || e.repeat || UI.dialogOpen) return;
     const tag = e.target && e.target.tagName; if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-    if (e.code === 'ControlLeft' || e.code === 'ControlRight') G.setCrouch(!G.player.crouch);
+    // CapsLock everywhere; Ctrl only in the installed app (in a browser tab Ctrl+W closes the page)
+    const app = typeof PWA !== 'undefined' && PWA.standalone();
+    if (e.code === 'CapsLock' || (app && (e.code === 'ControlLeft' || e.code === 'ControlRight'))) G.setCrouch(!G.player.crouch);
     else if (e.code === 'KeyP' && G.isExpert()) G.maskScent();
+  });
+  // browser tab: ask before closing while playing (Ctrl+W, closing the tab by mistake); the game is saved first
+  window.addEventListener('beforeunload', e => {
+    if (window.noLeaveGuard || G.state !== 'playing' || (typeof PWA !== 'undefined' && PWA.standalone())) return;
+    try { G.save(); } catch (err) {}
+    e.preventDefault(); e.returnValue = '';
   });
   G.stealthStat = () => ({ crouch: !!(G.player && G.player.crouch), lost: ST.lost || 0, expert: G.isExpert(), scent: G.scentRange() });
 })();

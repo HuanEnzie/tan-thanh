@@ -286,8 +286,37 @@
     SYS.msg(TUT_STEPS[i].text, 'quest');
     save();
   }
+  // khung hướng dẫn: thẻ nhỏ dưới khung nhiệm vụ (#qcol), hiện bước đầu tiên chưa xong; ẩn khi đủ 5 bước hoặc không ở chế độ Sinh tồn
+  function tutRender() {
+    const P = G.player, s = svRead();
+    const total = TUT_STEPS.length, done = s && s.tut ? s.tut.length : 0;
+    const show = !!(s && s.mode === 'survival' && done < total && P && !P.dead && !(typeof Net !== 'undefined' && Net.guest));
+    let el = document.getElementById('v22tut');
+    if (!show) { if (el) el.remove(); return; }
+    if (!document.getElementById('v22tut-css')) {
+      const st = document.createElement('style'); st.id = 'v22tut-css';
+      st.textContent = `#v22tut{background:var(--panel);border:1px solid rgba(255,207,58,.45);border-left:3px solid var(--gold);padding:4px 8px 5px;font-size:18px;line-height:1.08;color:var(--text);text-align:left;pointer-events:none}
+#v22tut b{display:block;color:var(--gold);font-size:16px;font-weight:normal;letter-spacing:1px}
+#v22tut span{display:block}
+body.touch #v22tut{font-size:14px;padding:2px 5px 3px}
+body.touch #v22tut b{font-size:12px}`;
+      document.head.appendChild(st);
+    }
+    if (!el) { el = document.createElement('div'); el.id = 'v22tut'; }
+    const host = document.getElementById('qcol') || document.getElementById('topleft');
+    if (host && el.parentNode !== host) host.appendChild(el);
+    const k = TUT_STEPS.findIndex((st, i) => !(s.tut || []).includes(i));
+    const key = done + ':' + k;
+    if (el.dataset.key !== key) {
+      el.dataset.key = key;
+      el.innerHTML = '';
+      const h = document.createElement('b'); h.textContent = `HƯỚNG DẪN SINH TỒN · ${done}/${total}`;
+      const t = document.createElement('span'); t.textContent = TUT_STEPS[k].text;
+      el.append(h, t);
+    }
+  }
   const v5t = G.v5Tick;
-  G.v5Tick = function (dt) { v5t.call(this, dt); if (this.frame % 60 === 0) tutorialTick(); };
+  G.v5Tick = function (dt) { v5t.call(this, dt); if (this.frame % 60 === 0) tutorialTick(); if (this.frame % 30 === 0) tutRender(); };
 
   // ---------- hồi sinh ----------
   function respawn() {

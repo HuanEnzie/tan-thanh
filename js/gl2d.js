@@ -423,7 +423,7 @@ ${Array.from({ length: UNITS }, (_, i) => `  ${i ? 'else ' : ''}if (vT == ${i}) 
         const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: false, powerPreference: 'high-performance' });
         if (!gl) return null;
         const c = new Ctx(canvas, gl);
-        canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); setTimeout(() => location.reload(), 300); });
+        canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); window.noLeaveGuard = 1; setTimeout(() => location.reload(), 300); });
         return c;
       } catch (e) { console.warn('GL2D off:', e); return null; }
     },

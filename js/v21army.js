@@ -18,7 +18,7 @@
     },
     rise: 0.07, riseT: 0.5, pool: 0.9,                                 // ARISE: cách nhau, thời gian trồi lên, vũng tối (giây)
   };
-  const MODE_NAME = { fight: 'Chiến đấu', loot: 'Nhặt đồ', wood: 'Đốn gỗ' };
+  const MODE_NAME = { guard: '🛡 Bảo vệ', fight: 'Chiến đấu', loot: 'Nhặt đồ', wood: 'Đốn gỗ' };
   const ORDER_JOBS = [['gather', 'Thu thập'], ['hunt', 'Săn bắt'], ['herb', 'Hái thuốc'], ['mine', 'Đào mỏ']];
   // weaker shadows: the base stats are edited in place (the stat wrapper below scales them by level)
   for (const t of ARMY.order) Object.assign(SH_TIER[t], { hp: ARMY.hp[t], dmg: ARMY.dmg[t], cost: ARMY.cost[t] });
@@ -190,7 +190,9 @@
       G.toast(`Không đủ sức chứa linh hồn (${soulLoad()}/${soulCap()}) — tăng INT/cấp hoặc giải phóng bớt bóng.`, 'warn');
       return;
     }
-    return ex.call(this, c);
+    const n0 = this.v10.shadows.length, r = ex.call(this, c);
+    const s = this.v10.shadows[n0]; if (s && !s.mode) s.mode = 'guard';   // a new shadow starts as a guard; saved modes stay
+    return r;
   };
   // stats: the level and INT curves are reshaped; the ratio keeps every earlier multiplier (realm, dark kingdom, rank)
   const sst = G.shStats;
@@ -228,6 +230,10 @@
     const v = G.v10, P = G.player;
     if (!v || !P) return;
     if (fixedFor !== v) { fixedFor = v; armySanitize(); }
+    // one toast each time the player starts crouching with guard shadows out
+    const cr = !!(P.crouch && !P.car);
+    if (cr && !G._armyCrouch && armyAllies().some(a => effMode(a) === 'guard')) G.toast(`${SM().icon} Khom lưng: ${SM().unit} đang ra trận chuyển sang 🛡 Bảo vệ, không khiêu khích quái. Đứng dậy để trở lại chế độ cũ.`, 'info');
+    G._armyCrouch = cr;
     const q = G._riseQ;
     while (q && q.length && (q[0].a.dead || G.time >= q[0].at)) {
       const e = q.shift(); if (e.a.dead) continue;
@@ -287,11 +293,54 @@
     }
   };
 
+  // ---------- Bảo vệ (guard): bóng giữ bên người chơi, chỉ đánh quái đã biết mình (đang truy đuổi, hoặc vừa đánh trúng người/bóng) ----------
+  // the mode a summon acts on now: a crouching player turns every summon into a guard, except the explicit job modes
+  const JOB_MODES = ['wood', 'mine'];
+  const GUARD = { leash: 300, hitT: 4 };   // px from the player; seconds an enemy stays aware after it hit the player or an ally
+  function effMode(a) {
+    const s = a.sid != null ? G.shById(a.sid) : null, m = s ? s.mode || 'loot' : 'loot', P = G.player;
+    if (JOB_MODES.includes(m)) return m;
+    return P && P.crouch && !P.car ? 'guard' : m;
+  }
+  const aware = z => z.state === 'chase' || (z._hitT != null && G.time - z._hitT < GUARD.hitT);
+  // the hits on the player or on an ally mark the enemy that dealt them
+  const ht = G.hurtTarget;
+  G.hurtTarget = function (t, dmg, src) {
+    const P = this.player;
+    if (src && typeof src === 'object' && P && (t === P || t === P.car || t instanceof Ally)) src._hitT = this.time;
+    return ht.call(this, t, dmg, src);
+  };
+  // a guard picks only aware enemies near the player; the rest of the time it simply follows
+  const ne = Ally.prototype.nearestEnemy;
+  Ally.prototype.nearestEnemy = function (range) {
+    if (this.kind !== 'shadow' || effMode(this) !== 'guard') return ne.call(this, range);
+    const P = G.player; let best = null, bd = range;
+    for (const z of G.zgrid.query(this.x, this.y, range)) {
+      if (z.dead || z.rise > 0 || !aware(z) || dist(z.x, z.y, P.x, P.y) > GUARD.leash) continue;
+      const d = dist(this.x, this.y, z.x, z.y);
+      if (d < bd && World.los(this.x, this.y, z.x, z.y)) { bd = d; best = z; }
+    }
+    return best;
+  };
+  // a guard does not run off to pick up drops (lootStep is the global of js/v11.js, called from its Ally wrapper)
+  const ls = lootStep;
+  lootStep = function (a, dt) { return effMode(a) === 'guard' ? false : ls(a, dt); };
+
   // ---------- the army panel of the inventory: a door to the System tab, and the soul warning ----------
   const bs = UI.buildShadows;
   UI.buildShadows = function () {
     bs.call(this);
     const box = document.getElementById('invBody'); if (!box || !G.v10) return;
+    // the mode row of each free shadow (v11ui) gets the guard button; the status line says "bảo vệ" for it
+    box.querySelectorAll('.pbtn.modes').forEach(row => {
+      const b0 = row.querySelector('[data-sm]'), s = b0 && G.shById(+b0.dataset.sm.split(':')[0]);
+      if (!s || row.querySelector('[data-sm$=":guard"]')) return;
+      row.insertAdjacentHTML('beforeend', `<button class="${s.mode === 'guard' ? 'on' : 'ghost'}" data-sm="${s.id}:guard">🛡 Bảo vệ</button>`);
+      const nb = row.lastElementChild; UI.bindBtn(nb);
+      nb.onclick = () => { s.mode = 'guard'; const a = G.shadowAlly(s); if (a) { a.chopP = null; a.lootIt = null; } UI.buildInv(); };
+      const st = row.closest('.pc10') && row.closest('.pc10').querySelector('.pstat');
+      if (st && s.mode === 'guard' && G.shadowAlly(s)) st.textContent = st.textContent.replace('chiến đấu', 'bảo vệ');
+    });
     const over = soulLoad() > soulCap();
     box.insertAdjacentHTML('afterbegin', `<div class="pbtn"><button id="a21open">⚑ Mở ${esc21(SM().army)} (Hệ thống)</button>${over ? `<small class="a21warn">Sức chứa linh hồn vượt: ${soulLoad()}/${soulCap()}</small>` : ''}</div>`);
     const b = document.getElementById('a21open'); UI.bindBtn(b);

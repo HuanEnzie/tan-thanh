@@ -53,8 +53,16 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 
 ## Bản v22: Sinh tồn, Đỡ đòn, Thây ma, Tầm nhìn
 
+- **v22.2**:
+  - Lính bóng có chế độ **🛡 Bảo vệ** (mặc định cho bóng mới): chỉ đánh quái đã phát hiện / đang tấn công bạn; khi bạn khom lưng, bóng tự chuyển sang bảo vệ.
+  - **Tháo dỡ công trình**: trong chế độ xây [B], bấm Delete hoặc nút ⛏ Tháo dỡ, giữ E / chuột trái 0,6 giây. Trả lại vật phẩm (hỏng nặng thì trả một nửa nguyên liệu); rương trả đồ vào túi.
+  - Nhiệm vụ hằng ngày làm mới theo **ngày trong game** (6:00 sáng); xong mà quên nhận thì tự nhận thưởng.
+  - Cột nhiệm vụ / hướng dẫn gọn ở góc trái (thu gọn được); dòng phím tắt tự ẩn sau 20 giây, F1 để hiện lại.
+  - Bảng Hệ thống giao diện cửa sổ game mới.
+  - Tầng trên có cửa sổ nhìn ra phố; đứng ngoài nhìn qua cửa / cửa sổ thấy được một phần trong nhà.
+
 - **Lẩn trốn**:
-  - Khom lưng [Ctrl / nút KHOM] để đi chậm, không có tiếng bước chân, quái khó thấy hơn.
+  - Khom lưng [CapsLock / nút KHOM; bản app cài đặt dùng được cả Ctrl] để đi chậm, không có tiếng bước chân, quái khó thấy hơn.
   - Quái chưa phát hiện chỉ nhìn thấy phía trước mặt; đi thường gây tiếng động nhỏ (75 px), chạy và bắn ồn hơn.
   - Khuất tầm nhìn khoảng 2,5 giây là quái bỏ đuổi và đi tìm chỗ thấy bạn lần cuối (dấu ? / !).
   - Khom lưng đánh cận chiến vào quái chưa phát hiện: Ám sát ×2,5 sát thương.
@@ -214,7 +222,7 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 | N | Hệ Thống |
 | B | Chế độ xây (E / chuột trái: đặt, [ ]: đổi vật) |
 | Chuột phải | Xô / Đỡ đòn |
-| Ctrl | Khom lưng / đứng dậy (đi chậm, không gây tiếng động, khó bị thấy) |
+| CapsLock (bản app: cả Ctrl) | Khom lưng / đứng dậy (đi chậm, không gây tiếng động, khó bị thấy) |
 | P | Xoá mùi: trát bùn cạnh nước, hoặc tẩm Can xăng (Sinh tồn chuyên gia) |
 | E | Tương tác, mở rương, mua bán |
 | U | Truyền tống |

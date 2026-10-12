@@ -418,6 +418,7 @@ G.render = function () {
       vis.push([b, x, y, w, h]);
     }
   }
+  if (G.revealTick) G.revealTick(vis);                 // v22floors: doors and windows open the roof near the player
   ctx.fillStyle = 'rgba(0,0,0,0.3)';
   for (const [b, x, y, w, h] of vis) { ctx.globalAlpha = b.roofAlpha; ctx.fillRect(x + 10, y + 12, w, h); }
   ctx.globalAlpha = 1;
@@ -445,7 +446,7 @@ G.render = function () {
     ctx.globalAlpha = p.alpha; drawPropImg(p, 0, 0);
     ctx.globalAlpha = 1;
   }
-  for (const [b, x, y, w, h] of vis) drawRoof(b, x, y, w, h);
+  for (const [b, x, y, w, h] of vis) drawRoofBlock(b, x, y, w, h);
   drawObjective();
   Floaters.draw(ctx);
   // colored light glows
@@ -509,29 +510,38 @@ function drawProp(p) {
   if (p.kind === 'barricade') { ctx.fillStyle = '#000'; ctx.fillRect(p.x - 12, p.y - 16, 24, 3); ctx.fillStyle = '#c8a050'; ctx.fillRect(p.x - 12, p.y - 16, 24 * p.hp / (160 + G.player.level * 10), 3); }
 }
 const ROOF_PATS = {};
-function drawRoof(b, x, y, w, h) {
-  if (b.roofAlpha < 0.02) { drawDoors(b); return; }
-  ctx.globalAlpha = b.roofAlpha;
-  if (!ROOF_PATS[b.roof]) { ROOF_PATS[b.roof] = ctx.createPattern(IMG[b.roof] || IMG.tex_roof, 'repeat'); ROOF_PATS[b.roof].setTransform(new DOMMatrix().scale(0.5)); }
-  ctx.fillStyle = ROOF_PATS[b.roof];
-  ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
+// paints one roof into g: the main ctx, or an offscreen reveal canvas (pats = that canvas's pattern cache, a = its alpha)
+function drawRoof(b, x, y, w, h, g = ctx, pats = ROOF_PATS, a = b.roofAlpha) {
+  if (a < 0.02) return;
+  g.globalAlpha = a;
+  if (!pats[b.roof]) { pats[b.roof] = g.createPattern(IMG[b.roof] || IMG.tex_roof, 'repeat'); pats[b.roof].setTransform(new DOMMatrix().scale(0.5)); }
+  g.fillStyle = pats[b.roof];
+  g.fillRect(x - 3, y - 3, w + 6, h + 6);
   const tints = ['rgba(90,60,30,0.18)', 'rgba(30,50,70,0.18)', 'rgba(60,70,40,0.16)', 'rgba(0,0,0,0.15)', 'rgba(120,100,80,0.12)', 'rgba(0,0,0,0)'];
-  ctx.fillStyle = tints[b.seed % tints.length]; ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
-  ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 4; ctx.strokeRect(x - 1, y - 1, w + 2, h + 2);
-  ctx.strokeStyle = RL.id === 'cy' ? 'rgba(255,79,216,0.5)' : 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1; ctx.strokeRect(x + 3, y + 3, w - 6, h - 6);
-  if (b.roof !== RL.roofs[0] || RL.style === 'ancient' || RL.style === 'sect') { ctx.fillStyle = 'rgba(0,0,0,0.25)'; if (w > h) ctx.fillRect(x, y + h / 2 - 2, w, 4); else ctx.fillRect(x + w / 2 - 2, y, 4, h); }
+  g.fillStyle = tints[b.seed % tints.length]; g.fillRect(x - 3, y - 3, w + 6, h + 6);
+  g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 4; g.strokeRect(x - 1, y - 1, w + 2, h + 2);
+  g.strokeStyle = RL.id === 'cy' ? 'rgba(255,79,216,0.5)' : 'rgba(255,255,255,0.12)'; g.lineWidth = 1; g.strokeRect(x + 3, y + 3, w - 6, h - 6);
+  if (b.roof !== RL.roofs[0] || RL.style === 'ancient' || RL.style === 'sect') { g.fillStyle = 'rgba(0,0,0,0.25)'; if (w > h) g.fillRect(x, y + h / 2 - 2, w, 4); else g.fillRect(x + w / 2 - 2, y, 4, h); }
   const rnd = mulberry32(b.seed);
   const n = Math.floor(w * h / 9000) + 1;
   if (RL.style === 'modern' || RL.style === 'cyber') for (let i = 0; i < n; i++) {
     const ux = x + 12 + rnd() * (w - 44), uy = y + 12 + rnd() * (h - 36);
-    if (rnd() < 0.6) { ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(ux + 3, uy + 3, 22, 16); ctx.fillStyle = RL.id === 'cy' ? '#3a3f55' : '#8d9196'; ctx.fillRect(ux, uy, 22, 16); ctx.fillStyle = RL.id === 'cy' ? '#3cf0ff' : '#5d6166'; for (let k = 0; k < 4; k++) ctx.fillRect(ux + 3 + k * 5, uy + 3, 3, 10); }
-    else { ctx.fillStyle = '#4a4d52'; ctx.beginPath(); ctx.arc(ux + 6, uy + 6, 6, 0, TAU); ctx.fill(); ctx.fillStyle = '#2a2c30'; ctx.beginPath(); ctx.arc(ux + 6, uy + 6, 3, 0, TAU); ctx.fill(); }
+    if (rnd() < 0.6) { g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(ux + 3, uy + 3, 22, 16); g.fillStyle = RL.id === 'cy' ? '#3a3f55' : '#8d9196'; g.fillRect(ux, uy, 22, 16); g.fillStyle = RL.id === 'cy' ? '#3cf0ff' : '#5d6166'; for (let k = 0; k < 4; k++) g.fillRect(ux + 3 + k * 5, uy + 3, 3, 10); }
+    else { g.fillStyle = '#4a4d52'; g.beginPath(); g.arc(ux + 6, uy + 6, 6, 0, TAU); g.fill(); g.fillStyle = '#2a2c30'; g.beginPath(); g.arc(ux + 6, uy + 6, 3, 0, TAU); g.fill(); }
   }
-  if (b.name && b.roofAlpha > 0.5 && w > 160 && G.player && dist(G.player.x, G.player.y, x + w / 2, y + h / 2) < 420) {
-    ctx.font = '14px VT323, monospace'; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillText(b.name, x + w / 2 + 1, y + h / 2 + 5);
-    ctx.fillStyle = 'rgba(255,240,210,0.75)'; ctx.fillText(b.name, x + w / 2, y + h / 2 + 4);
+  if (b.name && a > 0.5 && w > 160 && G.player && dist(G.player.x, G.player.y, x + w / 2, y + h / 2) < 420) {
+    g.font = '14px VT323, monospace'; g.textAlign = 'center'; g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillText(b.name, x + w / 2 + 1, y + h / 2 + 5);
+    g.fillStyle = 'rgba(255,240,210,0.75)'; g.fillText(b.name, x + w / 2, y + h / 2 + 4);
   }
-  ctx.globalAlpha = 1;
+  g.globalAlpha = 1;
+}
+// one building on screen: its roof (or the cached roof with the reveal cut out of it), then its doors
+function drawRoofBlock(b, x, y, w, h) {
+  if (b.roofAlpha >= 0.02) {
+    const rv = b._rv;
+    if (rv && rv.on && rv.rc) { ctx.globalAlpha = b.roofAlpha; ctx.drawImage(rv.rc, x - 3, y - 3, w + 6, h + 6); ctx.globalAlpha = 1; }
+    else drawRoof(b, x, y, w, h);
+  }
   drawDoors(b);
 }
 function drawObjective() {
