@@ -31,6 +31,7 @@ const Sfx18 = (() => {
       case 'heal': [523, 659, 784, 1047, 1319].forEach((f, i) => tone('sine', f, f * 1.01, i * 0.09, 0.9, 0.1)); tone('sine', 262, 262, 0, 1.1, 0.12); break;
       case 'void': tone('sine', 900, 60, 0, 1.0, 0.4); noise('lowpass', 3000, 90, 0, 1.0, 0.7); tone('sine', 55, 30, 0.7, 0.7, 0.9); break;
       case 'dash': noise('bandpass', 600, 6000, 0, 0.28, 0.6); tone('sine', 300, 1200, 0, 0.2, 0.2); break;
+      case 'scare': tone('sawtooth', 1900, 420, 0, 0.5, 0.2, 3000); tone('sine', 1300, 2600, 0.02, 0.35, 0.12); noise('highpass', 2500, 6000, 0, 0.3, 0.35); tone('sine', 58, 26, 0.04, 0.8, 1); break;
       default: tone('sine', 120, 40, 0, 0.6, 0.7);
     }
   }

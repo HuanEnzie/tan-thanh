@@ -1,0 +1,65 @@
+{
+ "furn21_mod_1": [
+  "ref21_props_md",
+  "ref21_sl_props"
+ ],
+ "furn21_mod_2": [
+  "ref21_props_md",
+  "ref21_sl_props"
+ ],
+ "furn21_mod_3": [
+  "ref21_props_md",
+  "ref21_sl_props"
+ ],
+ "furn21_tt_1": [
+  "ref21_tt_props",
+  "ref21_sl_props"
+ ],
+ "furn21_tt_2": [
+  "ref21_tt_props",
+  "ref21_sl_props"
+ ],
+ "furn21_tt_3": [
+  "ref21_tt_props",
+  "ref21_sl_props"
+ ],
+ "terr21_1": [
+  "ref21_nature",
+  "ref21_tt_props"
+ ],
+ "terr21_2": [
+  "ref21_nature",
+  "ref21_tt_props"
+ ],
+ "terr21_3": [
+  "ref21_nature",
+  "ref21_tt_props"
+ ],
+ "icon21_items": [
+  "ref21_items1"
+ ],
+ "icon21_base": [
+  "ref21_items1"
+ ],
+ "tex21_ice": [
+  "ref21_tex_ice"
+ ],
+ "tex21_cliff": [
+  "ref21_tex_dirt"
+ ],
+ "tex21_bridge": [
+  "ref21_tex_wood"
+ ],
+ "tex21_hosp": [
+  "ref21_tex_tile"
+ ],
+ "tex21_mall": [
+  "ref21_tex_sidewalk"
+ ],
+ "tex21_wood2": [
+  "ref21_tex_wood"
+ ],
+ "tex21_moss": [
+  "ref21_tex_grass"
+ ]
+}

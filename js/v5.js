@@ -616,7 +616,7 @@ Object.assign(UI, {
         if (on) this.mapHits.push({ x: mx, y: my, tp: G.tpList().find(t => t.kind === 'wp' && Math.abs(t.x - on.x) < 5 && Math.abs(t.y - on.y) < 5) });
       }
     }
-    if (v.basePos) { const [mx, my] = toM(v.basePos.x, v.basePos.y); this.mapIcon(g, mx, my, '⌂', '#6dff7a', 24); this.mapHits.push({ x: mx, y: my, tp: G.tpList().find(t => t.kind === 'base') }); }
+    if (v.basePos) { const [mx, my] = toM(v.basePos.x, v.basePos.y); if (typeof drawBaseBadge === 'function') drawBaseBadge(g, mx, my, 24 * this.mapK); else this.mapIcon(g, mx, my, '⌂', '#6dff7a', 24); this.mapHits.push({ x: mx, y: my, tp: G.tpList().find(t => t.kind === 'base') }); }
     for (const t of Story.targets()) { const [x, y] = toM(t.x, t.y); g.strokeStyle = '#ffcf3a'; g.lineWidth = 3; g.beginPath(); g.arc(clamp(x, 10, c.width - 10), clamp(y, 10, c.height - 10), 9, 0, TAU); g.stroke(); }
     const [px, py] = toM(P.x, P.y);
     g.save(); g.translate(px, py); g.scale(K, K); g.rotate(G.player.car ? G.player.car.angle : G.player.angle);

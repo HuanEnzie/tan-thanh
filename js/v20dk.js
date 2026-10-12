@@ -13,7 +13,7 @@ const DEMONS = [
   { n: 'Phá Quân', t: 'Tướng Quỷ Phá Giáp', relic: 'Ấn Phá Giáp', fx: { dmg: 0.06, pierce: 0.12 }, text: '+6% sát thương, xuyên một phần miễn nhiễm của Quỷ Vương', col: '#ffa31a', lore: 'Chưa có tấm khiên nào hắn không bẻ gãy.' },
   { n: 'Thiên Hạ', t: 'Tướng Quỷ Đệ Nhất', relic: 'Ấn Chúa Tể', fx: { dmg: 0.05, dr: 0.05, sh: 0.10 }, text: '+5% sát thương, −5% sát thương nhận, bóng +10% sát thương', col: '#ff3b3b', lore: 'Kẻ đứng cạnh ngai vàng, cũng là kẻ gác cổng.' },
 ];
-const KING_NAME = 'QUỶ VƯƠNG BARAN';
+let KING_NAME = 'QUỶ VƯƠNG BARAN'; // theo thế giới: v21realm.js đặt lại khi G.spawnKing
 const DKP = {
   nDead() { let n = 0; for (const k in this.gen) if (this.gen[k]) n++; return n; },
   nRel() { let n = 0; for (const k in this.relics) if (this.relics[k]) n++; return n; },
@@ -114,7 +114,7 @@ Object.assign(G, {
     dk.key = 1; dk.kingFound = 1;
     const lines = [
       { who: 'sys', text: 'Mười hai phong ấn cùng vỡ. Mười hai mảnh tàn dư bay lên không trung, xoay quanh bạn rồi dệt thành một vật lạnh buốt trong lòng bàn tay: Chìa Khóa Quỷ Vương.' },
-      { who: 'sys', text: '[HỆ THỐNG] Cổng Quỷ Vương đã hiện trên bản đồ. Có thể dịch chuyển tới đó.' },
+      { who: 'sys', text: R21(SYS_TAG) + ' Cổng Quỷ Vương đã hiện trên bản đồ. Có thể dịch chuyển tới đó.' },
       { who: 'sys', text: `Nhưng hãy nhớ: nếu thiếu Ấn của bất kỳ Tướng Quỷ nào, Quỷ Vương sẽ miễn nhiễm mọi sát thương vật lý lẫn phép thuật. Bạn hiện giữ ${dk.nRel()}/12 Ấn.` },
     ];
     UI.dialog({ lines, title: 'CHÌA KHÓA QUỶ VƯƠNG', cinematic: true });
@@ -142,7 +142,7 @@ Object.assign(G, {
     const dk = this.dkState(); dk.done = 1;
     const lines = [
       { who: 'sys', text: 'Quỷ Vương gục xuống. Mười hai ngọn lửa trên các bàn thờ cùng tắt, và những khe nứt trên bầu trời khép lại, từng cái một.' },
-      { who: 'sys', text: '[HỆ THỐNG] Dao động mana đã biến mất. Sẽ không còn Cổng nào mở nữa.' },
+      { who: 'sys', text: R21(SYS_TAG) + ' Dao động ' + manaName().toLowerCase() + ' đã biến mất. Sẽ không còn ' + gateName() + ' nào mở nữa.' },
       { who: 'sys', text: 'Những Cổng còn lại chỉ là hầm ngục bỏ hoang. Thế giới đã được trả lại cho bạn.' },
     ];
     setTimeout(() => UI.dialog({ lines, title: 'QUỶ VƯƠNG GỤC NGÃ', cinematic: true, onDone: () => { UI.victory(false); $('winTitle').textContent = 'QUỶ VƯƠNG ĐÃ GỤC NGÃ'; $('winSub').textContent = 'Mười hai Tướng Quỷ và Quỷ Vương đã bị đánh bại. Cổng không còn mở nữa.'; } }), 4000);

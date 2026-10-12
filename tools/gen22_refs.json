@@ -1,0 +1,186 @@
+{
+ "mon22_md": [
+  "ref22_chars",
+  "ref22_props_md"
+ ],
+ "mon22_sl": [
+  "ref22_chars",
+  "ref22_sl_props"
+ ],
+ "mon22_tt": [
+  "ref22_chars",
+  "ref22_tt_props"
+ ],
+ "zom22_mod": [
+  "ref22_chars",
+  "ref22_props_md"
+ ],
+ "zom22_sl": [
+  "ref22_chars",
+  "ref22_sl_props"
+ ],
+ "zom22_tt": [
+  "ref22_chars",
+  "ref22_tt_props"
+ ],
+ "boss22_dg_1": [
+  "ref22_bosses",
+  "ref22_sl_props"
+ ],
+ "boss22_dg_2": [
+  "ref22_bosses",
+  "ref22_sl_props"
+ ],
+ "boss22_king": [
+  "ref22_bosses",
+  "ref22_tt_props",
+  "ref22_sl_props"
+ ],
+ "mech22": [
+  "ref22_sl_props",
+  "ref22_props_md"
+ ],
+ "ruin22_mod_1": [
+  "ref22_nature",
+  "ref22_props_md"
+ ],
+ "ruin22_mod_2": [
+  "ref22_props_md",
+  "ref22_sl_props"
+ ],
+ "ruin22_tt": [
+  "ref22_tt_props",
+  "ref22_nature"
+ ],
+ "bld22_mod_1": [
+  "ref22_props_md",
+  "ref22_sl_props"
+ ],
+ "bld22_mod_2": [
+  "ref22_props_md",
+  "ref22_nature"
+ ],
+ "bld22_tt_1": [
+  "ref22_tt_props",
+  "ref22_sl_props"
+ ],
+ "bld22_tt_2": [
+  "ref22_tt_props",
+  "ref22_nature"
+ ],
+ "bld22_common": [
+  "ref22_sl_props",
+  "ref22_nature"
+ ],
+ "icon22_1": [
+  "ref22_items1"
+ ],
+ "icon22_2": [
+  "ref22_items1"
+ ],
+ "icon22_3": [
+  "ref22_items1"
+ ],
+ "icon22_4": [
+  "ref22_items1"
+ ],
+ "icon22_cry_mod": [
+  "ref22_items1"
+ ],
+ "icon22_cry_tt": [
+  "ref22_items1"
+ ],
+ "node22_mod": [
+  "ref22_nature",
+  "ref22_props_md"
+ ],
+ "node22_tt": [
+  "ref22_nature",
+  "ref22_tt_props"
+ ],
+ "furn22_mod_1": [
+  "ref22_props_md",
+  "ref22_sl_props"
+ ],
+ "furn22_mod_2": [
+  "ref22_props_md",
+  "ref22_sl_props"
+ ],
+ "furn22_mod_3": [
+  "ref22_props_md",
+  "ref22_sl_props"
+ ],
+ "furn22_tt_1": [
+  "ref22_tt_props",
+  "ref22_sl_props"
+ ],
+ "furn22_tt_2": [
+  "ref22_tt_props",
+  "ref22_sl_props"
+ ],
+ "ter22_1": [
+  "ref22_nature",
+  "ref22_tt_props"
+ ],
+ "ter22_2": [
+  "ref22_nature",
+  "ref22_tt_props"
+ ],
+ "tex22_roof_1": [
+  "ref22_tex_roof"
+ ],
+ "tex22_roof_2": [
+  "ref22_tex_roof"
+ ],
+ "tex22_roof_3": [
+  "ref22_tex_roof2"
+ ],
+ "tex22_roof_4": [
+  "ref22_tex_roof2"
+ ],
+ "tex22_roof_5": [
+  "ref22_tex_roof"
+ ],
+ "tex22_roof_6": [
+  "ref22_tex_roof"
+ ],
+ "tex22_roof_7": [
+  "ref22_tex_roof"
+ ],
+ "tex22_roof_8": [
+  "ref22_tex_tt_roof"
+ ],
+ "tex22_roof_9": [
+  "ref22_tex_tt_roof"
+ ],
+ "tex22_roof_10": [
+  "ref22_tex_roof"
+ ],
+ "tex22_roofdmg": [
+  "ref22_tex_roof"
+ ],
+ "tex22_sand": [
+  "ref22_tex_dirt"
+ ],
+ "tex22_farm": [
+  "ref22_tex_dirt"
+ ],
+ "tex22_paddy": [
+  "ref22_tex_grass"
+ ],
+ "tex22_redrock": [
+  "ref22_tex_dirt"
+ ],
+ "tex22_savanna": [
+  "ref22_tex_grass"
+ ],
+ "tex22_tundra": [
+  "ref22_tex_ice"
+ ],
+ "tex22_asphalt": [
+  "ref22_tex_sidewalk"
+ ],
+ "tex22_rubble": [
+  "ref22_tex_dirt"
+ ]
+}

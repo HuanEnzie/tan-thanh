@@ -114,8 +114,8 @@ Object.assign(G, {
     World.gateProp(rec);
     FX.pillar(rec.x, rec.y, RANK_COLOR[rank], 0.9, 60); Sound.at && Sound.at('sfx_portal', rec.x, rec.y, 0.5, 0.8);
     const dx = rec.x - P.x, dy = rec.y - P.y, dm = Math.round(Math.hypot(dx, dy) / TILE);
-    const msg = `Phát hiện dao động mana: Cổng hạng ${rank} vừa mở ở hướng ${dirName(dx, dy)}, cách khoảng ${dm}m. Quái sẽ tràn ra từ đó cho tới khi có người đóng Cổng.`;
-    if (RL.id === 'sl' && UI.radio) UI.radio(['[HỆ THỐNG] ' + msg]); else this.toast('⛩ ' + msg, 'warn');
+    const msg = `Phát hiện dao động ${manaName().toLowerCase()}: ${gateName()} hạng ${rank} vừa mở ở hướng ${dirName(dx, dy)}, cách khoảng ${dm}m. Quái sẽ tràn ra từ đó cho tới khi có người đóng ${gateName()}.`;
+    SYS.msg(msg, 'warn');
     return true;
   },
   gateMonster(r) {

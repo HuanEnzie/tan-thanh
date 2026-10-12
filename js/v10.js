@@ -237,7 +237,7 @@ Object.assign(G, {
   // ---------- teleport destinations ----------
   tpAll() {
     if (World.mode !== 'over') return [];
-    const v = this.v10, out = this.tpList().map(t => Object.assign({ icon: t.kind === 'base' ? '⌂' : t.kind === 'statue' ? '✦' : '◆', col: t.kind === 'base' ? '#6dff7a' : t.kind === 'statue' ? '#ffe6a0' : '#7dd8ff' }, t));
+    const v = this.v10, out = this.tpList().map(t => Object.assign({ icon: t.kind === 'base' ? (typeof baseIconHtml === 'function' ? baseIconHtml() : '⌂') : t.kind === 'statue' ? '✦' : '◆', col: t.kind === 'base' ? '#6dff7a' : t.kind === 'statue' ? '#ffe6a0' : '#7dd8ff' }, t));
     for (const k in v.gates) {
       const g = v.gates[k];
       if (v.gatesDone[gateKey(g.x, g.y)]) continue;

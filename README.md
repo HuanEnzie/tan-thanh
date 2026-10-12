@@ -51,6 +51,79 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 - **Lưu và tải file .json**: trong menu, chọn 💾 LƯU / TẢI FILE để xuất tiến độ ra file, sao chép mã, hoặc nạp lại từ file hay mã đã dán.
 - **Cửa nhà dễ thấy**: cửa vẽ trên mái, có ánh đèn hắt ra và mũi tên chỉ vào.
 
+## Bản v22: Sinh tồn, Đỡ đòn, Thây ma, Tầm nhìn
+
+- **Chế độ Sinh tồn** (mặc định khi tạo nhân vật; vẫn chọn được Cổ điển):
+  - Tỉnh dậy ở một vùng đất ngẫu nhiên, tay trắng, không có vũ khí.
+  - Chết không mất save: đồ rơi thành túi tại chỗ (💀 trên bản đồ). Hồi sinh ở giường đã đặt hoặc ở điểm xuất phát.
+  - Có gợi ý từng bước cho người mới.
+- **Thu thập & chế tạo kiểu Minecraft**:
+  - Nguyên liệu: gỗ, que, sợi cỏ, đá, đá lửa, quặng sắt, thỏi sắt, da, xương, vải, lõi quái.
+  - Công cụ (rìu, cuốc, giáo, kiếm sắt, cuốc tinh thể) giúp chặt và đào nhanh hơn.
+  - Có Bàn chế tạo và Lò nung (nấu quặng, nướng thịt).
+- **Xây dựng** (phím **B** / nút 🔨):
+  - Tường gỗ/đá/sắt, cửa, sàn, hàng rào, chông, đuốc, lửa trại.
+  - Giường (ngủ, đặt điểm hồi sinh), rương chứa đồ.
+  - Trận dịch chuyển (dịch chuyển miễn phí giữa các trận). Trận phòng thủ tự bắn quái, chạy bằng tinh thể.
+- **Đỡ đòn**:
+  - Quái vung đòn trước khi đánh: dấu **!** đỏ, chuyển vàng là lúc đỡ đẹp nhất.
+  - Nhấn chuột phải / nút ĐẨY đúng lúc để đỡ. Thành công thì quái choáng và đòn kế tiếp chí mạng ×2. Đạn bị dội ngược.
+  - Vòng đỏ là đòn không đỡ được: phải lướt né.
+- **12 Tướng Quỷ có cơ chế riêng**, mỗi tướng một cách khắc chế (xem Sổ tay):
+  - Mầm hồi máu phải phá, ảo cảnh và gương, tướng chỉ hiện hình trong ánh sáng.
+  - Tướng cướp bóng, tướng phản sát thương, tướng giáp phải đỡ đòn mới vỡ…
+  - Quỷ Vương đánh 3 giai đoạn.
+- **Quái mới**: vồ, cầm khiên, chui đất, triệu hồi, húc, hồi máu. Thêm boss mới.
+- **Thây ma**:
+  - Từ người biến thành (dân bị giết sẽ đứng dậy). Chỉ có trong nhà và ngoài đường, không có trong Cổng.
+  - Có loại biết chiêu (cựu thợ săn / tu sĩ), có cấp bậc tới Thây Ma Vương.
+  - Quái mạnh thêm 10% mỗi ngày. Cổng mở nhiều hơn.
+- **Tầm nhìn hình nón**:
+  - Không thấy sau lưng, trừ khi có bóng/đồng đội đứng đó. Quái có thể tấn công từ chỗ khuất.
+  - Có jumpscare khi bước vào nhà.
+  - Bật/tắt trong Cài đặt.
+- **Nhà nhiều tầng** (cầu thang lên tầng trên), 10 kiểu mái, nhà đổ nát kiểu tận thế.
+- **Công trình mới**:
+  - Hiện đại: trường học, đồn cảnh sát, trạm cứu hỏa, cây xăng, nhà thờ, nhà máy, kho hàng, khách sạn, chung cư, siêu thị, nhà thuốc, ngân hàng, trang trại, chốt quân sự.
+  - Tu tiên: võ đường, tàng kinh các, luyện đan phòng, tiêu cục, khách điếm, nha môn, chùa, lò rèn, chợ, nông trang.
+- **Địa hình mới**: bãi biển, đồng ruộng / ruộng lúa nước, hẻm núi đá đỏ, thảo nguyên, đài nguyên, rừng ngập mặn, rừng trúc, rừng chết.
+- **Tinh thể hạng E–S**:
+  - Tên theo thế giới. Tu Tiên: Linh Thạch Hạ Phẩm → Hỗn Độn Tinh Phách.
+  - Đào trong Cổng, giao cho bóng hoặc đồng đội khai thác. Đổi tinh thể lấy tiền.
+  - Lên hạng (cấp 10/20/30/40/50) cần tinh thể đúng hạng.
+  - Tu Tiên lên cấp chủ yếu bằng **hấp thụ linh thạch**.
+
+## Bản v21: Hệ Thống đầy đủ, Binh đoàn, độ khó
+
+- **Ba thế giới mở lại**: Tận Thế, Tu Tiên, Thợ Săn Cổng. Mỗi thế giới có tên gọi riêng: Cổng / Ổ dịch / Bí cảnh, Hệ Thống / Thiên Đạo, và Quỷ Vương riêng.
+- **Hệ Thống** (nút ◈ HỆ THỐNG trên màn hình, phím **N**, mở ở bất kỳ đâu):
+  - Trạng thái và cộng điểm thuộc tính.
+  - Điểm danh 7 ngày, gói tân thủ.
+  - Nhiệm vụ: hằng ngày, khẩn cấp, ẩn.
+  - Danh hiệu, Binh đoàn, Kỹ năng, Căn cứ.
+  - Cửa hàng bằng Điểm Hệ Thống, và Thu mua: bán đồ ở bất kỳ đâu với 60% giá.
+- **Nhiệm vụ hằng ngày**: bỏ dở thì hôm sau bị kéo vào **Vùng Phạt** 3 phút, không dịch chuyển được.
+- **Binh đoàn bóng**:
+  - Phân cấp: Quân vương → 2 Thủ lĩnh → mỗi Thủ lĩnh 2 Tinh anh → mỗi Tinh anh 4 lính.
+  - Gọi cả đội, gọi từng bóng, chọn đội nhanh cho phím K, phân công cả đội đi làm việc.
+  - Mỗi bóng chiếm *sức chứa linh hồn*, tức mana tối đa. Mỗi con khi gọi tốn mana, khi đứng ngoài thì hao mana mỗi giây. Hết mana thì bóng tự rút về.
+  - Gọi bóng có hiệu ứng **ARISE**.
+- **Độ khó**:
+  - EXP lên cấp tăng nhanh theo cấp: cấp 20 cần 7.750, bản cũ chỉ 2.034.
+  - Bóng hạ quái chỉ cho 35% EXP.
+  - Bóng yếu đi, chết thì hồi sinh lâu.
+  - Thuốc hồi máu theo % máu tối đa. Bom và lựu đạn mạnh theo cấp, đánh boss mạnh hơn.
+- **Đột phá có thể thất bại**: tỉ lệ giảm theo bậc. Thất bại thì EXP cấp hiện tại về 0 và bị **Phản phệ** 10 phút: −30% máu và mana tối đa. Đan Phá Cảnh tăng tỉ lệ.
+- **Dịch chuyển có giá**: miễn phí khi đứng ở Trạm, Tượng hoặc Căn cứ. Đứng ở chỗ khác thì tốn 1 Đá hồi hương.
+- **Thanh kỹ năng 4 ô** luôn hiện trên màn hình, mỗi ô có hồi chiêu riêng. Phím V hoặc Shift+1…4.
+- **Lục soát**: bụi cây, đá, tinh thể, tủ, kệ. Hệ Thống báo khi phát hiện rương gần đó, đánh dấu lên bản đồ, có nút 🧭 Chỉ đường hoặc dịch chuyển tới.
+- **Thế giới đa dạng**:
+  - Công trình: bệnh viện, trung tâm thương mại, quán ăn. Tu Tiên có Y Quán, Thương Hội, Tửu Lâu.
+  - Nội thất vẽ mới, đồ rơi hợp từng loại phòng. Có cầu qua sông.
+  - Địa hình mới: Núi Băng, Núi Tuyết, Rừng Nguyên Sinh, Đại Dương.
+- **Thủy quái chỉ chui ra từ Cổng Biển**: cổng mở trên mặt nước. Ra biển lâu thì chắc chắn có một cổng.
+- **Thương nhân**: hàng xoay vòng mỗi ngày theo 5 nhóm, có số lượng giới hạn, có "Hàng hiếm hôm nay". Có thêm Thuốc hồi Mana, Thuốc hồi phục cao cấp, Đá Thăng Hạng.
+
 ## Bản v5: Vùng, Tượng Thần, dịch chuyển, Căn cứ
 
 - **Vùng**:
@@ -127,8 +200,13 @@ Neon 2099 và Cổ Trang đang tạm đóng. Dữ liệu vẫn còn trong `js/re
 | W A S D | Di chuyển |
 | Space | Lướt |
 | Chuột trái | Tấn công |
-| Chuột phải | Đẩy lùi |
 | Q | Tuyệt kỹ |
+| V, Shift+1…4 | Kỹ năng ô 1…4 |
+| K / Shift+K | Gọi đội nhanh / thu hồi tất cả bóng |
+| J | Đổi chỗ với bóng |
+| N | Hệ Thống |
+| B | Chế độ xây (E / chuột trái: đặt, [ ]: đổi vật) |
+| Chuột phải | Xô / Đỡ đòn |
 | E | Tương tác, mở rương, mua bán |
 | U | Truyền tống |
 | 1–4 | Đổi vũ khí |
